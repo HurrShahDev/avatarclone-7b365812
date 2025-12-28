@@ -1,10 +1,28 @@
 import { Play } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import avatar1 from '@/assets/avatar-1.jpg';
+import avatar2 from '@/assets/avatar-2.jpg';
+import avatar3 from '@/assets/avatar-3.jpg';
 
 const samples = [
-  { name: 'Professional', similarity: 96, style: 'Corporate presenter' },
-  { name: 'Casual', similarity: 92, style: 'Friendly narrator' },
-  { name: 'News', similarity: 94, style: 'Broadcast quality' },
+  { 
+    name: 'Professional', 
+    similarity: 96, 
+    style: 'Corporate presenter',
+    image: avatar1,
+  },
+  { 
+    name: 'Casual', 
+    similarity: 92, 
+    style: 'Friendly narrator',
+    image: avatar2,
+  },
+  { 
+    name: 'News', 
+    similarity: 94, 
+    style: 'Broadcast quality',
+    image: avatar3,
+  },
 ];
 
 const GallerySection = () => {
@@ -16,16 +34,23 @@ const GallerySection = () => {
             Sample Avatars
           </h2>
           <p className="text-muted-foreground">
-            See what's possible with our technology.
+            See what's possible with our technology. These avatars were created with consent.
           </p>
         </div>
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-4xl mx-auto">
           {samples.map((sample) => (
             <div key={sample.name} className="card-simple overflow-hidden">
-              <div className="aspect-[4/5] bg-muted flex items-center justify-center relative group cursor-pointer">
-                <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-                  <Play className="w-6 h-6 text-primary ml-1" />
+              <div className="aspect-[4/5] relative group cursor-pointer">
+                <img 
+                  src={sample.image} 
+                  alt={`${sample.name} avatar sample`}
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-foreground/0 group-hover:bg-foreground/10 transition-colors flex items-center justify-center">
+                  <div className="w-14 h-14 rounded-full bg-background/90 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg">
+                    <Play className="w-6 h-6 text-primary ml-1" />
+                  </div>
                 </div>
                 <span className="absolute top-3 right-3 consent-badge">
                   Verified

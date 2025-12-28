@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { ArrowRight, Play } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import avatar1 from '@/assets/avatar-1.jpg';
 
 const HeroSection = () => {
   return (
@@ -51,14 +52,21 @@ const HeroSection = () => {
         {/* Preview Card */}
         <div className="mt-16 max-w-2xl mx-auto">
           <div className="card-simple p-6">
-            <div className="aspect-video rounded-lg bg-muted flex items-center justify-center mb-4">
-              <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
-                <Play className="w-6 h-6 text-primary ml-1" />
+            <div className="aspect-video rounded-lg overflow-hidden bg-muted flex items-center justify-center mb-4 relative group cursor-pointer">
+              <img 
+                src={avatar1} 
+                alt="Sample avatar preview"
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-foreground/10 flex items-center justify-center">
+                <div className="w-16 h-16 rounded-full bg-background/90 flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform">
+                  <Play className="w-6 h-6 text-primary ml-1" />
+                </div>
               </div>
             </div>
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium">Sample Avatar</p>
+                <p className="font-medium">Sample Avatar Demo</p>
                 <p className="text-sm text-muted-foreground">Voice similarity: 94%</p>
               </div>
               <span className="consent-badge">

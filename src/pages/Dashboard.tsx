@@ -6,6 +6,9 @@ import {
   CheckCircle, Loader2, AlertCircle, Sparkles, Menu
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import avatar1 from '@/assets/avatar-1.jpg';
+import avatar2 from '@/assets/avatar-2.jpg';
+import avatar3 from '@/assets/avatar-3.jpg';
 
 const sampleAvatars = [
   {
@@ -15,6 +18,7 @@ const sampleAvatars = [
     similarity: 84,
     status: 'ready',
     lastUpdated: 'Dec 20, 2025',
+    image: avatar1,
   },
   {
     id: 2,
@@ -23,6 +27,7 @@ const sampleAvatars = [
     similarity: 92,
     status: 'ready',
     lastUpdated: 'Dec 18, 2025',
+    image: avatar2,
   },
   {
     id: 3,
@@ -32,6 +37,7 @@ const sampleAvatars = [
     status: 'training',
     lastUpdated: 'Dec 22, 2025',
     progress: 67,
+    image: avatar3,
   },
   {
     id: 4,
@@ -41,6 +47,7 @@ const sampleAvatars = [
     status: 'failed',
     lastUpdated: 'Dec 19, 2025',
     error: 'Not enough audio',
+    image: avatar2,
   },
 ];
 
@@ -215,13 +222,15 @@ const Dashboard = () => {
             {/* Avatar Cards */}
             {sampleAvatars.map((avatar) => (
               <div key={avatar.id} className="card-simple overflow-hidden">
-                <div className="aspect-[4/5] bg-muted flex items-center justify-center relative group">
-                  <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
-                    <Sparkles className="w-8 h-8 text-primary/50" />
-                  </div>
+                <div className="aspect-[4/5] relative group">
+                  <img 
+                    src={avatar.image} 
+                    alt={`${avatar.name} avatar`}
+                    className="w-full h-full object-cover"
+                  />
 
                   {avatar.status === 'ready' && (
-                    <div className="absolute inset-0 flex items-center justify-center bg-foreground/0 group-hover:bg-foreground/5 transition-colors">
+                    <div className="absolute inset-0 flex items-center justify-center bg-foreground/0 group-hover:bg-foreground/10 transition-colors">
                       <div className="w-10 h-10 rounded-full bg-background flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow">
                         <Play className="w-4 h-4 text-primary ml-0.5" />
                       </div>
