@@ -2,62 +2,51 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   Plus, Search, Bell, Settings, LayoutDashboard, Wand2, Folder, CreditCard,
-  Play, Edit, Copy, Download, Trash2, MoreVertical, HardDrive, Cpu, Video,
-  CheckCircle, Loader2, AlertCircle, Sparkles, Sun, Moon
+  Play, Edit, Copy, Download, Trash2, HardDrive, Cpu, Video,
+  CheckCircle, Loader2, AlertCircle, Sparkles, Menu
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
-// Sample avatar data
 const sampleAvatars = [
   {
     id: 1,
     name: 'Aisha',
-    version: 'Voice Model v1',
+    version: 'v1',
     similarity: 84,
     status: 'ready',
     lastUpdated: 'Dec 20, 2025',
-    consentVerified: true,
   },
   {
     id: 2,
     name: 'Marcus',
-    version: 'Voice Model v2',
+    version: 'v2',
     similarity: 92,
     status: 'ready',
     lastUpdated: 'Dec 18, 2025',
-    consentVerified: true,
   },
   {
     id: 3,
     name: 'Sophie',
-    version: 'Voice Model v1',
+    version: 'v1',
     similarity: 88,
     status: 'training',
     lastUpdated: 'Dec 22, 2025',
-    consentVerified: true,
     progress: 67,
   },
   {
     id: 4,
     name: 'James',
-    version: 'Voice Model v1',
+    version: 'v1',
     similarity: 0,
     status: 'failed',
     lastUpdated: 'Dec 19, 2025',
-    consentVerified: true,
-    error: 'Not enough audio samples',
+    error: 'Not enough audio',
   },
 ];
 
 const Dashboard = () => {
-  const [isDark, setIsDark] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [showNotifications, setShowNotifications] = useState(false);
-
-  const toggleTheme = () => {
-    setIsDark(!isDark);
-    document.documentElement.classList.toggle('dark');
-  };
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const getStatusChip = (status: string, progress?: number) => {
     switch (status) {
@@ -72,7 +61,7 @@ const Dashboard = () => {
         return (
           <span className="status-chip training">
             <Loader2 className="w-3 h-3 animate-spin" />
-            Training {progress}%
+            {progress}%
           </span>
         );
       case 'failed':
@@ -90,122 +79,85 @@ const Dashboard = () => {
   return (
     <div className="min-h-screen bg-background flex">
       {/* Sidebar */}
-      <aside className="w-64 bg-sidebar border-r border-sidebar-border hidden lg:flex flex-col">
-        {/* Logo */}
-        <div className="p-6 border-b border-sidebar-border">
+      <aside className={`fixed inset-y-0 left-0 z-50 w-60 bg-sidebar border-r border-sidebar-border transform transition-transform lg:relative lg:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+        <div className="p-4 border-b border-sidebar-border">
           <Link to="/" className="flex items-center gap-2">
-            <div className="w-10 h-10 rounded-xl gradient-bg flex items-center justify-center">
-              <Sparkles className="w-5 h-5 text-primary-foreground" />
+            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
+              <Sparkles className="w-4 h-4 text-primary-foreground" />
             </div>
-            <span className="font-bold text-lg">
-              <span className="gradient-text">Avatar</span>
-              <span className="text-sidebar-foreground">Clone</span>
-            </span>
+            <span className="font-semibold">AvatarClone</span>
           </Link>
         </div>
 
-        {/* Navigation */}
-        <nav className="flex-1 p-4">
+        <nav className="p-3">
           <ul className="space-y-1">
-            <li>
-              <Link
-                to="/dashboard"
-                className="flex items-center gap-3 px-4 py-3 rounded-xl bg-sidebar-accent text-sidebar-accent-foreground font-medium"
-              >
-                <LayoutDashboard className="w-5 h-5" />
-                Dashboard
-              </Link>
-            </li>
-            <li>
-              <Link
-                to="/create"
-                className="flex items-center gap-3 px-4 py-3 rounded-xl text-sidebar-foreground hover:bg-sidebar-accent transition-colors"
-              >
-                <Wand2 className="w-5 h-5" />
-                Create Avatar
-              </Link>
-            </li>
-            <li>
-              <Link
-                to="/projects"
-                className="flex items-center gap-3 px-4 py-3 rounded-xl text-sidebar-foreground hover:bg-sidebar-accent transition-colors"
-              >
-                <Folder className="w-5 h-5" />
-                My Projects
-              </Link>
-            </li>
-            <li>
-              <Link
-                to="/billing"
-                className="flex items-center gap-3 px-4 py-3 rounded-xl text-sidebar-foreground hover:bg-sidebar-accent transition-colors"
-              >
-                <CreditCard className="w-5 h-5" />
-                Billing
-              </Link>
-            </li>
-            <li>
-              <Link
-                to="/settings"
-                className="flex items-center gap-3 px-4 py-3 rounded-xl text-sidebar-foreground hover:bg-sidebar-accent transition-colors"
-              >
-                <Settings className="w-5 h-5" />
-                Settings
-              </Link>
-            </li>
+            {[
+              { icon: LayoutDashboard, label: 'Dashboard', href: '/dashboard', active: true },
+              { icon: Wand2, label: 'Create Avatar', href: '/create' },
+              { icon: Folder, label: 'Projects', href: '/projects' },
+              { icon: CreditCard, label: 'Billing', href: '/billing' },
+              { icon: Settings, label: 'Settings', href: '/settings' },
+            ].map((item) => (
+              <li key={item.label}>
+                <Link
+                  to={item.href}
+                  className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm ${
+                    item.active
+                      ? 'bg-sidebar-accent text-sidebar-accent-foreground font-medium'
+                      : 'text-sidebar-foreground hover:bg-sidebar-accent'
+                  }`}
+                >
+                  <item.icon className="w-4 h-4" />
+                  {item.label}
+                </Link>
+              </li>
+            ))}
           </ul>
         </nav>
 
-        {/* Storage Info */}
-        <div className="p-4 border-t border-sidebar-border">
-          <div className="glass-card p-4">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium">Storage</span>
-              <span className="text-xs text-muted-foreground">2.4 / 5 GB</span>
-            </div>
-            <div className="progress-bar">
-              <div className="progress-bar-fill" style={{ width: '48%' }} />
-            </div>
+        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-sidebar-border">
+          <div className="text-xs text-muted-foreground mb-2">Storage: 2.4 / 5 GB</div>
+          <div className="progress-bar">
+            <div className="progress-bar-fill" style={{ width: '48%' }} />
           </div>
         </div>
       </aside>
 
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col">
+      {/* Overlay */}
+      {sidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-foreground/20 z-40 lg:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
+      {/* Main */}
+      <div className="flex-1 flex flex-col min-w-0">
         {/* Top Bar */}
-        <header className="h-16 border-b border-border flex items-center justify-between px-4 lg:px-8 bg-background/80 backdrop-blur-md sticky top-0 z-40">
-          {/* Search */}
-          <div className="relative flex-1 max-w-md">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-            <input
-              type="text"
-              placeholder="Search avatars..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="input-field pl-12 py-2"
-            />
+        <header className="h-14 border-b border-border flex items-center justify-between px-4 bg-background sticky top-0 z-30">
+          <div className="flex items-center gap-4">
+            <button className="lg:hidden" onClick={() => setSidebarOpen(true)}>
+              <Menu className="w-5 h-5" />
+            </button>
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <input
+                type="text"
+                placeholder="Search..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="input-field pl-9 py-2 w-48 lg:w-64"
+              />
+            </div>
           </div>
 
-          {/* Actions */}
-          <div className="flex items-center gap-4">
-            <button
-              onClick={toggleTheme}
-              className="btn-ghost p-2"
-              aria-label="Toggle theme"
-            >
-              {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-            </button>
-
-            <button
-              onClick={() => setShowNotifications(!showNotifications)}
-              className="btn-ghost p-2 relative"
-              aria-label="Notifications"
-            >
+          <div className="flex items-center gap-3">
+            <button className="p-2 hover:bg-muted rounded-lg relative">
               <Bell className="w-5 h-5" />
-              <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-accent" />
+              <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-accent" />
             </button>
-
             <Link to="/settings">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-primary-foreground font-semibold">
+              <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground text-sm font-medium">
                 A
               </div>
             </Link>
@@ -213,161 +165,121 @@ const Dashboard = () => {
         </header>
 
         {/* Content */}
-        <main className="flex-1 p-4 lg:p-8">
-          {/* Stats Strip */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-            <div className="glass-card p-5">
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
-                  <HardDrive className="w-6 h-6 text-primary" />
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Storage Used</p>
-                  <p className="text-2xl font-bold">2.4 GB</p>
-                </div>
-              </div>
-            </div>
-            <div className="glass-card p-5">
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center">
-                  <Cpu className="w-6 h-6 text-accent" />
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Training Jobs</p>
-                  <p className="text-2xl font-bold">1 Active</p>
+        <main className="flex-1 p-4 lg:p-6">
+          {/* Stats */}
+          <div className="grid grid-cols-3 gap-4 mb-6">
+            {[
+              { icon: HardDrive, label: 'Storage', value: '2.4 GB' },
+              { icon: Cpu, label: 'Training', value: '1 Active' },
+              { icon: Video, label: 'Videos', value: '24' },
+            ].map((stat) => (
+              <div key={stat.label} className="card-simple p-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                    <stat.icon className="w-5 h-5 text-primary" />
+                  </div>
+                  <div>
+                    <p className="text-xs text-muted-foreground">{stat.label}</p>
+                    <p className="font-semibold">{stat.value}</p>
+                  </div>
                 </div>
               </div>
-            </div>
-            <div className="glass-card p-5">
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
-                  <Video className="w-6 h-6 text-primary" />
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Videos Generated</p>
-                  <p className="text-2xl font-bold">24</p>
-                </div>
-              </div>
-            </div>
+            ))}
           </div>
 
           {/* Header */}
           <div className="flex items-center justify-between mb-6">
-            <h1 className="text-2xl lg:text-3xl font-bold">My Avatars</h1>
-            <Button asChild>
+            <h1 className="text-xl font-semibold">My Avatars</h1>
+            <Button asChild size="sm">
               <Link to="/create">
-                <Plus className="w-5 h-5" />
+                <Plus className="w-4 h-4" />
                 New Avatar
               </Link>
             </Button>
           </div>
 
-          {/* Avatar Grid */}
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {/* Create New Card */}
+          {/* Grid */}
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            {/* Create Card */}
             <Link
               to="/create"
-              className="avatar-card flex flex-col items-center justify-center min-h-[320px] border-2 border-dashed border-border hover:border-primary/50 group"
+              className="card-simple flex flex-col items-center justify-center min-h-[280px] border-dashed hover:border-primary/50 hover:bg-primary/5 transition-colors"
             >
-              <div className="w-16 h-16 rounded-2xl bg-muted flex items-center justify-center mb-4 group-hover:bg-primary/10 transition-colors">
-                <Plus className="w-8 h-8 text-muted-foreground group-hover:text-primary transition-colors" />
+              <div className="w-12 h-12 rounded-lg bg-muted flex items-center justify-center mb-3">
+                <Plus className="w-6 h-6 text-muted-foreground" />
               </div>
-              <p className="font-semibold text-foreground">Create New Avatar</p>
-              <p className="text-sm text-muted-foreground">Get started with a new project</p>
+              <p className="font-medium">Create New</p>
+              <p className="text-sm text-muted-foreground">Start a new project</p>
             </Link>
 
             {/* Avatar Cards */}
             {sampleAvatars.map((avatar) => (
-              <div key={avatar.id} className="avatar-card group">
-                {/* Thumbnail */}
-                <div className="relative aspect-[4/5] bg-gradient-to-br from-primary/10 to-accent/10">
-                  {/* Placeholder Avatar */}
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="w-20 h-20 rounded-full bg-gradient-to-br from-primary/50 to-accent/50 flex items-center justify-center">
-                      <Sparkles className="w-10 h-10 text-primary-foreground/70" />
-                    </div>
+              <div key={avatar.id} className="card-simple overflow-hidden">
+                <div className="aspect-[4/5] bg-muted flex items-center justify-center relative group">
+                  <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
+                    <Sparkles className="w-8 h-8 text-primary/50" />
                   </div>
 
-                  {/* Hover Play */}
                   {avatar.status === 'ready' && (
-                    <div className="absolute inset-0 flex items-center justify-center bg-foreground/0 group-hover:bg-foreground/10 transition-colors">
-                      <div className="w-12 h-12 rounded-full bg-primary-foreground/90 flex items-center justify-center opacity-0 group-hover:opacity-100 scale-75 group-hover:scale-100 transition-all shadow-xl">
-                        <Play className="w-5 h-5 text-primary ml-0.5" />
+                    <div className="absolute inset-0 flex items-center justify-center bg-foreground/0 group-hover:bg-foreground/5 transition-colors">
+                      <div className="w-10 h-10 rounded-full bg-background flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow">
+                        <Play className="w-4 h-4 text-primary ml-0.5" />
                       </div>
                     </div>
                   )}
 
-                  {/* Status */}
-                  <div className="absolute top-3 left-3">
+                  <div className="absolute top-2 left-2">
                     {getStatusChip(avatar.status, avatar.progress)}
                   </div>
 
-                  {/* Consent Badge */}
-                  {avatar.consentVerified && (
-                    <div className="absolute top-3 right-3 consent-badge">
-                      <div className="w-1.5 h-1.5 rounded-full bg-accent" />
-                      Verified
-                    </div>
-                  )}
+                  <span className="absolute top-2 right-2 consent-badge text-[10px]">
+                    Verified
+                  </span>
 
-                  {/* Training Progress */}
                   {avatar.status === 'training' && (
-                    <div className="absolute bottom-3 left-3 right-3">
+                    <div className="absolute bottom-2 left-2 right-2">
                       <div className="progress-bar">
-                        <div
-                          className="progress-bar-fill"
-                          style={{ width: `${avatar.progress}%` }}
-                        />
+                        <div className="progress-bar-fill" style={{ width: `${avatar.progress}%` }} />
                       </div>
                     </div>
                   )}
                 </div>
 
-                {/* Info */}
-                <div className="p-4">
-                  <div className="flex items-start justify-between mb-2">
-                    <div>
-                      <h3 className="font-semibold text-foreground">
-                        {avatar.name} • {avatar.version}
-                      </h3>
-                      <p className="text-sm text-muted-foreground">
-                        {avatar.status === 'ready' && `Voice similarity: ${avatar.similarity}%`}
-                        {avatar.status === 'training' && 'Training in progress...'}
-                        {avatar.status === 'failed' && avatar.error}
-                      </p>
-                    </div>
+                <div className="p-3">
+                  <div className="flex items-center justify-between mb-1">
+                    <h3 className="font-medium text-sm">{avatar.name} • {avatar.version}</h3>
                     {avatar.similarity > 0 && (
-                      <span className="text-lg font-bold text-accent">{avatar.similarity}%</span>
+                      <span className="text-sm text-accent font-medium">{avatar.similarity}%</span>
                     )}
                   </div>
-
-                  <p className="text-xs text-muted-foreground mb-4">
-                    Last updated: {avatar.lastUpdated}
+                  <p className="text-xs text-muted-foreground mb-3">
+                    {avatar.status === 'ready' && `Similarity: ${avatar.similarity}%`}
+                    {avatar.status === 'training' && 'Training...'}
+                    {avatar.status === 'failed' && avatar.error}
                   </p>
 
-                  {/* Actions */}
-                  <div className="flex items-center gap-2">
+                  <div className="flex gap-1">
                     {avatar.status === 'ready' && (
                       <>
-                        <Button variant="ghost" size="sm" className="flex-1">
-                          <Edit className="w-4 h-4" />
+                        <Button variant="ghost" size="sm" className="flex-1 h-8 text-xs">
+                          <Edit className="w-3 h-3" />
                           Edit
                         </Button>
-                        <Button variant="ghost" size="sm">
-                          <Copy className="w-4 h-4" />
+                        <Button variant="ghost" size="icon" className="h-8 w-8">
+                          <Copy className="w-3 h-3" />
                         </Button>
-                        <Button variant="ghost" size="sm">
-                          <Download className="w-4 h-4" />
+                        <Button variant="ghost" size="icon" className="h-8 w-8">
+                          <Download className="w-3 h-3" />
                         </Button>
                       </>
                     )}
                     {avatar.status === 'failed' && (
-                      <Button variant="outline" size="sm" className="flex-1">
-                        Retry Training
+                      <Button variant="outline" size="sm" className="flex-1 h-8 text-xs">
+                        Retry
                       </Button>
                     )}
-                    <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive">
-                      <Trash2 className="w-4 h-4" />
+                    <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:text-destructive">
+                      <Trash2 className="w-3 h-3" />
                     </Button>
                   </div>
                 </div>
@@ -375,17 +287,6 @@ const Dashboard = () => {
             ))}
           </div>
         </main>
-      </div>
-
-      {/* Toast Notification */}
-      <div className="fixed bottom-4 right-4 glass-card p-4 flex items-center gap-3 animate-slide-in-right z-50">
-        <div className="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center">
-          <Loader2 className="w-5 h-5 text-accent animate-spin" />
-        </div>
-        <div>
-          <p className="font-medium text-foreground">Training started</p>
-          <p className="text-sm text-muted-foreground">Estimated: 8 minutes</p>
-        </div>
       </div>
     </div>
   );
