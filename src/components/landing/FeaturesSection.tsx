@@ -1,4 +1,4 @@
-import { Mic, User, Zap, Shield, Globe, Lock, Sparkles, Clock } from 'lucide-react';
+import { Mic, User, Zap, Lock, Sparkles } from 'lucide-react';
 
 const features = [
   {
@@ -17,16 +17,6 @@ const features = [
     description: 'Generate videos in minutes with our optimized cloud GPU infrastructure. No waiting hours for results.',
   },
   {
-    icon: Shield,
-    title: 'Privacy First',
-    description: 'Your data is encrypted end-to-end and never shared. Full GDPR compliance with easy data deletion.',
-  },
-  {
-    icon: Globe,
-    title: 'Multi-Language',
-    description: 'Support for English, Spanish, French, German, and Chinese with more languages coming soon.',
-  },
-  {
     icon: Lock,
     title: 'Consent Verified',
     description: 'Every avatar displays a consent badge showing it was created with proper authorization.',
@@ -35,11 +25,6 @@ const features = [
     icon: Sparkles,
     title: 'High Quality Export',
     description: 'Export in 720p or 1080p resolution. Also available as audio-only MP3 for podcasts.',
-  },
-  {
-    icon: Clock,
-    title: 'Unlimited Videos',
-    description: 'Create as many videos as you need on paid plans. No per-video charges or hidden fees.',
   },
 ];
 
