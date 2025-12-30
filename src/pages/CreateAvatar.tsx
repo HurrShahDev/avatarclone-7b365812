@@ -64,6 +64,15 @@ const handleNext = () => {
               />
             </div>
 
+            <div>
+              <label className="block text-sm font-medium mb-1.5">Script</label>
+              <textarea
+                placeholder="Enter text for your avatar to speak..."
+                className="input-field min-h-[100px] resize-none"
+                defaultValue="Hello! This is my AI-generated avatar speaking."
+              />
+            </div>
+
           </div>
         );
 
@@ -168,14 +177,6 @@ const handleNext = () => {
                   <span className="text-xs text-muted-foreground">0:08 / 0:24</span>
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium mb-1.5">Script</label>
-                  <textarea
-                    placeholder="Enter text for your avatar to speak..."
-                    className="input-field min-h-[100px] resize-none"
-                    defaultValue="Hello! This is my AI-generated avatar speaking."
-                  />
-                </div>
               </div>
 
               <div className="space-y-4">
