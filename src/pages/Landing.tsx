@@ -3,7 +3,6 @@ import Footer from '@/components/layout/Footer';
 import HeroSection from '@/components/landing/HeroSection';
 import FeaturesSection from '@/components/landing/FeaturesSection';
 import HowItWorksSection from '@/components/landing/HowItWorksSection';
-import GallerySection from '@/components/landing/GallerySection';
 import CTASection from '@/components/landing/CTASection';
 
 const Landing = () => {
@@ -14,7 +13,7 @@ const Landing = () => {
         <HeroSection />
         <FeaturesSection />
         <HowItWorksSection />
-        <GallerySection />
+        <CTASection />
         <CTASection />
       </main>
       <Footer />
