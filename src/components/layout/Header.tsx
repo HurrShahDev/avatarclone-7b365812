@@ -18,8 +18,6 @@ const Header = ({ isLoggedIn = false }: HeaderProps) => {
         { label: 'Docs', href: '/docs' },
       ]
     : [
-        { label: 'How it works', href: '/#how-it-works' },
-        { label: 'Features', href: '/#features' },
         { label: 'Docs', href: '/docs' },
       ];
 
@@ -28,7 +26,7 @@ const Header = ({ isLoggedIn = false }: HeaderProps) => {
       <div className="container mx-auto px-4 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2">
+          <Link to="/home" className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
               <Sparkles className="w-4 h-4 text-primary-foreground" />
             </div>
@@ -59,14 +57,9 @@ const Header = ({ isLoggedIn = false }: HeaderProps) => {
                 </div>
               </Link>
             ) : (
-              <>
-                <Link to="/auth">
-                  <Button variant="ghost" size="sm">Sign in</Button>
-                </Link>
-                <Link to="/auth?mode=signup">
-                  <Button size="sm">Get Started</Button>
-                </Link>
-              </>
+              <Link to="/">
+                <Button size="sm">Get Started</Button>
+              </Link>
             )}
           </div>
 
@@ -98,10 +91,7 @@ const Header = ({ isLoggedIn = false }: HeaderProps) => {
               ))}
               {!isLoggedIn && (
                 <div className="flex flex-col gap-2 pt-4 border-t border-border">
-                  <Link to="/auth" onClick={() => setIsMenuOpen(false)}>
-                    <Button variant="outline" className="w-full">Sign in</Button>
-                  </Link>
-                  <Link to="/auth?mode=signup" onClick={() => setIsMenuOpen(false)}>
+                  <Link to="/" onClick={() => setIsMenuOpen(false)}>
                     <Button className="w-full">Get Started</Button>
                   </Link>
                 </div>

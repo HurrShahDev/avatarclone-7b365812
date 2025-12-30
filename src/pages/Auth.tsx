@@ -63,7 +63,7 @@ const Auth = () => {
     <div className="min-h-screen bg-background flex flex-col">
       {/* Header */}
       <header className="p-4 lg:p-6">
-        <Link to="/" className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground text-sm">
+        <Link to="/home" className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground text-sm">
           <ArrowLeft className="w-4 h-4" />
           Back to home
         </Link>
