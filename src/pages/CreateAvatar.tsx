@@ -1,17 +1,15 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  ArrowLeft, ArrowRight, Upload, Mic, Camera, Check, X, Play, Square,
-  AlertCircle, Info, Globe, Lock, Loader2, RefreshCw
+  ArrowLeft, ArrowRight, Upload, Mic, Camera, Check, Play, Square,
+  Info
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 const steps = [
   { id: 1, name: 'Info' },
   { id: 2, name: 'Upload' },
-  { id: 3, name: 'Process' },
-  { id: 4, name: 'Train' },
-  { id: 5, name: 'Generate' },
+  { id: 3, name: 'Generate' },
 ];
 
 const sampleSentences = [
@@ -32,8 +30,8 @@ const CreateAvatar = () => {
 
   const [isRecording, setIsRecording] = useState(false);
 
-  const handleNext = () => {
-    if (currentStep < 5) setCurrentStep(currentStep + 1);
+const handleNext = () => {
+    if (currentStep < 3) setCurrentStep(currentStep + 1);
   };
 
   const handlePrev = () => {
@@ -66,44 +64,6 @@ const CreateAvatar = () => {
               />
             </div>
 
-            <div>
-              <label className="block text-sm font-medium mb-1.5">Language</label>
-              <select
-                value={formData.language}
-                onChange={(e) => setFormData({ ...formData, language: e.target.value })}
-                className="input-field"
-              >
-                <option value="en">English</option>
-                <option value="es">Spanish</option>
-                <option value="fr">French</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-2">Privacy</label>
-              <div className="grid grid-cols-2 gap-3">
-                <button
-                  type="button"
-                  onClick={() => setFormData({ ...formData, privacy: 'private' })}
-                  className={`p-3 rounded-lg border text-left text-sm ${
-                    formData.privacy === 'private' ? 'border-primary bg-primary/5' : 'border-border'
-                  }`}
-                >
-                  <Lock className="w-4 h-4 mb-1" />
-                  <p className="font-medium">Private</p>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setFormData({ ...formData, privacy: 'public' })}
-                  className={`p-3 rounded-lg border text-left text-sm ${
-                    formData.privacy === 'public' ? 'border-primary bg-primary/5' : 'border-border'
-                  }`}
-                >
-                  <Globe className="w-4 h-4 mb-1" />
-                  <p className="font-medium">Public</p>
-                </button>
-              </div>
-            </div>
           </div>
         );
 
@@ -189,95 +149,6 @@ const CreateAvatar = () => {
 
       case 3:
         return (
-          <div className="max-w-3xl mx-auto animate-fade-in">
-            <div className="grid md:grid-cols-2 gap-6">
-              <div className="card-simple p-5">
-                <h3 className="font-medium mb-4">Face Detection</h3>
-                <div className="aspect-square rounded-lg bg-muted flex items-center justify-center mb-4">
-                  <div className="w-24 h-24 rounded-full border-2 border-dashed border-primary/50" />
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Face detected: 1</span>
-                  <Button variant="ghost" size="sm">
-                    <RefreshCw className="w-3 h-3 mr-1" />
-                    Re-detect
-                  </Button>
-                </div>
-              </div>
-
-              <div className="card-simple p-5">
-                <h3 className="font-medium mb-4">Audio Cleaning</h3>
-                <div className="aspect-[2/1] rounded-lg bg-muted mb-4" />
-                <div className="space-y-3">
-                  <div>
-                    <div className="flex justify-between text-sm mb-1">
-                      <span>Noise Reduction</span>
-                      <span className="text-muted-foreground">40%</span>
-                    </div>
-                    <input type="range" className="w-full" defaultValue={40} />
-                  </div>
-                  <div className="flex items-center gap-2 text-sm text-accent">
-                    <Check className="w-4 h-4" />
-                    Audio quality: Good
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        );
-
-      case 4:
-        return (
-          <div className="max-w-md mx-auto animate-fade-in">
-            <div className="card-simple p-8 text-center">
-              <div className="relative w-32 h-32 mx-auto mb-6">
-                <svg className="w-full h-full -rotate-90">
-                  <circle cx="64" cy="64" r="56" fill="none" stroke="currentColor" strokeWidth="8" className="text-muted" />
-                  <circle
-                    cx="64" cy="64" r="56"
-                    fill="none" stroke="currentColor" strokeWidth="8"
-                    strokeLinecap="round"
-                    strokeDasharray={`${2 * Math.PI * 56}`}
-                    strokeDashoffset={`${2 * Math.PI * 56 * 0.33}`}
-                    className="text-primary transition-all"
-                  />
-                </svg>
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-2xl font-bold">67%</span>
-                </div>
-              </div>
-
-              <h2 className="text-lg font-semibold mb-2">Training in Progress</h2>
-              <p className="text-sm text-muted-foreground mb-6">Estimated: 3 min remaining</p>
-
-              <div className="grid grid-cols-3 gap-3 mb-6 text-sm">
-                <div className="p-3 rounded-lg bg-muted">
-                  <p className="font-semibold">67/100</p>
-                  <p className="text-xs text-muted-foreground">Epochs</p>
-                </div>
-                <div className="p-3 rounded-lg bg-muted">
-                  <p className="font-semibold">3:24</p>
-                  <p className="text-xs text-muted-foreground">Remaining</p>
-                </div>
-                <div className="p-3 rounded-lg bg-muted">
-                  <p className="font-semibold">85%</p>
-                  <p className="text-xs text-muted-foreground">GPU</p>
-                </div>
-              </div>
-
-              <div className="flex gap-3 justify-center">
-                <Button variant="outline" size="sm">Preview</Button>
-                <Button variant="ghost" size="sm" className="text-destructive">
-                  <X className="w-3 h-3 mr-1" />
-                  Cancel
-                </Button>
-              </div>
-            </div>
-          </div>
-        );
-
-      case 5:
-        return (
           <div className="max-w-4xl mx-auto animate-fade-in">
             <div className="grid lg:grid-cols-3 gap-6">
               <div className="lg:col-span-2 card-simple p-5">
@@ -308,26 +179,6 @@ const CreateAvatar = () => {
               </div>
 
               <div className="space-y-4">
-                <div className="card-simple p-4">
-                  <h3 className="font-medium mb-3 text-sm">Voice Settings</h3>
-                  <div className="space-y-3">
-                    <div>
-                      <div className="flex justify-between text-xs mb-1">
-                        <span>Speed</span>
-                        <span className="text-muted-foreground">1.0x</span>
-                      </div>
-                      <input type="range" className="w-full" defaultValue={50} />
-                    </div>
-                    <div>
-                      <div className="flex justify-between text-xs mb-1">
-                        <span>Pitch</span>
-                        <span className="text-muted-foreground">0</span>
-                      </div>
-                      <input type="range" className="w-full" defaultValue={50} />
-                    </div>
-                  </div>
-                </div>
-
                 <div className="card-simple p-4">
                   <h3 className="font-medium mb-3 text-sm">Export</h3>
                   <Button className="w-full mb-2">Generate Video</Button>
@@ -403,8 +254,8 @@ const CreateAvatar = () => {
             <ArrowLeft className="w-4 h-4 mr-2" />
             Previous
           </Button>
-          <Button onClick={handleNext} disabled={currentStep === 5}>
-            {currentStep === 4 ? 'View Results' : 'Continue'}
+          <Button onClick={handleNext} disabled={currentStep === 3}>
+            Continue
             <ArrowRight className="w-4 h-4 ml-2" />
           </Button>
         </div>
