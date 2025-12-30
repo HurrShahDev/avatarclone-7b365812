@@ -14,7 +14,6 @@ const Landing = () => {
         <FeaturesSection />
         <HowItWorksSection />
         <CTASection />
-        <CTASection />
       </main>
       <Footer />
     </div>

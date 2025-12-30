@@ -15,7 +15,7 @@ const CTASection = () => {
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Button asChild size="lg">
-              <Link to="/auth?mode=signup">
+              <Link to="/create">
                 Get Started Free
                 <ArrowRight className="w-4 h-4" />
               </Link>
