@@ -17,9 +17,7 @@ const Header = ({ isLoggedIn = false }: HeaderProps) => {
         { label: 'Create Avatar', href: '/create' },
         { label: 'Docs', href: '/docs' },
       ]
-    : [
-        { label: 'Docs', href: '/docs' },
-      ];
+    : [];
 
   return (
     <header className="sticky top-0 z-50 bg-background border-b border-border">
@@ -57,9 +55,14 @@ const Header = ({ isLoggedIn = false }: HeaderProps) => {
                 </div>
               </Link>
             ) : (
-              <Link to="/">
-                <Button size="sm">Get Started</Button>
-              </Link>
+              <>
+                <Link to="/docs">
+                  <Button size="sm">Docs</Button>
+                </Link>
+                <Link to="/">
+                  <Button size="sm">Get Started</Button>
+                </Link>
+              </>
             )}
           </div>
 
