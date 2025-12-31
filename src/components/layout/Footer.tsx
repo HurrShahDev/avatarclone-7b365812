@@ -27,7 +27,8 @@ const Footer = () => {
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li><Link to="/create" className="hover:text-foreground">Avatar Generation</Link></li>
               <li><Link to="/create" className="hover:text-foreground">Voice Cloning</Link></li>
-              <li><Link to="/docs" className="hover:text-foreground">Docs</Link></li>
+              <li><Link to="/create" className="hover:text-foreground">Video Generation</Link></li>
+              <li><Link to="/create" className="hover:text-foreground">AI Lip Sync</Link></li>
             </ul>
           </div>
 
@@ -50,7 +51,7 @@ const Footer = () => {
           </div>
         </div>
 
-        <div className="pt-8 border-t border-border flex flex-col sm:flex-row justify-between items-center gap-4">
+        <div className="pt-8 border-t border-border flex justify-center">
           <p className="text-sm text-muted-foreground">
             © {currentYear} AvatarClone. All rights reserved.
           </p>
