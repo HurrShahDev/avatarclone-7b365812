@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, Sparkles } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import logo from '@/assets/logo.png';
 
 interface HeaderProps {
   isLoggedIn?: boolean;
@@ -25,10 +26,7 @@ const Header = ({ isLoggedIn = false }: HeaderProps) => {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link to="/home" className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-              <Sparkles className="w-4 h-4 text-primary-foreground" />
-            </div>
-            <span className="font-semibold text-foreground">AvatarClone</span>
+            <img src={logo} alt="AvatarClone" className="h-10 w-auto" />
           </Link>
 
           {/* Desktop Navigation */}
