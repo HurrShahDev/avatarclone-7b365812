@@ -25,8 +25,8 @@ const Footer = () => {
           <div>
             <h4 className="font-medium mb-3">Product</h4>
             <ul className="space-y-2 text-sm text-muted-foreground">
-              <li><Link to="/#features" className="hover:text-foreground">Features</Link></li>
-              <li><Link to="/pricing" className="hover:text-foreground">Pricing</Link></li>
+              <li><Link to="/create" className="hover:text-foreground">Avatar Generation</Link></li>
+              <li><Link to="/create" className="hover:text-foreground">Voice Cloning</Link></li>
               <li><Link to="/docs" className="hover:text-foreground">Docs</Link></li>
             </ul>
           </div>
@@ -37,7 +37,6 @@ const Footer = () => {
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li><Link to="/privacy" className="hover:text-foreground">Privacy</Link></li>
               <li><Link to="/terms" className="hover:text-foreground">Terms</Link></li>
-              <li><Link to="/gdpr" className="hover:text-foreground">GDPR</Link></li>
             </ul>
           </div>
 
@@ -54,9 +53,6 @@ const Footer = () => {
         <div className="pt-8 border-t border-border flex flex-col sm:flex-row justify-between items-center gap-4">
           <p className="text-sm text-muted-foreground">
             © {currentYear} AvatarClone. All rights reserved.
-          </p>
-          <p className="text-xs text-muted-foreground">
-            Data encrypted • GDPR compliant
           </p>
         </div>
       </div>
