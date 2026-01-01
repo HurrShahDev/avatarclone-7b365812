@@ -76,6 +76,7 @@ const Auth = () => {
           {/* Logo */}
           <div className="flex items-center justify-center gap-2 mb-8">
             <img src={logo} alt="AvatarClone" className="h-12 w-auto" />
+            <span className="font-semibold text-xl">AvatarClone</span>
           </div>
 
           {/* Card */}

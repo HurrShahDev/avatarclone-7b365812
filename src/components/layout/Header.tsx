@@ -27,6 +27,7 @@ const Header = ({ isLoggedIn = false }: HeaderProps) => {
           {/* Logo */}
           <Link to="/home" className="flex items-center gap-2">
             <img src={logo} alt="AvatarClone" className="h-10 w-auto" />
+            <span className="font-semibold text-foreground">AvatarClone</span>
           </Link>
 
           {/* Desktop Navigation */}
