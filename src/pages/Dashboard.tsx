@@ -3,9 +3,10 @@ import { Link } from 'react-router-dom';
 import { 
   Plus, Search, Bell, Settings, LayoutDashboard, Wand2, Folder, CreditCard,
   Play, Edit, Copy, Download, Trash2, HardDrive, Cpu, Video,
-  CheckCircle, Loader2, AlertCircle, Sparkles, Menu
+  CheckCircle, Loader2, AlertCircle, Menu
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import logo from '@/assets/logo.png';
 import avatar1 from '@/assets/avatar-1.jpg';
 import avatar2 from '@/assets/avatar-2.jpg';
 import avatar3 from '@/assets/avatar-3.jpg';
@@ -89,10 +90,7 @@ const Dashboard = () => {
       <aside className={`fixed inset-y-0 left-0 z-50 w-60 bg-sidebar border-r border-sidebar-border transform transition-transform lg:relative lg:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         <div className="p-4 border-b border-sidebar-border">
           <Link to="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-              <Sparkles className="w-4 h-4 text-primary-foreground" />
-            </div>
-            <span className="font-semibold">AvatarClone</span>
+            <img src={logo} alt="AvatarClone" className="h-10 w-auto" />
           </Link>
         </div>
 
