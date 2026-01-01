@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { Eye, EyeOff, Github, Mail, Lock, User, AlertCircle, Sparkles, ArrowLeft } from 'lucide-react';
+import { Eye, EyeOff, Github, Mail, Lock, User, AlertCircle, ArrowLeft } from 'lucide-react';
+import logo from '@/assets/logo.png';
 import { Button } from '@/components/ui/button';
 
 const Auth = () => {
@@ -74,10 +75,7 @@ const Auth = () => {
         <div className="w-full max-w-md">
           {/* Logo */}
           <div className="flex items-center justify-center gap-2 mb-8">
-            <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center">
-              <Sparkles className="w-5 h-5 text-primary-foreground" />
-            </div>
-            <span className="font-semibold text-xl">AvatarClone</span>
+            <img src={logo} alt="AvatarClone" className="h-12 w-auto" />
           </div>
 
           {/* Card */}
