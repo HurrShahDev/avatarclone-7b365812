@@ -12,6 +12,7 @@ const Footer = () => {
           <div className="col-span-2 md:col-span-1">
             <Link to="/" className="flex items-center gap-2 mb-3">
               <img src={logo} alt="AvatarClone" className="h-10 w-auto" />
+              <span className="font-semibold">AvatarClone</span>
             </Link>
             <p className="text-sm text-muted-foreground">
               Create AI avatars with your voice and face.
