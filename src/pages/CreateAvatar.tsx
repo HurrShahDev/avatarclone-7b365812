@@ -5,6 +5,7 @@ import {
   Info
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import avatarPreview from '@/assets/avatar-preview.jpg';
 
 const steps = [
   { id: 1, name: 'Info' },
@@ -161,9 +162,12 @@ const handleNext = () => {
           <div className="max-w-4xl mx-auto animate-fade-in">
             <div className="grid lg:grid-cols-3 gap-6">
               <div className="lg:col-span-2 card-simple p-5">
-                <div className="aspect-video rounded-lg bg-muted flex items-center justify-center mb-4">
-                  <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
-                    <Play className="w-6 h-6 text-primary ml-1" />
+                <div className="aspect-video rounded-lg bg-muted flex items-center justify-center mb-4 overflow-hidden relative">
+                  <img src={avatarPreview} alt="Avatar Preview" className="w-full h-full object-cover" />
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="w-16 h-16 rounded-full bg-primary/80 flex items-center justify-center">
+                      <Play className="w-6 h-6 text-primary-foreground ml-1" />
+                    </div>
                   </div>
                 </div>
 
