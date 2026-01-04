@@ -58,7 +58,7 @@ const Header = ({ isLoggedIn = false }: HeaderProps) => {
                 <Link to="/docs">
                   <Button size="sm">Docs</Button>
                 </Link>
-                <Link to="/">
+                <Link to="/create">
                   <Button size="sm">Get Started</Button>
                 </Link>
               </>
@@ -93,7 +93,7 @@ const Header = ({ isLoggedIn = false }: HeaderProps) => {
               ))}
               {!isLoggedIn && (
                 <div className="flex flex-col gap-2 pt-4 border-t border-border">
-                  <Link to="/" onClick={() => setIsMenuOpen(false)}>
+                  <Link to="/create" onClick={() => setIsMenuOpen(false)}>
                     <Button className="w-full">Get Started</Button>
                   </Link>
                 </div>
