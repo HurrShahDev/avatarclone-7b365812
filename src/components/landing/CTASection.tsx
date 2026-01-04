@@ -20,8 +20,8 @@ const CTASection = () => {
                 <ArrowRight className="w-4 h-4" />
               </Link>
             </Button>
-            <Button asChild variant="outline" size="lg">
-              <Link to="/pricing">View Pricing</Link>
+            <Button variant="outline" size="lg" onClick={(e) => e.preventDefault()}>
+              View Pricing
             </Button>
           </div>
         </div>
