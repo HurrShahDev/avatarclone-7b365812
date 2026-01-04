@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 
 const CTASection = () => {
   return (
-    <section className="py-16 lg:py-24">
+    <section className="py-16 lg:py-24 bg-muted/30">
       <div className="container mx-auto px-4 lg:px-8">
         <div className="card-simple max-w-2xl mx-auto p-8 lg:p-12 text-center">
           <h2 className="text-2xl lg:text-3xl font-bold mb-4">
