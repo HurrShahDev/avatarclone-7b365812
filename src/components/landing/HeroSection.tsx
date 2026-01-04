@@ -36,7 +36,7 @@ const HeroSection = () => {
           <div className="flex items-center justify-center gap-6 text-sm text-muted-foreground">
             <span className="flex items-center gap-1.5">
               <span className="w-1.5 h-1.5 rounded-full bg-accent" />
-              Data encrypted
+              Secure storage
             </span>
             <span className="flex items-center gap-1.5">
               <span className="w-1.5 h-1.5 rounded-full bg-accent" />
@@ -44,7 +44,7 @@ const HeroSection = () => {
             </span>
             <span className="flex items-center gap-1.5">
               <span className="w-1.5 h-1.5 rounded-full bg-accent" />
-              GDPR compliant
+              Privacy focused
             </span>
           </div>
         </div>
