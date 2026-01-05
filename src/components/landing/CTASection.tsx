@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import comparisonImage from '@/assets/human-avatar-comparison.jpg';
+import avatarImage from '@/assets/ai-avatar-promo.jpg';
 
 const CTASection = () => {
   return (
@@ -29,12 +29,12 @@ const CTASection = () => {
             </div>
           </div>
           
-          {/* Comparison Image */}
+          {/* Avatar Image - Right Side */}
           <div className="flex-1">
             <img 
-              src={comparisonImage} 
-              alt="Real human photo transformed to 2D avatar" 
-              className="w-full max-w-md mx-auto rounded-xl shadow-lg"
+              src={avatarImage} 
+              alt="Professional AI Avatar" 
+              className="w-full max-w-sm mx-auto rounded-xl shadow-lg"
             />
           </div>
         </div>
