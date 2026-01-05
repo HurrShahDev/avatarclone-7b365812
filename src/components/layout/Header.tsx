@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -10,7 +10,16 @@ interface HeaderProps {
 
 const Header = ({ isLoggedIn = false }: HeaderProps) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
   const location = useLocation();
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 50);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const navLinks = isLoggedIn
     ? [
@@ -21,7 +30,9 @@ const Header = ({ isLoggedIn = false }: HeaderProps) => {
     : [];
 
   return (
-    <header className="sticky top-0 z-50 bg-muted/50 border-b border-border backdrop-blur-sm">
+    <header className={`sticky top-0 z-50 border-b border-border backdrop-blur-md transition-all duration-300 ${
+      isScrolled ? 'bg-muted/40' : 'bg-muted/60'
+    }`}>
       <div className="container mx-auto px-4 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
