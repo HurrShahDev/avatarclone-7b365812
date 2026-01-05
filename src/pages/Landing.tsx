@@ -1,6 +1,7 @@
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import HeroSection from '@/components/landing/HeroSection';
+import PromoSection from '@/components/landing/PromoSection';
 import FeaturesSection from '@/components/landing/FeaturesSection';
 import HowItWorksSection from '@/components/landing/HowItWorksSection';
 import CTASection from '@/components/landing/CTASection';
@@ -11,6 +12,7 @@ const Landing = () => {
       <Header />
       <main>
         <HeroSection />
+        <PromoSection />
         <FeaturesSection />
         <HowItWorksSection />
         <CTASection />
