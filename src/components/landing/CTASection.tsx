@@ -1,38 +1,41 @@
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import transformImage from '@/assets/human-to-avatar-transform.jpg';
+import comparisonImage from '@/assets/human-avatar-comparison.jpg';
 
 const CTASection = () => {
   return (
-    <section className="py-16 lg:py-24 bg-muted/30">
+    <section className="py-16 lg:py-24 bg-accent/20">
       <div className="container mx-auto px-4 lg:px-8">
-        {/* Transformation Image */}
-        <div className="max-w-3xl mx-auto mb-12">
-          <img 
-            src={transformImage} 
-            alt="Transform from real human to AI avatar" 
-            className="w-full rounded-xl shadow-lg"
-          />
-        </div>
-        
-        <div className="card-simple max-w-2xl mx-auto p-8 lg:p-12 text-center">
-          <h2 className="text-2xl lg:text-3xl font-bold mb-4">
-            Ready to create your avatar?
-          </h2>
-          <p className="text-muted-foreground mb-6">
-            Start free with our starter plan. No credit card required.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Button asChild size="lg">
-              <Link to="/create">
-                Get Started Free
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-            </Button>
-            <Button variant="outline" size="lg" onClick={(e) => e.preventDefault()}>
-              View Pricing
-            </Button>
+        <div className="flex flex-col lg:flex-row items-center gap-8 lg:gap-12 max-w-5xl mx-auto">
+          {/* Text Content */}
+          <div className="flex-1 text-center lg:text-left">
+            <h2 className="text-2xl lg:text-3xl font-bold mb-4">
+              Ready to create your avatar?
+            </h2>
+            <p className="text-muted-foreground mb-6">
+              Start free with our starter plan. No credit card required.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start">
+              <Button asChild size="lg">
+                <Link to="/create">
+                  Get Started Free
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
+              </Button>
+              <Button variant="outline" size="lg" onClick={(e) => e.preventDefault()}>
+                View Pricing
+              </Button>
+            </div>
+          </div>
+          
+          {/* Comparison Image */}
+          <div className="flex-1">
+            <img 
+              src={comparisonImage} 
+              alt="Real human photo transformed to 2D avatar" 
+              className="w-full max-w-md mx-auto rounded-xl shadow-lg"
+            />
           </div>
         </div>
       </div>
