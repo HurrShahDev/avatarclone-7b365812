@@ -1,11 +1,21 @@
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import transformImage from '@/assets/human-to-avatar-transform.jpg';
 
 const CTASection = () => {
   return (
     <section className="py-16 lg:py-24 bg-muted/30">
       <div className="container mx-auto px-4 lg:px-8">
+        {/* Transformation Image */}
+        <div className="max-w-3xl mx-auto mb-12">
+          <img 
+            src={transformImage} 
+            alt="Transform from real human to AI avatar" 
+            className="w-full rounded-xl shadow-lg"
+          />
+        </div>
+        
         <div className="card-simple max-w-2xl mx-auto p-8 lg:p-12 text-center">
           <h2 className="text-2xl lg:text-3xl font-bold mb-4">
             Ready to create your avatar?
