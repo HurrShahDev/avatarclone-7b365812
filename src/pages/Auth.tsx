@@ -1,16 +1,20 @@
 import { useState } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
-import { Eye, EyeOff, Github, Mail, Lock, User, AlertCircle, ArrowLeft } from 'lucide-react';
+import { useSearchParams, useNavigate } from 'react-router-dom';
+import { Eye, EyeOff, Github, Mail, Lock, User, AlertCircle } from 'lucide-react';
 import logo from '@/assets/logo.png';
 import { Button } from '@/components/ui/button';
+import { auth } from '@/lib/firebase';
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile } from 'firebase/auth';
 
 const Auth = () => {
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const [mode, setMode] = useState<'signin' | 'signup'>(
     searchParams.get('mode') === 'signup' ? 'signup' : 'signin'
   );
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   
   const [formData, setFormData] = useState({
     fullName: '',
@@ -36,7 +40,7 @@ const Auth = () => {
   const strengthLabels = ['', 'Weak', 'Fair', 'Good', 'Strong'];
   const strengthColors = ['', 'bg-destructive', 'bg-yellow-500', 'bg-accent/70', 'bg-accent'];
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const newErrors: Record<string, string> = {};
 
@@ -57,19 +61,55 @@ const Auth = () => {
       newErrors.email = 'Enter a valid email';
     }
 
-    setErrors(newErrors);
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+
+    setErrors({});
+    setIsLoading(true);
+
+    try {
+      if (mode === 'signup') {
+        const userCredential = await createUserWithEmailAndPassword(
+          auth,
+          formData.email,
+          formData.password
+        );
+        await updateProfile(userCredential.user, {
+          displayName: formData.fullName,
+        });
+        // Clear form and switch to sign in
+        setFormData({
+          fullName: '',
+          email: '',
+          password: '',
+          confirmPassword: '',
+          consent: false,
+          rememberMe: false,
+        });
+        setMode('signin');
+      } else {
+        await signInWithEmailAndPassword(auth, formData.email, formData.password);
+        navigate('/home');
+      }
+    } catch (error: any) {
+      if (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') {
+        setErrors({ email: 'No account found with this email/password' });
+      } else if (error.code === 'auth/wrong-password') {
+        setErrors({ password: 'Incorrect password' });
+      } else if (error.code === 'auth/email-already-in-use') {
+        setErrors({ email: 'An account with this email already exists' });
+      } else {
+        setErrors({ email: error.message });
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      {/* Header */}
-      <header className="p-4 lg:p-6">
-        <Link to="/home" className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground text-sm">
-          <ArrowLeft className="w-4 h-4" />
-          Back to home
-        </Link>
-      </header>
-
       {/* Main */}
       <main className="flex-1 flex items-center justify-center p-4">
         <div className="w-full max-w-md">
@@ -274,8 +314,8 @@ const Auth = () => {
                 </div>
               )}
 
-              <Button type="submit" className="w-full">
-                {mode === 'signin' ? 'Sign In' : 'Create Account'}
+              <Button type="submit" className="w-full" disabled={isLoading}>
+                {isLoading ? 'Please wait...' : mode === 'signin' ? 'Sign In' : 'Create Account'}
               </Button>
             </form>
           </div>
