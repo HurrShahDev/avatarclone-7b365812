@@ -27,10 +27,21 @@ const HeroSection = () => {
                 <ArrowRight className="w-4 h-4" />
               </Link>
             </Button>
-            <Button variant="outline" size="lg">
-              <Play className="w-4 h-4" />
-              Watch Demo
-            </Button>
+            <div className="relative group">
+              <div className="aspect-video w-64 sm:w-72 rounded-lg overflow-hidden bg-muted cursor-pointer shadow-md hover:shadow-lg transition-shadow">
+                <img 
+                  src={avatar1} 
+                  alt="Sample avatar preview"
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-foreground/10 flex items-center justify-center">
+                  <div className="w-12 h-12 rounded-full bg-background/90 flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform">
+                    <Play className="w-5 h-5 text-primary ml-0.5" />
+                  </div>
+                </div>
+              </div>
+              <p className="text-xs text-muted-foreground mt-2">Sample Avatar Demo</p>
+            </div>
           </div>
 
           <div className="flex items-center justify-center gap-6 text-sm text-muted-foreground">
@@ -46,34 +57,6 @@ const HeroSection = () => {
               <span className="w-1.5 h-1.5 rounded-full bg-accent" />
               Privacy focused
             </span>
-          </div>
-        </div>
-
-        {/* Preview Card */}
-        <div className="mt-16 max-w-2xl mx-auto">
-          <div className="card-simple p-6">
-            <div className="aspect-video rounded-lg overflow-hidden bg-muted flex items-center justify-center mb-4 relative group cursor-pointer">
-              <img 
-                src={avatar1} 
-                alt="Sample avatar preview"
-                className="w-full h-full object-cover"
-              />
-              <div className="absolute inset-0 bg-foreground/10 flex items-center justify-center">
-                <div className="w-16 h-16 rounded-full bg-background/90 flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform">
-                  <Play className="w-6 h-6 text-primary ml-1" />
-                </div>
-              </div>
-            </div>
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="font-medium">Sample Avatar Demo</p>
-                <p className="text-sm text-muted-foreground">Voice similarity: 94%</p>
-              </div>
-              <span className="consent-badge">
-                <span className="w-1.5 h-1.5 rounded-full bg-accent" />
-                Consent Verified
-              </span>
-            </div>
           </div>
         </div>
       </div>
