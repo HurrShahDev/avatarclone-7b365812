@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
   ArrowLeft, ArrowRight, Upload, Mic, Camera, Check, Play, Square,
-  Info
+  Info, X, Pause, AlertTriangle
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import avatarPreview from '@/assets/avatar-preview.jpg';
@@ -29,9 +29,194 @@ const CreateAvatar = () => {
     consent: false,
   });
 
-  const [isRecording, setIsRecording] = useState(false);
+  // Photo upload state
+  const [uploadedImage, setUploadedImage] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [imageSizeWarning, setImageSizeWarning] = useState<string | null>(null);
+  const [isDraggingImage, setIsDraggingImage] = useState(false);
+  const imageInputRef = useRef<HTMLInputElement>(null);
 
-const handleNext = () => {
+  // Voice recording state
+  const [isRecording, setIsRecording] = useState(false);
+  const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
+  const [audioUrl, setAudioUrl] = useState<string | null>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [recordingDuration, setRecordingDuration] = useState(0);
+  const [audioDuration, setAudioDuration] = useState(0);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const recordingIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const audioInputRef = useRef<HTMLInputElement>(null);
+
+  // Cleanup URLs on unmount
+  useEffect(() => {
+    return () => {
+      if (imagePreview) URL.revokeObjectURL(imagePreview);
+      if (audioUrl) URL.revokeObjectURL(audioUrl);
+    };
+  }, []);
+
+  // Handle image file selection
+  const handleImageSelect = (file: File) => {
+    if (!file.type.match(/^image\/(jpeg|png)$/)) {
+      alert('Please upload a JPG or PNG image only.');
+      return;
+    }
+
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      if (img.width !== 1024 || img.height !== 1024) {
+        setImageSizeWarning(`Image is ${img.width}×${img.height}. Recommended: 1024×1024`);
+      } else {
+        setImageSizeWarning(null);
+      }
+    };
+    img.src = url;
+
+    if (imagePreview) URL.revokeObjectURL(imagePreview);
+    setUploadedImage(file);
+    setImagePreview(url);
+  };
+
+  const handleImageDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDraggingImage(false);
+    const file = e.dataTransfer.files[0];
+    if (file) handleImageSelect(file);
+  };
+
+  const handleImageDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDraggingImage(true);
+  };
+
+  const handleImageDragLeave = () => {
+    setIsDraggingImage(false);
+  };
+
+  const removeImage = () => {
+    if (imagePreview) URL.revokeObjectURL(imagePreview);
+    setUploadedImage(null);
+    setImagePreview(null);
+    setImageSizeWarning(null);
+  };
+
+  // Voice recording functions
+  const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mediaRecorder = new MediaRecorder(stream);
+      mediaRecorderRef.current = mediaRecorder;
+      audioChunksRef.current = [];
+
+      mediaRecorder.ondataavailable = (e) => {
+        if (e.data.size > 0) {
+          audioChunksRef.current.push(e.data);
+        }
+      };
+
+      mediaRecorder.onstop = () => {
+        const blob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+        const url = URL.createObjectURL(blob);
+        if (audioUrl) URL.revokeObjectURL(audioUrl);
+        setAudioBlob(blob);
+        setAudioUrl(url);
+        setAudioDuration(recordingDuration);
+        stream.getTracks().forEach(track => track.stop());
+      };
+
+      mediaRecorder.start();
+      setIsRecording(true);
+      setRecordingDuration(0);
+
+      recordingIntervalRef.current = setInterval(() => {
+        setRecordingDuration(prev => {
+          if (prev >= 60) {
+            stopRecording();
+            return 60;
+          }
+          return prev + 1;
+        });
+      }, 1000);
+    } catch (err) {
+      alert('Could not access microphone. Please allow microphone access and try again.');
+    }
+  };
+
+  const stopRecording = () => {
+    if (mediaRecorderRef.current && isRecording) {
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
+      if (recordingIntervalRef.current) {
+        clearInterval(recordingIntervalRef.current);
+        recordingIntervalRef.current = null;
+      }
+    }
+  };
+
+  const toggleRecording = () => {
+    if (isRecording) {
+      stopRecording();
+    } else {
+      // Clear previous recording
+      if (audioUrl) URL.revokeObjectURL(audioUrl);
+      setAudioBlob(null);
+      setAudioUrl(null);
+      setAudioDuration(0);
+      startRecording();
+    }
+  };
+
+  const handleAudioFileSelect = (file: File) => {
+    if (!file.type.match(/^audio\/(mpeg|wav|mp3|x-wav)$/)) {
+      alert('Please upload an MP3 or WAV file only.');
+      return;
+    }
+
+    const url = URL.createObjectURL(file);
+    if (audioUrl) URL.revokeObjectURL(audioUrl);
+    setAudioBlob(file);
+    setAudioUrl(url);
+
+    // Get duration
+    const audio = new Audio(url);
+    audio.onloadedmetadata = () => {
+      setAudioDuration(Math.round(audio.duration));
+    };
+  };
+
+  const togglePlayback = () => {
+    if (!audioRef.current || !audioUrl) return;
+
+    if (isPlaying) {
+      audioRef.current.pause();
+      setIsPlaying(false);
+    } else {
+      audioRef.current.play();
+      setIsPlaying(true);
+    }
+  };
+
+  const removeAudio = () => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+    }
+    if (audioUrl) URL.revokeObjectURL(audioUrl);
+    setAudioBlob(null);
+    setAudioUrl(null);
+    setAudioDuration(0);
+    setIsPlaying(false);
+  };
+
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  const handleNext = () => {
     if (currentStep < 3) setCurrentStep(currentStep + 1);
   };
 
@@ -81,63 +266,196 @@ const handleNext = () => {
         return (
           <div className="max-w-3xl mx-auto animate-fade-in">
             <div className="grid md:grid-cols-2 gap-6">
-              {/* Image */}
+              {/* Image Upload */}
               <div className="card-simple p-5">
                 <div className="flex items-center gap-2 mb-4">
                   <Camera className="w-4 h-4 text-primary" />
                   <span className="font-medium text-sm">Photo</span>
                 </div>
-                <div className="upload-zone aspect-square mb-3">
-                  <Upload className="w-8 h-8 text-muted-foreground" />
-                  <p className="text-sm font-medium">Drop photo here</p>
-                  <p className="text-xs text-muted-foreground">JPG, PNG • 1024×1024</p>
+
+                <input
+                  ref={imageInputRef}
+                  type="file"
+                  accept="image/jpeg,image/png"
+                  onChange={(e) => e.target.files?.[0] && handleImageSelect(e.target.files[0])}
+                  className="hidden"
+                />
+
+                <div
+                  onClick={() => !imagePreview && imageInputRef.current?.click()}
+                  onDrop={handleImageDrop}
+                  onDragOver={handleImageDragOver}
+                  onDragLeave={handleImageDragLeave}
+                  className={`upload-zone aspect-square mb-3 relative overflow-hidden cursor-pointer transition-colors ${
+                    isDraggingImage ? 'border-primary bg-primary/5' : ''
+                  } ${imagePreview ? 'border-solid' : ''}`}
+                >
+                  {imagePreview ? (
+                    <>
+                      <img
+                        src={imagePreview}
+                        alt="Uploaded preview"
+                        className="w-full h-full object-cover absolute inset-0"
+                      />
+                      <div className="absolute inset-0 bg-black/50 opacity-0 hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2">
+                        <Button
+                          variant="secondary"
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            imageInputRef.current?.click();
+                          }}
+                        >
+                          Change Photo
+                        </Button>
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            removeImage();
+                          }}
+                        >
+                          <X className="w-4 h-4 mr-1" />
+                          Remove
+                        </Button>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <Upload className="w-8 h-8 text-muted-foreground" />
+                      <p className="text-sm font-medium">Drop photo here</p>
+                      <p className="text-xs text-muted-foreground">JPG, PNG • 1024×1024</p>
+                    </>
+                  )}
                 </div>
+
+                {imageSizeWarning && (
+                  <div className="flex items-center gap-2 text-xs text-yellow-600 dark:text-yellow-500 mb-2">
+                    <AlertTriangle className="w-3 h-3 flex-shrink-0" />
+                    <span>{imageSizeWarning}</span>
+                  </div>
+                )}
+
                 <div className="flex items-start gap-2 text-xs text-muted-foreground">
                   <Info className="w-3 h-3 mt-0.5 flex-shrink-0" />
                   <span>Center face, neutral expression, good lighting</span>
                 </div>
               </div>
 
-              {/* Voice */}
+              {/* Voice Recording */}
               <div className="card-simple p-5">
-                <div className="flex items-center gap-2 mb-4">
-                  <Mic className="w-4 h-4 text-primary" />
-                  <span className="font-medium text-sm">Voice (30-60s)</span>
-                </div>
-
-                <div className="flex justify-center mb-4">
-                  <button
-                    onClick={() => setIsRecording(!isRecording)}
-                    className={`w-16 h-16 rounded-full flex items-center justify-center transition-colors ${
-                      isRecording ? 'bg-destructive text-destructive-foreground' : 'bg-primary text-primary-foreground'
-                    }`}
-                  >
-                    {isRecording ? <Square className="w-6 h-6" /> : <Mic className="w-6 h-6" />}
-                  </button>
-                </div>
-
-                <p className="text-xs text-center text-muted-foreground mb-4">
-                  {isRecording ? 'Recording...' : 'Click to record'}
-                </p>
-
-                <div className="space-y-2 max-h-32 overflow-y-auto">
-                  {sampleSentences.map((s, i) => (
-                    <p key={i} className="text-xs text-muted-foreground p-2 bg-muted rounded">{s}</p>
-                  ))}
-                </div>
-
-                <div className="relative my-4">
-                  <div className="absolute inset-0 flex items-center">
-                    <div className="w-full border-t border-border" />
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-2">
+                    <Mic className="w-4 h-4 text-primary" />
+                    <span className="font-medium text-sm">Voice (30-60s)</span>
                   </div>
-                  <div className="relative flex justify-center">
-                    <span className="px-2 bg-card text-xs text-muted-foreground">or upload</span>
-                  </div>
+                  {audioUrl && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={removeAudio}
+                      className="text-destructive hover:text-destructive h-7 px-2"
+                    >
+                      <X className="w-4 h-4" />
+                    </Button>
+                  )}
                 </div>
 
-                <button className="w-full p-3 rounded-lg border border-dashed border-border text-sm text-muted-foreground hover:border-primary/50">
-                  Upload MP3/WAV
-                </button>
+                {!audioUrl ? (
+                  <>
+                    <div className="flex flex-col items-center mb-4">
+                      <button
+                        onClick={toggleRecording}
+                        className={`w-16 h-16 rounded-full flex items-center justify-center transition-all ${
+                          isRecording
+                            ? 'bg-destructive text-destructive-foreground animate-pulse'
+                            : 'bg-primary text-primary-foreground hover:bg-primary/90'
+                        }`}
+                      >
+                        {isRecording ? <Square className="w-6 h-6" /> : <Mic className="w-6 h-6" />}
+                      </button>
+                      {isRecording && (
+                        <p className="text-sm font-medium mt-3 text-destructive">
+                          Recording... {formatTime(recordingDuration)}
+                        </p>
+                      )}
+                    </div>
+
+                    <p className="text-xs text-center text-muted-foreground mb-4">
+                      {isRecording ? 'Click to stop recording' : 'Click to start recording'}
+                    </p>
+
+                    <div className="space-y-2 max-h-32 overflow-y-auto">
+                      {sampleSentences.map((s, i) => (
+                        <p key={i} className="text-xs text-muted-foreground p-2 bg-muted rounded">{s}</p>
+                      ))}
+                    </div>
+
+                    <div className="relative my-4">
+                      <div className="absolute inset-0 flex items-center">
+                        <div className="w-full border-t border-border" />
+                      </div>
+                      <div className="relative flex justify-center">
+                        <span className="px-2 bg-card text-xs text-muted-foreground">or upload</span>
+                      </div>
+                    </div>
+
+                    <input
+                      ref={audioInputRef}
+                      type="file"
+                      accept="audio/mpeg,audio/wav,audio/mp3"
+                      onChange={(e) => e.target.files?.[0] && handleAudioFileSelect(e.target.files[0])}
+                      className="hidden"
+                    />
+
+                    <button
+                      onClick={() => audioInputRef.current?.click()}
+                      className="w-full p-3 rounded-lg border border-dashed border-border text-sm text-muted-foreground hover:border-primary/50 hover:bg-muted/50 transition-colors"
+                    >
+                      Upload MP3/WAV
+                    </button>
+                  </>
+                ) : (
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-center gap-4 py-6">
+                      <button
+                        onClick={togglePlayback}
+                        className="w-14 h-14 rounded-full bg-primary text-primary-foreground flex items-center justify-center hover:bg-primary/90 transition-colors"
+                      >
+                        {isPlaying ? <Pause className="w-6 h-6" /> : <Play className="w-6 h-6 ml-1" />}
+                      </button>
+                      <div className="text-center">
+                        <p className="text-sm font-medium">Audio Ready</p>
+                        <p className="text-xs text-muted-foreground">Duration: {formatTime(audioDuration)}</p>
+                      </div>
+                    </div>
+
+                    <audio
+                      ref={audioRef}
+                      src={audioUrl}
+                      onEnded={() => setIsPlaying(false)}
+                      className="hidden"
+                    />
+
+                    {audioDuration > 0 && audioDuration < 30 && (
+                      <div className="flex items-center gap-2 text-xs text-yellow-600 dark:text-yellow-500">
+                        <AlertTriangle className="w-3 h-3 flex-shrink-0" />
+                        <span>Recording is shorter than 30 seconds. Longer recordings produce better results.</span>
+                      </div>
+                    )}
+
+                    <Button
+                      variant="outline"
+                      className="w-full"
+                      onClick={() => {
+                        removeAudio();
+                      }}
+                    >
+                      Record Again
+                    </Button>
+                  </div>
+                )}
               </div>
             </div>
 
