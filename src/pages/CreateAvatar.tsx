@@ -34,7 +34,11 @@ const CreateAvatar = () => {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [imageSizeWarning, setImageSizeWarning] = useState<string | null>(null);
   const [isDraggingImage, setIsDraggingImage] = useState(false);
+  const [isCameraOpen, setIsCameraOpen] = useState(false);
   const imageInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const cameraStreamRef = useRef<MediaStream | null>(null);
 
   // Voice recording state
   const [isRecording, setIsRecording] = useState(false);
@@ -101,6 +105,48 @@ const CreateAvatar = () => {
     setUploadedImage(null);
     setImagePreview(null);
     setImageSizeWarning(null);
+  };
+
+  // Camera functions
+  const openCamera = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } });
+      cameraStreamRef.current = stream;
+      setIsCameraOpen(true);
+      setTimeout(() => {
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+          videoRef.current.play();
+        }
+      }, 100);
+    } catch {
+      alert('Could not access camera. Please allow camera access and try again.');
+    }
+  };
+
+  const capturePhoto = () => {
+    if (!videoRef.current) return;
+    const canvas = document.createElement('canvas');
+    canvas.width = videoRef.current.videoWidth;
+    canvas.height = videoRef.current.videoHeight;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    ctx.drawImage(videoRef.current, 0, 0);
+    canvas.toBlob((blob) => {
+      if (blob) {
+        const file = new File([blob], 'camera-photo.png', { type: 'image/png' });
+        handleImageSelect(file);
+      }
+    }, 'image/png');
+    closeCamera();
+  };
+
+  const closeCamera = () => {
+    if (cameraStreamRef.current) {
+      cameraStreamRef.current.getTracks().forEach(track => track.stop());
+      cameraStreamRef.current = null;
+    }
+    setIsCameraOpen(false);
   };
 
   // Voice recording functions
@@ -330,6 +376,30 @@ const CreateAvatar = () => {
                   )}
                 </div>
 
+                {isCameraOpen && (
+                  <div className="relative aspect-square mb-3 rounded-lg overflow-hidden border border-border bg-black">
+                    <video ref={videoRef} className="w-full h-full object-cover" autoPlay playsInline muted />
+                    <div className="absolute bottom-3 left-0 right-0 flex items-center justify-center gap-3">
+                      <Button variant="destructive" size="sm" onClick={closeCamera}>
+                        <X className="w-4 h-4 mr-1" /> Cancel
+                      </Button>
+                      <Button variant="default" size="sm" onClick={capturePhoto}>
+                        <Camera className="w-4 h-4 mr-1" /> Capture
+                      </Button>
+                    </div>
+                  </div>
+                )}
+
+                {!imagePreview && !isCameraOpen && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="w-full mb-3"
+                    onClick={openCamera}
+                  >
+                    <Camera className="w-4 h-4 mr-1" /> Take Photo
+                  </Button>
+                )}
                 {imageSizeWarning && (
                   <div className="flex items-center gap-2 text-xs text-yellow-600 dark:text-yellow-500 mb-2">
                     <AlertTriangle className="w-3 h-3 flex-shrink-0" />
