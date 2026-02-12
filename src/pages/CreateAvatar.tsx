@@ -35,10 +35,17 @@ const CreateAvatar = () => {
   const [imageSizeWarning, setImageSizeWarning] = useState<string | null>(null);
   const [isDraggingImage, setIsDraggingImage] = useState(false);
   const [isCameraOpen, setIsCameraOpen] = useState(false);
+  const [cameraGuide, setCameraGuide] = useState<{
+    brightness: 'low' | 'ok' | 'high';
+    centered: boolean;
+    stable: boolean;
+  }>({ brightness: 'ok', centered: false, stable: false });
   const imageInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
   const cameraStreamRef = useRef<MediaStream | null>(null);
+  const analysisIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   // Voice recording state
   const [isRecording, setIsRecording] = useState(false);
@@ -107,18 +114,80 @@ const CreateAvatar = () => {
     setImageSizeWarning(null);
   };
 
-  // Camera functions
+  // Camera analysis: brightness + center region skin-tone detection
+  const analyzeFrame = () => {
+    if (!videoRef.current || !canvasRef.current) return;
+    const video = videoRef.current;
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d', { willReadFrequently: true });
+    if (!ctx || video.videoWidth === 0) return;
+
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    ctx.drawImage(video, 0, 0);
+
+    const w = canvas.width;
+    const h = canvas.height;
+
+    // 1. Overall brightness
+    const fullData = ctx.getImageData(0, 0, w, h).data;
+    let totalBrightness = 0;
+    const pixelCount = w * h;
+    for (let i = 0; i < fullData.length; i += 16) { // sample every 4th pixel
+      totalBrightness += (fullData[i] * 0.299 + fullData[i + 1] * 0.587 + fullData[i + 2] * 0.114);
+    }
+    const avgBrightness = totalBrightness / (pixelCount / 4);
+
+    // 2. Center region: check for skin-tone-like pixels (face proxy)
+    const cx = Math.floor(w * 0.3);
+    const cy = Math.floor(h * 0.15);
+    const cw = Math.floor(w * 0.4);
+    const ch = Math.floor(h * 0.55);
+    const centerData = ctx.getImageData(cx, cy, cw, ch).data;
+    let skinPixels = 0;
+    const centerPixelCount = cw * ch;
+    for (let i = 0; i < centerData.length; i += 16) {
+      const r = centerData[i], g = centerData[i + 1], b = centerData[i + 2];
+      // Simple skin tone heuristic (works across various skin tones)
+      if (r > 60 && g > 40 && b > 20 && r > g && r > b && Math.abs(r - g) > 10 && r - b > 15) {
+        skinPixels++;
+      }
+    }
+    const skinRatio = skinPixels / (centerPixelCount / 4);
+
+    // 3. Edge region check: face should NOT be heavily at edges
+    const edgeData = ctx.getImageData(0, 0, Math.floor(w * 0.15), h).data;
+    let edgeSkin = 0;
+    for (let i = 0; i < edgeData.length; i += 16) {
+      const r = edgeData[i], g = edgeData[i + 1], b = edgeData[i + 2];
+      if (r > 60 && g > 40 && b > 20 && r > g && r > b && Math.abs(r - g) > 10 && r - b > 15) {
+        edgeSkin++;
+      }
+    }
+    const edgeSkinRatio = edgeSkin / (Math.floor(w * 0.15) * h / 4);
+
+    const centered = skinRatio > 0.12 && edgeSkinRatio < skinRatio * 0.6;
+    const brightness: 'low' | 'ok' | 'high' = avgBrightness < 60 ? 'low' : avgBrightness > 210 ? 'high' : 'ok';
+
+    setCameraGuide({ brightness, centered, stable: centered && brightness === 'ok' });
+  };
+
   const openCamera = async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } });
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: 'user', width: { ideal: 1024 }, height: { ideal: 1024 } }
+      });
       cameraStreamRef.current = stream;
       setIsCameraOpen(true);
+      setCameraGuide({ brightness: 'ok', centered: false, stable: false });
       setTimeout(() => {
         if (videoRef.current) {
           videoRef.current.srcObject = stream;
           videoRef.current.play();
+          // Start real-time analysis every 300ms
+          analysisIntervalRef.current = setInterval(analyzeFrame, 300);
         }
-      }, 100);
+      }, 200);
     } catch {
       alert('Could not access camera. Please allow camera access and try again.');
     }
@@ -142,6 +211,10 @@ const CreateAvatar = () => {
   };
 
   const closeCamera = () => {
+    if (analysisIntervalRef.current) {
+      clearInterval(analysisIntervalRef.current);
+      analysisIntervalRef.current = null;
+    }
     if (cameraStreamRef.current) {
       cameraStreamRef.current.getTracks().forEach(track => track.stop());
       cameraStreamRef.current = null;
@@ -379,7 +452,58 @@ const CreateAvatar = () => {
                 {isCameraOpen && (
                   <div className="relative aspect-square mb-3 rounded-lg overflow-hidden border border-border bg-black">
                     <video ref={videoRef} className="w-full h-full object-cover" autoPlay playsInline muted />
-                    <div className="absolute bottom-3 left-0 right-0 flex items-center justify-center gap-3">
+                    <canvas ref={canvasRef} className="hidden" />
+
+                    {/* Face guide oval */}
+                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                      <div
+                        className={`w-[55%] h-[70%] rounded-full border-[3px] transition-colors duration-300 ${
+                          cameraGuide.stable
+                            ? 'border-green-400 shadow-[0_0_15px_rgba(74,222,128,0.4)]'
+                            : cameraGuide.centered
+                              ? 'border-yellow-400'
+                              : 'border-white/50'
+                        }`}
+                      />
+                    </div>
+
+                    {/* Corner brackets */}
+                    <div className="absolute inset-0 pointer-events-none">
+                      <div className={`absolute top-3 left-3 w-6 h-6 border-t-2 border-l-2 rounded-tl transition-colors duration-300 ${cameraGuide.stable ? 'border-green-400' : 'border-white/40'}`} />
+                      <div className={`absolute top-3 right-3 w-6 h-6 border-t-2 border-r-2 rounded-tr transition-colors duration-300 ${cameraGuide.stable ? 'border-green-400' : 'border-white/40'}`} />
+                      <div className={`absolute bottom-14 left-3 w-6 h-6 border-b-2 border-l-2 rounded-bl transition-colors duration-300 ${cameraGuide.stable ? 'border-green-400' : 'border-white/40'}`} />
+                      <div className={`absolute bottom-14 right-3 w-6 h-6 border-b-2 border-r-2 rounded-br transition-colors duration-300 ${cameraGuide.stable ? 'border-green-400' : 'border-white/40'}`} />
+                    </div>
+
+                    {/* Status banner */}
+                    <div className="absolute top-2 left-0 right-0 flex flex-col items-center pointer-events-none">
+                      <div className={`px-3 py-1 rounded-full text-xs font-medium backdrop-blur-sm transition-colors duration-300 ${
+                        cameraGuide.stable ? 'bg-green-500/80 text-white' : 'bg-black/60 text-white'
+                      }`}>
+                        {cameraGuide.stable
+                          ? '✓ Ready to capture!'
+                          : cameraGuide.centered
+                            ? 'Almost there...'
+                            : 'Position your face in the oval'}
+                      </div>
+                    </div>
+
+                    {/* Status chips */}
+                    <div className="absolute bottom-12 left-0 right-0 flex justify-center gap-2 pointer-events-none">
+                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium backdrop-blur-sm ${
+                        cameraGuide.brightness === 'ok' ? 'bg-green-500/70 text-white' : 'bg-yellow-500/70 text-white'
+                      }`}>
+                        {cameraGuide.brightness === 'low' ? '☀ More light' : cameraGuide.brightness === 'high' ? '☀ Too bright' : '☀ Good light'}
+                      </span>
+                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium backdrop-blur-sm ${
+                        cameraGuide.centered ? 'bg-green-500/70 text-white' : 'bg-yellow-500/70 text-white'
+                      }`}>
+                        {cameraGuide.centered ? '◎ Centered' : '◎ Center face'}
+                      </span>
+                    </div>
+
+                    {/* Action buttons */}
+                    <div className="absolute bottom-2 left-0 right-0 flex items-center justify-center gap-3">
                       <Button variant="destructive" size="sm" onClick={closeCamera}>
                         <X className="w-4 h-4 mr-1" /> Cancel
                       </Button>
