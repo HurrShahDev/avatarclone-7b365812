@@ -46,6 +46,8 @@ const CreateAvatar = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const cameraStreamRef = useRef<MediaStream | null>(null);
   const analysisIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const centeredHistoryRef = useRef<boolean[]>([]);
+  const brightnessHistoryRef = useRef<('low' | 'ok' | 'high')[]>([]);
 
   // Voice recording state
   const [isRecording, setIsRecording] = useState(false);
@@ -114,7 +116,24 @@ const CreateAvatar = () => {
     setImageSizeWarning(null);
   };
 
-  // Camera analysis: brightness + center region skin-tone detection
+  // Broader skin-tone check covering diverse skin tones
+  const isSkinTone = (r: number, g: number, b: number) => {
+    // HSV-based: skin has R as dominant channel, moderate saturation
+    const max = Math.max(r, g, b);
+    const min = Math.min(r, g, b);
+    const diff = max - min;
+    if (max < 40) return false; // too dark to tell
+    const saturation = max === 0 ? 0 : diff / max;
+    // Skin: R is usually highest, not too saturated, not too grey
+    return (
+      r >= g && r >= b && // R dominant or equal
+      saturation > 0.05 && saturation < 0.75 &&
+      r > 40 && g > 20 &&
+      (r - b) > 5
+    );
+  };
+
+  // Camera analysis: brightness + center region detection with smoothing
   const analyzeFrame = () => {
     if (!videoRef.current || !canvasRef.current) return;
     const video = videoRef.current;
@@ -129,45 +148,53 @@ const CreateAvatar = () => {
     const w = canvas.width;
     const h = canvas.height;
 
-    // 1. Overall brightness
+    // 1. Overall brightness (sample every 8th pixel for speed)
     const fullData = ctx.getImageData(0, 0, w, h).data;
     let totalBrightness = 0;
-    const pixelCount = w * h;
-    for (let i = 0; i < fullData.length; i += 16) { // sample every 4th pixel
+    let sampleCount = 0;
+    for (let i = 0; i < fullData.length; i += 32) {
       totalBrightness += (fullData[i] * 0.299 + fullData[i + 1] * 0.587 + fullData[i + 2] * 0.114);
+      sampleCount++;
     }
-    const avgBrightness = totalBrightness / (pixelCount / 4);
+    const avgBrightness = totalBrightness / sampleCount;
 
     // 2. Center region: check for skin-tone-like pixels (face proxy)
-    const cx = Math.floor(w * 0.3);
-    const cy = Math.floor(h * 0.15);
-    const cw = Math.floor(w * 0.4);
-    const ch = Math.floor(h * 0.55);
+    const cx = Math.floor(w * 0.25);
+    const cy = Math.floor(h * 0.1);
+    const cw = Math.floor(w * 0.5);
+    const ch = Math.floor(h * 0.6);
     const centerData = ctx.getImageData(cx, cy, cw, ch).data;
     let skinPixels = 0;
-    const centerPixelCount = cw * ch;
+    let centerSamples = 0;
     for (let i = 0; i < centerData.length; i += 16) {
-      const r = centerData[i], g = centerData[i + 1], b = centerData[i + 2];
-      // Simple skin tone heuristic (works across various skin tones)
-      if (r > 60 && g > 40 && b > 20 && r > g && r > b && Math.abs(r - g) > 10 && r - b > 15) {
+      if (isSkinTone(centerData[i], centerData[i + 1], centerData[i + 2])) {
         skinPixels++;
       }
+      centerSamples++;
     }
-    const skinRatio = skinPixels / (centerPixelCount / 4);
+    const skinRatio = skinPixels / centerSamples;
 
-    // 3. Edge region check: face should NOT be heavily at edges
-    const edgeData = ctx.getImageData(0, 0, Math.floor(w * 0.15), h).data;
-    let edgeSkin = 0;
-    for (let i = 0; i < edgeData.length; i += 16) {
-      const r = edgeData[i], g = edgeData[i + 1], b = edgeData[i + 2];
-      if (r > 60 && g > 40 && b > 20 && r > g && r > b && Math.abs(r - g) > 10 && r - b > 15) {
-        edgeSkin++;
-      }
-    }
-    const edgeSkinRatio = edgeSkin / (Math.floor(w * 0.15) * h / 4);
+    // Lowered threshold: even 5% skin pixels in center = face present
+    const rawCentered = skinRatio > 0.05;
+    const rawBrightness: 'low' | 'ok' | 'high' = avgBrightness < 45 ? 'low' : avgBrightness > 220 ? 'high' : 'ok';
 
-    const centered = skinRatio > 0.12 && edgeSkinRatio < skinRatio * 0.6;
-    const brightness: 'low' | 'ok' | 'high' = avgBrightness < 60 ? 'low' : avgBrightness > 210 ? 'high' : 'ok';
+    // Smoothing: use last 5 frames to prevent flicker
+    const cHist = centeredHistoryRef.current;
+    const bHist = brightnessHistoryRef.current;
+    cHist.push(rawCentered);
+    bHist.push(rawBrightness);
+    if (cHist.length > 5) cHist.shift();
+    if (bHist.length > 5) bHist.shift();
+
+    // Centered if majority of recent frames say so
+    const centeredVotes = cHist.filter(Boolean).length;
+    const centered = centeredVotes >= 3;
+
+    // Brightness: use mode of recent frames
+    const bCounts = { low: 0, ok: 0, high: 0 };
+    bHist.forEach(b => bCounts[b]++);
+    const brightness = (Object.keys(bCounts) as ('low' | 'ok' | 'high')[])
+      .reduce((a, b) => bCounts[a] >= bCounts[b] ? a : b);
 
     setCameraGuide({ brightness, centered, stable: centered && brightness === 'ok' });
   };
