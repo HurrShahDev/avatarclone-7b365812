@@ -15,20 +15,22 @@ const Auth = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  
-  const [formData, setFormData] = useState({
-    fullName: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
-    consent: false,
-    rememberMe: false,
-  });
+
+  // Separate state for each mode so they don't overwrite each other
+  const [signInData, setSignInData] = useState({ email: '', password: '', rememberMe: false });
+  const [signUpData, setSignUpData] = useState({ fullName: '', email: '', password: '', confirmPassword: '', consent: false });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
 
+  const switchMode = (newMode: 'signin' | 'signup') => {
+    setMode(newMode);
+    setErrors({});
+    setShowPassword(false);
+    setShowConfirmPassword(false);
+  };
+
   const getPasswordStrength = () => {
-    const password = formData.password;
+    const password = mode === 'signup' ? signUpData.password : signInData.password;
     let strength = 0;
     if (password.length >= 8) strength++;
     if (/[a-z]/.test(password) && /[A-Z]/.test(password)) strength++;
@@ -45,20 +47,20 @@ const Auth = () => {
     const newErrors: Record<string, string> = {};
 
     if (mode === 'signup') {
-      if (!formData.fullName.trim()) newErrors.fullName = 'Name is required';
-      if (formData.password !== formData.confirmPassword) {
+      if (!signUpData.fullName.trim()) newErrors.fullName = 'Name is required';
+      if (!signUpData.email.includes('@')) newErrors.email = 'Enter a valid email';
+      if (signUpData.password !== signUpData.confirmPassword) {
         newErrors.confirmPassword = 'Passwords do not match';
       }
       if (getPasswordStrength() < 2) {
         newErrors.password = 'Use at least 8 characters with a number and special character';
       }
-      if (!formData.consent) {
+      if (!signUpData.consent) {
         newErrors.consent = 'Consent is required';
       }
-    }
-
-    if (!formData.email.includes('@')) {
-      newErrors.email = 'Enter a valid email';
+    } else {
+      if (!signInData.email.includes('@')) newErrors.email = 'Enter a valid email';
+      if (!signInData.password) newErrors.password = 'Password is required';
     }
 
     if (Object.keys(newErrors).length > 0) {
@@ -73,35 +75,38 @@ const Auth = () => {
       if (mode === 'signup') {
         const userCredential = await createUserWithEmailAndPassword(
           auth,
-          formData.email,
-          formData.password
+          signUpData.email,
+          signUpData.password
         );
         await updateProfile(userCredential.user, {
-          displayName: formData.fullName,
+          displayName: signUpData.fullName,
         });
-        // Clear form and switch to sign in
-        setFormData({
-          fullName: '',
-          email: '',
-          password: '',
-          confirmPassword: '',
-          consent: false,
-          rememberMe: false,
-        });
-        setMode('signin');
+        setSignUpData({ fullName: '', email: '', password: '', confirmPassword: '', consent: false });
+        switchMode('signin');
       } else {
-        await signInWithEmailAndPassword(auth, formData.email, formData.password);
+        await signInWithEmailAndPassword(auth, signInData.email, signInData.password);
         navigate('/home');
       }
     } catch (error: any) {
-      if (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') {
-        setErrors({ email: 'No account found with this email/password' });
-      } else if (error.code === 'auth/wrong-password') {
-        setErrors({ password: 'Incorrect password' });
-      } else if (error.code === 'auth/email-already-in-use') {
-        setErrors({ email: 'An account with this email already exists' });
+      const code = error.code || '';
+      if (mode === 'signin') {
+        if (code === 'auth/user-not-found') {
+          setErrors({ email: 'No account found with this email' });
+        } else if (code === 'auth/wrong-password' || code === 'auth/invalid-credential') {
+          setErrors({ password: 'Incorrect email or password' });
+        } else if (code === 'auth/too-many-requests') {
+          setErrors({ email: 'Too many attempts. Please try again later.' });
+        } else {
+          setErrors({ email: error.message });
+        }
       } else {
-        setErrors({ email: error.message });
+        if (code === 'auth/email-already-in-use') {
+          setErrors({ email: 'An account with this email already exists' });
+        } else if (code === 'auth/weak-password') {
+          setErrors({ password: 'Password is too weak' });
+        } else {
+          setErrors({ email: error.message });
+        }
       }
     } finally {
       setIsLoading(false);
@@ -110,21 +115,17 @@ const Auth = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      {/* Main */}
       <main className="flex-1 flex items-center justify-center p-4">
         <div className="w-full max-w-md">
-          {/* Logo */}
           <div className="flex items-center justify-center gap-2 mb-8">
             <img src={logo} alt="AvatarClone" className="h-12 w-auto" />
             <span className="font-semibold text-xl">AvatarClone</span>
           </div>
 
-          {/* Card */}
           <div className="card-simple p-6 lg:p-8">
-            {/* Tabs */}
             <div className="flex mb-6 p-1 bg-muted rounded-lg">
               <button
-                onClick={() => setMode('signin')}
+                onClick={() => switchMode('signin')}
                 className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
                   mode === 'signin' ? 'bg-background shadow-sm' : 'text-muted-foreground'
                 }`}
@@ -132,7 +133,7 @@ const Auth = () => {
                 Sign In
               </button>
               <button
-                onClick={() => setMode('signup')}
+                onClick={() => switchMode('signup')}
                 className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
                   mode === 'signup' ? 'bg-background shadow-sm' : 'text-muted-foreground'
                 }`}
@@ -141,7 +142,6 @@ const Auth = () => {
               </button>
             </div>
 
-            {/* GitHub */}
             <button className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg border border-border hover:bg-muted transition-colors mb-4">
               <Github className="w-5 h-5" />
               <span className="text-sm font-medium">Continue with GitHub</span>
@@ -156,7 +156,6 @@ const Auth = () => {
               </div>
             </div>
 
-            {/* Form */}
             <form onSubmit={handleSubmit} className="space-y-4">
               {mode === 'signup' && (
                 <div>
@@ -166,8 +165,8 @@ const Auth = () => {
                     <input
                       type="text"
                       placeholder="Your name"
-                      value={formData.fullName}
-                      onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+                      value={signUpData.fullName}
+                      onChange={(e) => setSignUpData({ ...signUpData, fullName: e.target.value })}
                       className="input-field pl-10"
                     />
                   </div>
@@ -187,8 +186,12 @@ const Auth = () => {
                   <input
                     type="email"
                     placeholder="you@example.com"
-                    value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    value={mode === 'signin' ? signInData.email : signUpData.email}
+                    onChange={(e) =>
+                      mode === 'signin'
+                        ? setSignInData({ ...signInData, email: e.target.value })
+                        : setSignUpData({ ...signUpData, email: e.target.value })
+                    }
                     className="input-field pl-10"
                   />
                 </div>
@@ -207,8 +210,12 @@ const Auth = () => {
                   <input
                     type={showPassword ? 'text' : 'password'}
                     placeholder="••••••••"
-                    value={formData.password}
-                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                    value={mode === 'signin' ? signInData.password : signUpData.password}
+                    onChange={(e) =>
+                      mode === 'signin'
+                        ? setSignInData({ ...signInData, password: e.target.value })
+                        : setSignUpData({ ...signUpData, password: e.target.value })
+                    }
                     className="input-field pl-10 pr-10"
                   />
                   <button
@@ -219,7 +226,7 @@ const Auth = () => {
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
                 </div>
-                {mode === 'signup' && formData.password && (
+                {mode === 'signup' && signUpData.password && (
                   <div className="mt-2">
                     <div className="flex gap-1 mb-1">
                       {[1, 2, 3, 4].map((level) => (
@@ -252,8 +259,8 @@ const Auth = () => {
                     <input
                       type={showConfirmPassword ? 'text' : 'password'}
                       placeholder="••••••••"
-                      value={formData.confirmPassword}
-                      onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                      value={signUpData.confirmPassword}
+                      onChange={(e) => setSignUpData({ ...signUpData, confirmPassword: e.target.value })}
                       className="input-field pl-10 pr-10"
                     />
                     <button
@@ -278,8 +285,8 @@ const Auth = () => {
                   <label className="flex items-center gap-2 cursor-pointer">
                     <input
                       type="checkbox"
-                      checked={formData.rememberMe}
-                      onChange={(e) => setFormData({ ...formData, rememberMe: e.target.checked })}
+                      checked={signInData.rememberMe}
+                      onChange={(e) => setSignInData({ ...signInData, rememberMe: e.target.checked })}
                       className="w-4 h-4 rounded border-border"
                     />
                     <span className="text-sm text-muted-foreground">Remember me</span>
@@ -295,8 +302,8 @@ const Auth = () => {
                   <label className="flex items-start gap-2 cursor-pointer">
                     <input
                       type="checkbox"
-                      checked={formData.consent}
-                      onChange={(e) => setFormData({ ...formData, consent: e.target.checked })}
+                      checked={signUpData.consent}
+                      onChange={(e) => setSignUpData({ ...signUpData, consent: e.target.checked })}
                       className="w-4 h-4 rounded border-border mt-0.5"
                     />
                     <span className="text-sm text-muted-foreground">
