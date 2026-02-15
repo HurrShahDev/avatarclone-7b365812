@@ -131,23 +131,41 @@ const CreateAvatar = () => {
     setImageSizeWarning(null);
   };
 
-  // ─── Stricter skin-tone detection ───
-  const isSkinTone = (r: number, g: number, b: number) => {
-    // Require minimum brightness to avoid dark noise
-    if (r < 60 || g < 40 || b < 20) return false;
-    // R must be dominant
-    if (r <= g || r <= b) return false;
-    // Enough separation between channels
-    if ((r - g) < 10 || (r - b) < 15) return false;
-    // HSV saturation check
-    const max = Math.max(r, g, b);
-    const min = Math.min(r, g, b);
-    const sat = max === 0 ? 0 : (max - min) / max;
-    // Skin has moderate saturation, not too grey, not too vivid
-    return sat > 0.1 && sat < 0.65;
+  // ─── Face detection: use FaceDetector API if available, else variance-based ───
+  const faceDetectorRef = useRef<any>(null);
+  const hasFaceDetectorRef = useRef<boolean | null>(null);
+
+  useEffect(() => {
+    // Check if FaceDetector API is available (Chromium browsers)
+    if (typeof (window as any).FaceDetector !== 'undefined') {
+      try {
+        faceDetectorRef.current = new (window as any).FaceDetector({ fastMode: true, maxDetectedFaces: 1 });
+        hasFaceDetectorRef.current = true;
+      } catch {
+        hasFaceDetectorRef.current = false;
+      }
+    } else {
+      hasFaceDetectorRef.current = false;
+    }
+  }, []);
+
+  // Calculate pixel variance in a region (high variance = face/detail, low = flat wall)
+  const calcVariance = (data: Uint8ClampedArray, step: number = 16) => {
+    let sum = 0;
+    let sumSq = 0;
+    let count = 0;
+    for (let i = 0; i < data.length; i += step * 4) {
+      const gray = data[i] * 0.299 + data[i + 1] * 0.587 + data[i + 2] * 0.114;
+      sum += gray;
+      sumSq += gray * gray;
+      count++;
+    }
+    if (count === 0) return 0;
+    const mean = sum / count;
+    return sumSq / count - mean * mean; // variance
   };
 
-  // ─── Frame analysis with edge comparison ───
+  // ─── Frame analysis: variance-based + FaceDetector API ───
   const analyzeFrame = useCallback(() => {
     if (!videoRef.current || !canvasRef.current) return;
     const video = videoRef.current;
@@ -161,7 +179,7 @@ const CreateAvatar = () => {
     const w = canvas.width;
     const h = canvas.height;
 
-    // 1. Brightness - sample every 12th pixel
+    // 1. Brightness
     const fullData = ctx.getImageData(0, 0, w, h).data;
     let totalBrightness = 0;
     let sampleCount = 0;
@@ -171,52 +189,57 @@ const CreateAvatar = () => {
     }
     const avgBrightness = totalBrightness / sampleCount;
 
-    // 2. Center oval region skin detection
-    const cx = Math.floor(w * 0.3);
-    const cy = Math.floor(h * 0.15);
-    const cw = Math.floor(w * 0.4);
-    const ch = Math.floor(h * 0.55);
+    // 2. Variance-based centering: compare center region complexity vs edges
+    const cx = Math.floor(w * 0.25);
+    const cy = Math.floor(h * 0.1);
+    const cw = Math.floor(w * 0.5);
+    const ch = Math.floor(h * 0.65);
     const centerData = ctx.getImageData(cx, cy, cw, ch).data;
-    let centerSkin = 0;
-    let centerTotal = 0;
-    for (let i = 0; i < centerData.length; i += 16) {
-      if (isSkinTone(centerData[i], centerData[i + 1], centerData[i + 2])) centerSkin++;
-      centerTotal++;
-    }
-    const centerRatio = centerSkin / centerTotal;
+    const centerVariance = calcVariance(centerData, 8);
 
-    // 3. Edge regions (left+right strips) - face should NOT be there predominantly
+    // Edge strips (left 15% + right 15%)
     const edgeW = Math.floor(w * 0.15);
     const leftData = ctx.getImageData(0, 0, edgeW, h).data;
     const rightData = ctx.getImageData(w - edgeW, 0, edgeW, h).data;
-    let edgeSkin = 0;
-    let edgeTotal = 0;
-    for (let i = 0; i < leftData.length; i += 16) {
-      if (isSkinTone(leftData[i], leftData[i + 1], leftData[i + 2])) edgeSkin++;
-      edgeTotal++;
-    }
-    for (let i = 0; i < rightData.length; i += 16) {
-      if (isSkinTone(rightData[i], rightData[i + 1], rightData[i + 2])) edgeSkin++;
-      edgeTotal++;
-    }
-    const edgeRatio = edgeSkin / edgeTotal;
+    const edgeVariance = (calcVariance(leftData, 8) + calcVariance(rightData, 8)) / 2;
 
-    // Face centered: significant skin in center AND center >> edges
-    const rawCentered = centerRatio > 0.15 && centerRatio > edgeRatio * 2;
+    // Face present in center: center has significantly more detail than edges
+    // AND center variance must exceed an absolute minimum (a face is complex)
+    const rawCentered = centerVariance > 400 && centerVariance > edgeVariance * 1.5;
 
-    // Brightness thresholds
+    // Also try FaceDetector API (async, updates on next cycle)
+    if (hasFaceDetectorRef.current && faceDetectorRef.current) {
+      faceDetectorRef.current.detect(canvas).then((faces: any[]) => {
+        if (faces.length > 0) {
+          const face = faces[0].boundingBox;
+          const faceCenterX = face.x + face.width / 2;
+          const faceCenterY = face.y + face.height / 2;
+          const frameCenterX = w / 2;
+          const frameCenterY = h / 2;
+          // Face is centered if its center is within 25% of frame center
+          const xOk = Math.abs(faceCenterX - frameCenterX) < w * 0.25;
+          const yOk = Math.abs(faceCenterY - frameCenterY) < h * 0.25;
+          const apiCentered = xOk && yOk;
+          // Push API result into history
+          centeredHistoryRef.current.push(apiCentered);
+          if (centeredHistoryRef.current.length > 10) centeredHistoryRef.current.shift();
+        }
+      }).catch(() => {});
+    }
+
     const rawBrightness: 'low' | 'ok' | 'high' =
-      avgBrightness < 70 ? 'low' : avgBrightness > 200 ? 'high' : 'ok';
+      avgBrightness < 60 ? 'low' : avgBrightness > 210 ? 'high' : 'ok';
 
-    // Smoothing over last 7 frames
+    // Smoothing over last 10 frames
     const cHist = centeredHistoryRef.current;
     const bHist = brightnessHistoryRef.current;
     cHist.push(rawCentered);
     bHist.push(rawBrightness);
-    if (cHist.length > 7) cHist.shift();
-    if (bHist.length > 7) bHist.shift();
+    if (cHist.length > 10) cHist.shift();
+    if (bHist.length > 10) bHist.shift();
 
-    const centered = cHist.filter(Boolean).length >= 4;
+    // Need 5/10 positive frames
+    const centered = cHist.filter(Boolean).length >= 5;
     const bCounts = { low: 0, ok: 0, high: 0 };
     bHist.forEach(b => bCounts[b]++);
     const brightness = (Object.keys(bCounts) as ('low' | 'ok' | 'high')[])
@@ -225,7 +248,7 @@ const CreateAvatar = () => {
     const stable = centered && brightness === 'ok';
     setCameraGuide({ brightness, centered, stable });
 
-    // Auto-capture: start 3s countdown when stable
+    // Auto-capture countdown
     if (stable) {
       if (!stableStartRef.current) {
         stableStartRef.current = Date.now();
@@ -243,7 +266,6 @@ const CreateAvatar = () => {
         }, 500);
       }
     } else {
-      // Reset countdown
       stableStartRef.current = null;
       setAutoCountdown(null);
       if (countdownRef.current) {
