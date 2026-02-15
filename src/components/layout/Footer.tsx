@@ -23,10 +23,9 @@ const Footer = () => {
           <div>
             <h4 className="font-medium mb-3">Product</h4>
             <ul className="space-y-2 text-sm text-muted-foreground">
-              <li><Link to="/create" className="hover:text-foreground">Avatar Generation</Link></li>
-              <li><Link to="/create" className="hover:text-foreground">Voice Cloning</Link></li>
-              <li><Link to="/create" className="hover:text-foreground">Video Generation</Link></li>
-              <li><Link to="/create" className="hover:text-foreground">AI Lip Sync</Link></li>
+              <li><Link to="/products/avatar-video" className="hover:text-foreground">Avatar Video Generation</Link></li>
+              <li><Link to="/products/voice-cloning" className="hover:text-foreground">Voice Cloning</Link></li>
+              <li><Link to="/products/text-to-speech" className="hover:text-foreground">Text to Speech</Link></li>
             </ul>
           </div>
 
