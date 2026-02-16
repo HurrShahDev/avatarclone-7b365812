@@ -203,6 +203,16 @@
   }
 }
 
+@keyframes scanLine {
+  0%, 100% { top: 10%; }
+  50% { top: 85%; }
+}
+
+@keyframes waveBar {
+  0% { transform: scaleY(0.4); }
+  100% { transform: scaleY(1); }
+}
+
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
