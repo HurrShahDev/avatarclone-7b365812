@@ -83,6 +83,10 @@
     --sidebar-accent-foreground: 40 10% 90%;
     --sidebar-border: 220 15% 20%;
     --sidebar-ring: 220 60% 55%;
+
+    --hero-neon-blue: 210 100% 60%;
+    --hero-neon-purple: 270 80% 60%;
+    --hero-dark-bg: 225 30% 6%;
   }
 }
 
