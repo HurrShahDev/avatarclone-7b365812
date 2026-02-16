@@ -23,7 +23,7 @@ const PromoSection = () => {
       <div className="container mx-auto px-4 lg:px-8">
         <div className="flex flex-col lg:flex-row items-center gap-10 lg:gap-16 max-w-6xl mx-auto">
           {/* Text Content - Left Side */}
-          <div className="flex-1 order-2 lg:order-1">
+          <div className="flex-1 order-1 lg:order-1">
             <h2 className="text-2xl lg:text-4xl font-bold mb-4 leading-tight">
               Professional AI Avatar & Voice Clone
             </h2>
@@ -60,7 +60,7 @@ const PromoSection = () => {
           </div>
 
           {/* Demo Video - Right Side */}
-          <div className="flex-1 w-full order-1 lg:order-2">
+          <div className="flex-1 w-full order-2 lg:order-2">
             <div className="relative aspect-video bg-muted rounded-2xl shadow-xl overflow-hidden">
               <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-primary/5 to-primary/10">
                 <div className="w-20 h-20 bg-primary/90 rounded-full flex items-center justify-center cursor-pointer hover:bg-primary transition-colors shadow-lg">
