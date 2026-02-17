@@ -21,8 +21,8 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Auth />} />
-          <Route path="/home" element={<Landing />} />
+          <Route path="/" element={<Landing />} />
+          <Route path="/auth" element={<Auth />} />
           <Route path="/create" element={<CreateAvatar />} />
           <Route path="/docs" element={<Docs />} />
           <Route path="/products/avatar-video" element={<AvatarVideoGeneration />} />

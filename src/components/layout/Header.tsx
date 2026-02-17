@@ -36,7 +36,7 @@ const Header = ({ isLoggedIn = false }: HeaderProps) => {
       <div className="container mx-auto px-4 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link to="/home" className="flex items-center gap-2">
+          <Link to="/" className="flex items-center gap-2">
             <img src={logo} alt="AvatarClone" className="h-10 w-auto" />
             <span className="font-semibold text-foreground">AvatarClone</span>
           </Link>
@@ -67,9 +67,12 @@ const Header = ({ isLoggedIn = false }: HeaderProps) => {
             ) : (
               <>
                 <Link to="/docs">
-                  <Button size="sm">Docs</Button>
+                  <Button variant="ghost" size="sm">Docs</Button>
                 </Link>
-                <Link to="/create">
+                <Link to="/auth">
+                  <Button variant="outline" size="sm">Sign In</Button>
+                </Link>
+                <Link to="/auth?mode=signup">
                   <Button size="sm">Get Started</Button>
                 </Link>
               </>
@@ -104,7 +107,10 @@ const Header = ({ isLoggedIn = false }: HeaderProps) => {
               ))}
               {!isLoggedIn && (
                 <div className="flex flex-col gap-2 pt-4 border-t border-border">
-                  <Link to="/create" onClick={() => setIsMenuOpen(false)}>
+                  <Link to="/auth" onClick={() => setIsMenuOpen(false)}>
+                    <Button variant="outline" className="w-full">Sign In</Button>
+                  </Link>
+                  <Link to="/auth?mode=signup" onClick={() => setIsMenuOpen(false)}>
                     <Button className="w-full">Get Started</Button>
                   </Link>
                 </div>
