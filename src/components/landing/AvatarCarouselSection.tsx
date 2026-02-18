@@ -136,7 +136,7 @@ const AvatarCarouselSection = () => {
   }, []);
 
   return (
-    <section className="py-16 lg:py-24 bg-accent/20 overflow-hidden">
+    <section className="pt-16 lg:pt-24 pb-6 bg-accent/20 overflow-hidden">
       <div className="container mx-auto px-4 lg:px-8 mb-10">
         <div className="text-center max-w-2xl mx-auto">
           <h2 className="text-2xl lg:text-3xl font-bold mb-4">
