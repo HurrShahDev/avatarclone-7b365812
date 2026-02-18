@@ -58,50 +58,52 @@ const AvatarCard = ({ avatar, cardKey }: AvatarCardProps) => {
             : 'scale-100'
         }`}
       >
-        {/* Static image shown when not hovered */}
-        <img
-          src={avatar.img}
-          alt={`${avatar.name} AI avatar`}
-          className={`w-full aspect-[3/4] object-cover transition-opacity duration-300 ${
-            hovered ? 'opacity-0 absolute inset-0' : 'opacity-100'
-          }`}
-          draggable={false}
-        />
+        {/* Container that maintains aspect ratio */}
+        <div className="relative w-full aspect-[3/4]">
+          {/* Static image */}
+          <img
+            src={avatar.img}
+            alt={`${avatar.name} AI avatar`}
+            className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${
+              hovered ? 'opacity-0' : 'opacity-100'
+            }`}
+            draggable={false}
+          />
 
-        {/* Video shown on hover — real face movement */}
-        <video
-          ref={videoRef}
-          src={avatar.vid}
-          loop
-          muted
-          playsInline
-          preload="auto"
-          className={`w-full aspect-[3/4] object-cover transition-opacity duration-300 ${
-            hovered ? 'opacity-100' : 'opacity-0'
-          }`}
-          style={{ display: hovered ? 'block' : 'block' }}
-        />
+          {/* Video on hover — real face movement */}
+          <video
+            ref={videoRef}
+            src={avatar.vid}
+            loop
+            muted
+            playsInline
+            preload="auto"
+            className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${
+              hovered ? 'opacity-100' : 'opacity-0'
+            }`}
+          />
 
-        {/* Name + waveform overlay when speaking */}
-        {hovered && (
-          <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-transparent to-transparent flex flex-col items-center justify-end pb-4 animate-fade-in pointer-events-none">
-            <div className="flex items-end gap-[3px] h-6 mb-1.5">
-              {Array.from({ length: 10 }).map((_, i) => (
-                <div
-                  key={i}
-                  className="w-[3px] rounded-full bg-primary"
-                  style={{
-                    height: `${6 + Math.sin(i * 0.9) * 8 + 6}px`,
-                    animation: `waveformBar 0.45s ease-in-out ${i * 0.06}s infinite alternate`,
-                  }}
-                />
-              ))}
+          {/* Name + waveform overlay when speaking */}
+          {hovered && (
+            <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-transparent to-transparent flex flex-col items-center justify-end pb-4 animate-fade-in pointer-events-none">
+              <div className="flex items-end gap-[3px] h-6 mb-1.5">
+                {Array.from({ length: 10 }).map((_, i) => (
+                  <div
+                    key={i}
+                    className="w-[3px] rounded-full bg-primary"
+                    style={{
+                      height: `${6 + Math.sin(i * 0.9) * 8 + 6}px`,
+                      animation: `waveformBar 0.45s ease-in-out ${i * 0.06}s infinite alternate`,
+                    }}
+                  />
+                ))}
+              </div>
+              <span className="text-[10px] font-semibold text-primary-foreground/90 tracking-widest uppercase">
+                AI Speaking…
+              </span>
             </div>
-            <span className="text-[10px] font-semibold text-primary-foreground/90 tracking-widest uppercase">
-              AI Speaking…
-            </span>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );
