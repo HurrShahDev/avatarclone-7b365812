@@ -19,23 +19,84 @@ const avatars = [
 const loopAvatars = [...avatars, ...avatars];
 
 const SpeakingOverlay = () => (
-  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent flex flex-col items-center justify-end pb-4 animate-fade-in">
-    {/* Waveform bars */}
-    <div className="flex items-end gap-[3px] h-8 mb-2">
-      {Array.from({ length: 12 }).map((_, i) => (
-        <div
-          key={i}
-          className="w-[3px] rounded-full bg-primary"
-          style={{
-            animation: `waveformBar 0.6s ease-in-out ${i * 0.05}s infinite alternate`,
-            height: `${8 + Math.random() * 20}px`,
-          }}
-        />
-      ))}
+  <div className="absolute inset-0 animate-fade-in pointer-events-none">
+    {/* Dark gradient at bottom */}
+    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
+
+    {/* Eye blink overlays — positioned ~38% from top, side by side */}
+    <div
+      className="absolute left-[28%] w-[16%] overflow-hidden"
+      style={{ top: '37%', height: '6%' }}
+    >
+      <div
+        style={{
+          width: '100%',
+          height: '100%',
+          background: 'rgba(0,0,0,0)',
+          animation: 'eyeBlink 3.5s ease-in-out infinite',
+        }}
+      />
     </div>
-    <span className="text-xs font-medium text-primary-foreground/90 tracking-wider uppercase">
-      AI Speaking…
-    </span>
+    <div
+      className="absolute right-[28%] w-[16%] overflow-hidden"
+      style={{ top: '37%', height: '6%' }}
+    >
+      <div
+        style={{
+          width: '100%',
+          height: '100%',
+          background: 'rgba(0,0,0,0)',
+          animation: 'eyeBlink 3.5s ease-in-out 0.05s infinite',
+        }}
+      />
+    </div>
+
+    {/* Lip-sync mouth overlay — positioned ~73% from top, centered */}
+    <div
+      className="absolute left-1/2 -translate-x-1/2"
+      style={{ top: '71%', width: '24%' }}
+    >
+      {/* Upper lip stays fixed; lower lip animates down */}
+      <svg viewBox="0 0 60 24" className="w-full" style={{ animation: 'lipSync 0.38s ease-in-out infinite alternate' }}>
+        {/* Upper lip */}
+        <path
+          d="M5 10 Q15 4 30 6 Q45 4 55 10"
+          fill="none"
+          stroke="rgba(180,80,80,0.85)"
+          strokeWidth="2.5"
+          strokeLinecap="round"
+        />
+        {/* Lower lip — animates via parent */}
+        <path
+          d="M5 10 Q15 20 30 18 Q45 20 55 10"
+          fill="rgba(160,60,60,0.5)"
+          stroke="rgba(180,80,80,0.85)"
+          strokeWidth="2"
+          strokeLinecap="round"
+        />
+        {/* Inner mouth darkness */}
+        <ellipse cx="30" cy="12" rx="18" ry="4" fill="rgba(30,10,10,0.6)" />
+      </svg>
+    </div>
+
+    {/* Waveform at bottom */}
+    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1">
+      <div className="flex items-end gap-[3px] h-6">
+        {Array.from({ length: 10 }).map((_, i) => (
+          <div
+            key={i}
+            className="w-[3px] rounded-full bg-primary"
+            style={{
+              height: `${6 + Math.sin(i * 0.8) * 10 + 6}px`,
+              animation: `waveformBar 0.45s ease-in-out ${i * 0.06}s infinite alternate`,
+            }}
+          />
+        ))}
+      </div>
+      <span className="text-[10px] font-semibold text-primary-foreground/90 tracking-widest uppercase">
+        AI Speaking…
+      </span>
+    </div>
   </div>
 );
 
