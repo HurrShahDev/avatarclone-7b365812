@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate, Link } from 'react-router-dom';
-import { Eye, EyeOff, Mail, Lock, User, AlertCircle, Play, Sparkles, Zap, ArrowLeft, Video, Mic, UserCircle } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock, User, AlertCircle, Play, Sparkles, Zap, ArrowLeft } from 'lucide-react';
 import logo from '@/assets/logo.png';
+import orbitAvatar from '@/assets/orbit-avatar.png';
 import { Button } from '@/components/ui/button';
 import { auth } from '@/lib/firebase';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
@@ -20,88 +21,71 @@ const FloatingOrb = ({ delay, size, x, y }: { delay: number; size: number; x: st
   />
 );
 
-/* Floating icon that orbits around the form */
-const FloatingIcon = ({ icon: Icon, delay, radius, duration, size = 20 }: { icon: any; delay: number; radius: number; duration: number; size?: number }) => (
-  <div
-    className="absolute pointer-events-none"
-    style={{
-      left: '50%',
-      top: '50%',
-      animation: `orbitFloat ${duration}s linear infinite ${delay}s`,
-    }}
-  >
-    <div
-      style={{
-        transform: `translateX(${radius}px)`,
-        animation: `iconBob 3s ease-in-out infinite ${delay}s`,
-      }}
-    >
-      <Icon
-        className="text-primary/30"
-        style={{ width: size, height: size }}
-      />
-    </div>
-  </div>
-);
-
-/* Animated eye mascot that reacts to password typing */
-const PasswordEyeMascot = ({ isTyping, isVisible }: { isTyping: boolean; isVisible: boolean }) => (
-  <div className="flex justify-center mb-2">
-    <div className="relative w-12 h-12 flex items-center justify-center">
-      {/* Eye body */}
+/* Realistic eye inside password field — closes when typing */
+const PasswordFieldEye = ({ isTyping }: { isTyping: boolean }) => (
+  <div className="absolute right-10 top-1/2 -translate-y-1/2 pointer-events-none flex items-center">
+    <div className="relative" style={{ width: 22, height: 14 }}>
+      {/* Eye shape */}
       <div
-        className="relative transition-all duration-500 ease-out"
+        className="absolute inset-0 rounded-[50%] overflow-hidden transition-all duration-300"
         style={{
-          width: 44,
-          height: 28,
-          borderRadius: '50%',
-          background: 'linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary) / 0.8))',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
+          background: 'radial-gradient(circle, hsl(0 0% 98%) 0%, hsl(0 0% 90%) 100%)',
+          border: '1.5px solid hsl(var(--muted-foreground) / 0.3)',
+          transform: isTyping ? 'scaleY(0.08)' : 'scaleY(1)',
           boxShadow: isTyping
-            ? '0 0 20px hsl(var(--primary) / 0.4)'
-            : '0 0 8px hsl(var(--primary) / 0.2)',
-          transform: isTyping ? 'scaleY(0.15)' : 'scaleY(1)',
+            ? '0 0 0 transparent'
+            : '0 1px 3px hsl(0 0% 0% / 0.15), inset 0 -1px 2px hsl(0 0% 0% / 0.05)',
         }}
       >
-        {/* Pupil - only visible when eye is open */}
+        {/* Iris */}
         <div
-          className="rounded-full transition-all duration-300"
+          className="absolute rounded-full transition-all duration-300"
           style={{
-            width: 12,
-            height: 12,
-            background: 'hsl(var(--primary-foreground))',
+            width: 8, height: 8,
+            top: '50%', left: '50%',
+            transform: 'translate(-50%, -50%)',
+            background: 'radial-gradient(circle at 35% 35%, hsl(200 70% 50%), hsl(220 60% 30%))',
             opacity: isTyping ? 0 : 1,
-            transform: isTyping ? 'scale(0)' : 'scale(1)',
           }}
         >
-          <div
-            className="rounded-full mt-1 ml-1"
-            style={{
-              width: 5,
-              height: 5,
-              background: 'hsl(var(--primary))',
-            }}
-          />
+          {/* Pupil */}
+          <div className="absolute rounded-full" style={{ width: 4, height: 4, top: '50%', left: '50%', transform: 'translate(-50%, -50%)', background: 'hsl(0 0% 5%)' }} />
+          {/* Reflection */}
+          <div className="absolute rounded-full" style={{ width: 2, height: 2, top: 1, right: 1, background: 'hsl(0 0% 100%)' }} />
         </div>
       </div>
       {/* Eyelashes when closed */}
       {isTyping && (
-        <div className="absolute bottom-1 flex gap-1">
-          {[...Array(5)].map((_, i) => (
-            <div
-              key={i}
-              className="bg-primary/60 rounded-full animate-fade-in"
-              style={{
-                width: 2,
-                height: 4 + Math.sin(i) * 2,
-                animationDelay: `${i * 50}ms`,
-              }}
-            />
-          ))}
+        <div className="absolute w-full top-1/2 -translate-y-1/2">
+          <div className="w-full h-px rounded-full animate-fade-in" style={{ background: 'linear-gradient(90deg, transparent, hsl(var(--muted-foreground) / 0.5), transparent)' }} />
+          <div className="flex justify-center gap-[2px] -mt-[2px]">
+            {[4, 5, 6, 5, 4].map((h, i) => (
+              <div key={i} className="rounded-full animate-fade-in" style={{ width: 1, height: h, background: 'hsl(var(--muted-foreground) / 0.4)', animationDelay: `${i * 40}ms`, transform: `rotate(${(i - 2) * 12}deg)` }} />
+            ))}
+          </div>
         </div>
       )}
+    </div>
+  </div>
+);
+
+/* Small avatar that orbits the auth card */
+const OrbitingAvatar = () => (
+  <div
+    className="absolute pointer-events-none z-20"
+    style={{ left: '50%', top: '50%', width: 0, height: 0, animation: 'orbitFloat 14s linear infinite' }}
+  >
+    <div style={{ transform: 'translateX(210px)', animation: 'iconBob 3s ease-in-out infinite' }}>
+      <img
+        src={orbitAvatar}
+        alt=""
+        className="rounded-full"
+        style={{
+          width: 44, height: 44,
+          animation: 'orbitFloat 14s linear infinite reverse',
+          filter: 'drop-shadow(0 4px 12px hsl(220 60% 55% / 0.35))',
+        }}
+      />
     </div>
   </div>
 );
@@ -124,9 +108,7 @@ const Auth = () => {
   const [signUpData, setSignUpData] = useState({ fullName: '', email: '', password: '', confirmPassword: '', consent: false });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  useEffect(() => { setMounted(true); }, []);
 
   useEffect(() => {
     const m = searchParams.get('mode');
@@ -141,7 +123,6 @@ const Auth = () => {
   };
 
   const handlePasswordChange = (value: string, field: 'password' | 'confirmPassword' = 'password') => {
-    // Set typing state
     setIsTypingPassword(true);
     if (typingTimeout) clearTimeout(typingTimeout);
     const timeout = setTimeout(() => setIsTypingPassword(false), 800);
@@ -189,24 +170,15 @@ const Auth = () => {
     if (mode === 'signup') {
       if (!signUpData.fullName.trim()) newErrors.fullName = 'Name is required';
       if (!signUpData.email.includes('@')) newErrors.email = 'Enter a valid email';
-      if (signUpData.password !== signUpData.confirmPassword) {
-        newErrors.confirmPassword = 'Passwords do not match';
-      }
-      if (getPasswordStrength() < 2) {
-        newErrors.password = 'Use at least 8 characters with a number and special character';
-      }
-      if (!signUpData.consent) {
-        newErrors.consent = 'Consent is required';
-      }
+      if (signUpData.password !== signUpData.confirmPassword) newErrors.confirmPassword = 'Passwords do not match';
+      if (getPasswordStrength() < 2) newErrors.password = 'Use at least 8 characters with a number and special character';
+      if (!signUpData.consent) newErrors.consent = 'Consent is required';
     } else {
       if (!signInData.email.includes('@')) newErrors.email = 'Enter a valid email';
       if (!signInData.password) newErrors.password = 'Password is required';
     }
 
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
-      return;
-    }
+    if (Object.keys(newErrors).length > 0) { setErrors(newErrors); return; }
 
     setErrors({});
     setIsLoading(true);
@@ -242,12 +214,9 @@ const Auth = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      {/* Back arrow bar */}
+      {/* Back arrow */}
       <div className="w-full px-4 lg:px-8 py-3 z-20">
-        <Link
-          to="/"
-          className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors group"
-        >
+        <Link to="/" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors group">
           <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
           Back to Home
         </Link>
@@ -255,10 +224,7 @@ const Auth = () => {
 
       <div className="flex flex-1">
         {/* Left Side - Auth Form (40%) */}
-        <div
-          className={`w-full lg:w-[40%] flex flex-col items-center justify-center p-6 lg:p-12 relative overflow-hidden transition-all duration-700 ${mounted ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-8'}`}
-        >
-          {/* Floating orbs background */}
+        <div className={`w-full lg:w-[40%] flex flex-col items-center justify-center p-6 lg:p-12 relative overflow-hidden transition-all duration-700 ${mounted ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-8'}`}>
           <FloatingOrb delay={0} size={120} x="10%" y="20%" />
           <FloatingOrb delay={2} size={80} x="70%" y="70%" />
           <FloatingOrb delay={4} size={60} x="50%" y="10%" />
@@ -271,19 +237,16 @@ const Auth = () => {
               <p className="text-xs text-muted-foreground">AI-Powered Avatar Videos</p>
             </div>
 
-            <div className="card-simple p-6 lg:p-8 backdrop-blur-sm relative overflow-hidden">
-              {/* Floating icons orbiting the card */}
-              <FloatingIcon icon={Video} delay={0} radius={180} duration={20} />
-              <FloatingIcon icon={Mic} delay={5} radius={200} duration={25} size={16} />
-              <FloatingIcon icon={UserCircle} delay={10} radius={160} duration={18} size={18} />
-              <FloatingIcon icon={Sparkles} delay={15} radius={190} duration={22} size={14} />
+            <div className="card-simple p-6 lg:p-8 backdrop-blur-sm relative overflow-visible">
+              {/* Orbiting avatar */}
+              <OrbitingAvatar />
 
-              {/* Animated border glow */}
+              {/* Glow on password focus */}
               <div
                 className="absolute inset-0 rounded-lg opacity-0 transition-opacity duration-500 pointer-events-none"
                 style={{
                   opacity: passwordFocused ? 0.6 : 0,
-                  boxShadow: `inset 0 0 20px hsl(220 60% 55% / 0.1), 0 0 40px hsl(220 60% 55% / 0.05)`,
+                  boxShadow: 'inset 0 0 20px hsl(220 60% 55% / 0.1), 0 0 40px hsl(220 60% 55% / 0.05)',
                 }}
               />
 
@@ -291,34 +254,14 @@ const Auth = () => {
               <div className="flex mb-6 p-1 bg-muted rounded-lg relative">
                 <div
                   className="absolute top-1 bottom-1 rounded-md bg-background shadow-sm transition-all duration-300 ease-out"
-                  style={{
-                    width: 'calc(50% - 4px)',
-                    left: mode === 'signin' ? '4px' : 'calc(50%)',
-                  }}
+                  style={{ width: 'calc(50% - 4px)', left: mode === 'signin' ? '4px' : 'calc(50%)' }}
                 />
-                <button
-                  onClick={() => switchMode('signin')}
-                  className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors relative z-10 ${mode === 'signin' ? 'text-foreground' : 'text-muted-foreground'}`}
-                >
-                  Sign In
-                </button>
-                <button
-                  onClick={() => switchMode('signup')}
-                  className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors relative z-10 ${mode === 'signup' ? 'text-foreground' : 'text-muted-foreground'}`}
-                >
-                  Sign Up
-                </button>
+                <button onClick={() => switchMode('signin')} className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors relative z-10 ${mode === 'signin' ? 'text-foreground' : 'text-muted-foreground'}`}>Sign In</button>
+                <button onClick={() => switchMode('signup')} className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors relative z-10 ${mode === 'signup' ? 'text-foreground' : 'text-muted-foreground'}`}>Sign Up</button>
               </div>
 
-              {/* Password eye mascot */}
-              <PasswordEyeMascot isTyping={isTypingPassword} isVisible={passwordFocused} />
-
               {/* Google auth */}
-              <button
-                onClick={handleGoogleSignIn}
-                disabled={isLoading}
-                className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg border border-border hover:bg-muted transition-all duration-200 mb-4 hover:shadow-md hover:scale-[1.01] active:scale-[0.99]"
-              >
+              <button onClick={handleGoogleSignIn} disabled={isLoading} className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg border border-border hover:bg-muted transition-all duration-200 mb-4 hover:shadow-md hover:scale-[1.01] active:scale-[0.99]">
                 <svg className="w-5 h-5" viewBox="0 0 24 24">
                   <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4" />
                   <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
@@ -329,12 +272,8 @@ const Auth = () => {
               </button>
 
               <div className="relative my-5">
-                <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-border" />
-                </div>
-                <div className="relative flex justify-center">
-                  <span className="px-3 bg-card text-xs text-muted-foreground">or</span>
-                </div>
+                <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-border" /></div>
+                <div className="relative flex justify-center"><span className="px-3 bg-card text-xs text-muted-foreground">or</span></div>
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-4">
@@ -343,42 +282,18 @@ const Auth = () => {
                   <label className="block text-sm font-medium mb-1.5">Full Name</label>
                   <div className="relative group">
                     <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground transition-colors group-focus-within:text-primary" />
-                    <input
-                      type="text"
-                      placeholder="Your name"
-                      value={signUpData.fullName}
-                      onChange={(e) => setSignUpData({ ...signUpData, fullName: e.target.value })}
-                      className="input-field pl-10"
-                    />
+                    <input type="text" placeholder="Your name" value={signUpData.fullName} onChange={(e) => setSignUpData({ ...signUpData, fullName: e.target.value })} className="input-field pl-10" />
                   </div>
-                  {errors.fullName && (
-                    <p className="text-xs text-destructive mt-1 flex items-center gap-1 animate-fade-in">
-                      <AlertCircle className="w-3 h-3" /> {errors.fullName}
-                    </p>
-                  )}
+                  {errors.fullName && <p className="text-xs text-destructive mt-1 flex items-center gap-1 animate-fade-in"><AlertCircle className="w-3 h-3" /> {errors.fullName}</p>}
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium mb-1.5">Email</label>
                   <div className="relative group">
                     <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground transition-colors group-focus-within:text-primary" />
-                    <input
-                      type="email"
-                      placeholder="you@example.com"
-                      value={mode === 'signin' ? signInData.email : signUpData.email}
-                      onChange={(e) =>
-                        mode === 'signin'
-                          ? setSignInData({ ...signInData, email: e.target.value })
-                          : setSignUpData({ ...signUpData, email: e.target.value })
-                      }
-                      className="input-field pl-10"
-                    />
+                    <input type="email" placeholder="you@example.com" value={mode === 'signin' ? signInData.email : signUpData.email} onChange={(e) => mode === 'signin' ? setSignInData({ ...signInData, email: e.target.value }) : setSignUpData({ ...signUpData, email: e.target.value })} className="input-field pl-10" />
                   </div>
-                  {errors.email && (
-                    <p className="text-xs text-destructive mt-1 flex items-center gap-1 animate-fade-in">
-                      <AlertCircle className="w-3 h-3" /> {errors.email}
-                    </p>
-                  )}
+                  {errors.email && <p className="text-xs text-destructive mt-1 flex items-center gap-1 animate-fade-in"><AlertCircle className="w-3 h-3" /> {errors.email}</p>}
                 </div>
 
                 <div>
@@ -392,8 +307,10 @@ const Auth = () => {
                       onChange={(e) => handlePasswordChange(e.target.value)}
                       onFocus={() => setPasswordFocused(true)}
                       onBlur={() => { setPasswordFocused(false); setIsTypingPassword(false); }}
-                      className="input-field pl-10 pr-10"
+                      className="input-field pl-10 pr-16"
                     />
+                    {/* Realistic eye animation */}
+                    <PasswordFieldEye isTyping={isTypingPassword} />
                     <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors">
                       {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
@@ -402,11 +319,7 @@ const Auth = () => {
                     <div className="mt-2">
                       <div className="flex gap-1 mb-1">
                         {[1, 2, 3, 4].map((level) => (
-                          <div
-                            key={level}
-                            className={`h-1.5 flex-1 rounded-full transition-all duration-500 ${strength >= level ? strengthColors[strength] : 'bg-muted'}`}
-                            style={{ transitionDelay: `${level * 80}ms` }}
-                          />
+                          <div key={level} className={`h-1.5 flex-1 rounded-full transition-all duration-500 ${strength >= level ? strengthColors[strength] : 'bg-muted'}`} style={{ transitionDelay: `${level * 80}ms` }} />
                         ))}
                       </div>
                       <p className="text-xs text-muted-foreground flex items-center gap-1">
@@ -415,44 +328,25 @@ const Auth = () => {
                       </p>
                     </div>
                   )}
-                  {errors.password && (
-                    <p className="text-xs text-destructive mt-1 flex items-center gap-1 animate-fade-in">
-                      <AlertCircle className="w-3 h-3" /> {errors.password}
-                    </p>
-                  )}
+                  {errors.password && <p className="text-xs text-destructive mt-1 flex items-center gap-1 animate-fade-in"><AlertCircle className="w-3 h-3" /> {errors.password}</p>}
                 </div>
 
                 <div className={`transition-all duration-500 ${mode === 'signup' ? 'max-h-24 opacity-100' : 'max-h-0 opacity-0 overflow-hidden'}`}>
                   <label className="block text-sm font-medium mb-1.5">Confirm Password</label>
                   <div className="relative group">
                     <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground transition-colors group-focus-within:text-primary" />
-                    <input
-                      type={showConfirmPassword ? 'text' : 'password'}
-                      placeholder="••••••••"
-                      value={signUpData.confirmPassword}
-                      onChange={(e) => handlePasswordChange(e.target.value, 'confirmPassword')}
-                      className="input-field pl-10 pr-10"
-                    />
+                    <input type={showConfirmPassword ? 'text' : 'password'} placeholder="••••••••" value={signUpData.confirmPassword} onChange={(e) => handlePasswordChange(e.target.value, 'confirmPassword')} className="input-field pl-10 pr-10" />
                     <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors">
                       {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
                   </div>
-                  {errors.confirmPassword && (
-                    <p className="text-xs text-destructive mt-1 flex items-center gap-1 animate-fade-in">
-                      <AlertCircle className="w-3 h-3" /> {errors.confirmPassword}
-                    </p>
-                  )}
+                  {errors.confirmPassword && <p className="text-xs text-destructive mt-1 flex items-center gap-1 animate-fade-in"><AlertCircle className="w-3 h-3" /> {errors.confirmPassword}</p>}
                 </div>
 
                 {mode === 'signin' && (
                   <div className="flex items-center justify-between">
                     <label className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={signInData.rememberMe}
-                        onChange={(e) => setSignInData({ ...signInData, rememberMe: e.target.checked })}
-                        className="w-4 h-4 rounded border-border"
-                      />
+                      <input type="checkbox" checked={signInData.rememberMe} onChange={(e) => setSignInData({ ...signInData, rememberMe: e.target.checked })} className="w-4 h-4 rounded border-border" />
                       <span className="text-sm text-muted-foreground">Remember me</span>
                     </label>
                     <a href="/forgot-password" className="text-sm text-primary hover:underline">Forgot password?</a>
@@ -462,37 +356,20 @@ const Auth = () => {
                 {mode === 'signup' && (
                   <div>
                     <label className="flex items-start gap-2 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={signUpData.consent}
-                        onChange={(e) => setSignUpData({ ...signUpData, consent: e.target.checked })}
-                        className="w-4 h-4 rounded border-border mt-0.5"
-                      />
+                      <input type="checkbox" checked={signUpData.consent} onChange={(e) => setSignUpData({ ...signUpData, consent: e.target.checked })} className="w-4 h-4 rounded border-border mt-0.5" />
                       <span className="text-sm text-muted-foreground">
                         I consent to the processing of my voice and photo.{' '}
                         <a href="/privacy" className="text-primary hover:underline">Privacy</a> &{' '}
                         <a href="/terms" className="text-primary hover:underline">Terms</a>
                       </span>
                     </label>
-                    {errors.consent && (
-                      <p className="text-xs text-destructive mt-1 flex items-center gap-1 animate-fade-in">
-                        <AlertCircle className="w-3 h-3" /> {errors.consent}
-                      </p>
-                    )}
+                    {errors.consent && <p className="text-xs text-destructive mt-1 flex items-center gap-1 animate-fade-in"><AlertCircle className="w-3 h-3" /> {errors.consent}</p>}
                   </div>
                 )}
 
-                <Button
-                  type="submit"
-                  className="w-full relative overflow-hidden group"
-                  disabled={isLoading}
-                >
+                <Button type="submit" className="w-full relative overflow-hidden group" disabled={isLoading}>
                   <span className="relative z-10 flex items-center gap-2">
-                    {isLoading ? (
-                      <div className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
-                    ) : (
-                      <Zap className="w-4 h-4" />
-                    )}
+                    {isLoading ? <div className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" /> : <Zap className="w-4 h-4" />}
                     {isLoading ? 'Please wait...' : mode === 'signin' ? 'Sign In' : 'Create Account'}
                   </span>
                 </Button>
@@ -504,24 +381,12 @@ const Auth = () => {
         {/* Right Side - Promo (60%) */}
         <div
           className={`hidden lg:flex lg:w-[60%] relative overflow-hidden flex-col items-center justify-center transition-all duration-700 delay-200 ${mounted ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-8'}`}
-          style={{
-            background: 'linear-gradient(135deg, hsl(220 25% 8%) 0%, hsl(240 20% 12%) 50%, hsl(220 30% 10%) 100%)',
-          }}
+          style={{ background: 'linear-gradient(135deg, hsl(220 25% 8%) 0%, hsl(240 20% 12%) 50%, hsl(220 30% 10%) 100%)' }}
         >
-          {/* Grid overlay */}
-          <div
-            className="absolute inset-0 opacity-[0.04]"
-            style={{
-              backgroundImage: 'linear-gradient(hsl(220 60% 55%) 1px, transparent 1px), linear-gradient(90deg, hsl(220 60% 55%) 1px, transparent 1px)',
-              backgroundSize: '60px 60px',
-            }}
-          />
-
-          {/* Glow effects */}
+          <div className="absolute inset-0 opacity-[0.04]" style={{ backgroundImage: 'linear-gradient(hsl(220 60% 55%) 1px, transparent 1px), linear-gradient(90deg, hsl(220 60% 55%) 1px, transparent 1px)', backgroundSize: '60px 60px' }} />
           <div className="absolute top-1/4 left-1/3 w-80 h-80 rounded-full opacity-20 blur-[100px]" style={{ background: 'hsl(220 80% 55%)' }} />
           <div className="absolute bottom-1/4 right-1/4 w-64 h-64 rounded-full opacity-15 blur-[80px]" style={{ background: 'hsl(270 60% 55%)' }} />
 
-          {/* Content */}
           <div className="relative z-10 text-center px-8 max-w-2xl">
             <h2 className="text-3xl xl:text-4xl font-bold mb-3 leading-tight" style={{ color: 'hsl(0 0% 95%)' }}>
               CREATE PERSONALIZED<br />AI AVATAR VIDEOS
@@ -530,63 +395,23 @@ const Auth = () => {
               Transform your ideas, voice and face into<br />synchronized talking avatar videos
             </p>
 
-            {/* Video Placeholder */}
             <div className="relative mx-auto w-full max-w-lg aspect-video rounded-2xl overflow-hidden shadow-2xl" style={{ border: '1px solid hsl(220 20% 20%)' }}>
-              <div
-                className="absolute inset-0"
-                style={{
-                  background: 'linear-gradient(135deg, hsl(220 20% 14%) 0%, hsl(240 15% 18%) 100%)',
-                }}
-              />
-              {/* Scan line animation */}
-              <div
-                className="absolute left-0 right-0 h-px opacity-30"
-                style={{
-                  background: 'linear-gradient(90deg, transparent, hsl(220 80% 60%), transparent)',
-                  animation: 'scanLine 4s linear infinite',
-                }}
-              />
-              {/* Play icon */}
+              <div className="absolute inset-0" style={{ background: 'linear-gradient(135deg, hsl(220 20% 14%) 0%, hsl(240 15% 18%) 100%)' }} />
+              <div className="absolute left-0 right-0 h-px opacity-30" style={{ background: 'linear-gradient(90deg, transparent, hsl(220 80% 60%), transparent)', animation: 'scanLine 4s linear infinite' }} />
               <div className="absolute inset-0 flex items-center justify-center">
-                <div
-                  className="w-16 h-16 rounded-full flex items-center justify-center cursor-pointer transition-transform duration-300 hover:scale-110"
-                  style={{
-                    background: 'linear-gradient(135deg, hsl(220 60% 50%), hsl(270 50% 50%))',
-                    boxShadow: '0 0 30px hsl(220 60% 50% / 0.3)',
-                  }}
-                >
+                <div className="w-16 h-16 rounded-full flex items-center justify-center cursor-pointer transition-transform duration-300 hover:scale-110" style={{ background: 'linear-gradient(135deg, hsl(220 60% 50%), hsl(270 50% 50%))', boxShadow: '0 0 30px hsl(220 60% 50% / 0.3)' }}>
                   <Play className="w-6 h-6 ml-1" style={{ color: 'white' }} fill="white" />
                 </div>
               </div>
-              {/* Corner brackets */}
-              <svg className="absolute top-3 left-3 w-6 h-6 opacity-30" viewBox="0 0 24 24" fill="none" stroke="hsl(220 60% 60%)" strokeWidth="1.5">
-                <path d="M1 8V1h7" />
-              </svg>
-              <svg className="absolute top-3 right-3 w-6 h-6 opacity-30" viewBox="0 0 24 24" fill="none" stroke="hsl(220 60% 60%)" strokeWidth="1.5">
-                <path d="M23 8V1h-7" />
-              </svg>
-              <svg className="absolute bottom-3 left-3 w-6 h-6 opacity-30" viewBox="0 0 24 24" fill="none" stroke="hsl(220 60% 60%)" strokeWidth="1.5">
-                <path d="M1 16v7h7" />
-              </svg>
-              <svg className="absolute bottom-3 right-3 w-6 h-6 opacity-30" viewBox="0 0 24 24" fill="none" stroke="hsl(220 60% 60%)" strokeWidth="1.5">
-                <path d="M23 16v7h-7" />
-              </svg>
+              <svg className="absolute top-3 left-3 w-6 h-6 opacity-30" viewBox="0 0 24 24" fill="none" stroke="hsl(220 60% 60%)" strokeWidth="1.5"><path d="M1 8V1h7" /></svg>
+              <svg className="absolute top-3 right-3 w-6 h-6 opacity-30" viewBox="0 0 24 24" fill="none" stroke="hsl(220 60% 60%)" strokeWidth="1.5"><path d="M23 8V1h-7" /></svg>
+              <svg className="absolute bottom-3 left-3 w-6 h-6 opacity-30" viewBox="0 0 24 24" fill="none" stroke="hsl(220 60% 60%)" strokeWidth="1.5"><path d="M1 16v7h7" /></svg>
+              <svg className="absolute bottom-3 right-3 w-6 h-6 opacity-30" viewBox="0 0 24 24" fill="none" stroke="hsl(220 60% 60%)" strokeWidth="1.5"><path d="M23 16v7h-7" /></svg>
             </div>
           </div>
 
-          {/* Floating particles */}
           {[...Array(6)].map((_, i) => (
-            <div
-              key={i}
-              className="absolute w-1 h-1 rounded-full"
-              style={{
-                background: 'hsl(220 60% 60%)',
-                left: `${15 + i * 15}%`,
-                top: `${20 + (i % 3) * 25}%`,
-                opacity: 0.3,
-                animation: `floatOrb ${5 + i * 1.5}s ease-in-out infinite ${i * 0.8}s`,
-              }}
-            />
+            <div key={i} className="absolute w-1 h-1 rounded-full" style={{ background: 'hsl(220 60% 60%)', left: `${15 + i * 15}%`, top: `${20 + (i % 3) * 25}%`, opacity: 0.3, animation: `floatOrb ${5 + i * 1.5}s ease-in-out infinite ${i * 0.8}s` }} />
           ))}
         </div>
       </div>
