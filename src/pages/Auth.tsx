@@ -243,9 +243,10 @@ const Auth = () => {
           <FloatingOrb delay={2} size={80} x="70%" y="70%" />
           <FloatingOrb delay={4} size={60} x="50%" y="10%" />
 
+          {/* Orbiting avatar around the whole form area */}
+          <OrbitingAvatar />
+
           <div className="w-full max-w-md relative z-10">
-            {/* Orbiting avatar around the whole form area */}
-            <OrbitingAvatar />
 
             {/* Centered logo + site name */}
             <div className="flex flex-col items-center gap-1 mb-4">
