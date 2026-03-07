@@ -78,13 +78,13 @@ const OrbitingAvatar = () => (
       top: '50%',
       width: 0,
       height: 0,
-      animation: 'orbitFloat 14s linear infinite',
+      animation: 'orbitFloat 12s linear infinite',
     }}
   >
     <div
       className="relative"
       style={{
-        '--radius': '180px',
+        '--radius': '220px',
         transform: 'translateX(var(--radius))',
         animation: 'iconBob 3s ease-in-out infinite',
       } as React.CSSProperties}
@@ -92,12 +92,13 @@ const OrbitingAvatar = () => (
       <img
         src={orbitAvatar}
         alt=""
-        className="rounded-full border-2 border-primary/30 shadow-lg"
+        className="rounded-full shadow-lg"
         style={{
-          width: 40,
-          height: 40,
-          animation: 'orbitFloat 14s linear infinite reverse',
-          filter: 'drop-shadow(0 2px 8px hsl(220 60% 55% / 0.4))',
+          width: 44,
+          height: 44,
+          animation: 'orbitFloat 12s linear infinite reverse',
+          filter: 'drop-shadow(0 2px 10px hsl(220 60% 55% / 0.5))',
+          background: 'hsl(var(--background))',
         }}
       />
     </div>
