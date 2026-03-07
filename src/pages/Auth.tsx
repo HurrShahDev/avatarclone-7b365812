@@ -69,41 +69,40 @@ const PasswordFieldEye = ({ isTyping }: { isTyping: boolean }) => (
   </div>
 );
 
-/* Small avatar that orbits the auth card */
-const OrbitingAvatar = () => (
-  <div
-    className="absolute pointer-events-none z-20"
-    style={{
-      left: '50%',
-      top: '50%',
-      width: 0,
-      height: 0,
-      animation: 'orbitFloat 12s linear infinite',
-    }}
-  >
-    <div
-      className="relative"
+/* Small robot avatar that orbits the auth form */
+const OrbitingAvatar = () => {
+  const [angle, setAngle] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setAngle(prev => (prev + 0.8) % 360);
+    }, 30);
+    return () => clearInterval(interval);
+  }, []);
+
+  const radiusX = 260;
+  const radiusY = 300;
+  const rad = (angle * Math.PI) / 180;
+  const x = Math.cos(rad) * radiusX;
+  const y = Math.sin(rad) * radiusY;
+  const bob = Math.sin(rad * 2) * 5;
+
+  return (
+    <img
+      src={orbitAvatar}
+      alt=""
+      className="absolute rounded-full pointer-events-none z-30"
       style={{
-        '--radius': '220px',
-        transform: 'translateX(var(--radius))',
-        animation: 'iconBob 3s ease-in-out infinite',
-      } as React.CSSProperties}
-    >
-      <img
-        src={orbitAvatar}
-        alt=""
-        className="rounded-full shadow-lg"
-        style={{
-          width: 44,
-          height: 44,
-          animation: 'orbitFloat 12s linear infinite reverse',
-          filter: 'drop-shadow(0 2px 10px hsl(220 60% 55% / 0.5))',
-          background: 'hsl(var(--background))',
-        }}
-      />
-    </div>
-  </div>
-);
+        width: 48,
+        height: 48,
+        left: `calc(50% + ${x}px - 24px)`,
+        top: `calc(50% + ${y + bob}px - 24px)`,
+        filter: 'drop-shadow(0 4px 12px hsl(220 60% 55% / 0.5))',
+        transition: 'none',
+      }}
+    />
+  );
+};
 
 const Auth = () => {
   const [searchParams] = useSearchParams();
