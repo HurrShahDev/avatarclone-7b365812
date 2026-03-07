@@ -228,7 +228,7 @@ const Auth = () => {
   const strength = getPasswordStrength();
 
   return (
-    <div className="h-screen bg-background flex flex-col overflow-hidden">
+    <div className="h-screen bg-background flex flex-col overflow-visible">
       {/* Back arrow */}
       <div className="w-full px-4 lg:px-8 py-2 z-20 shrink-0">
         <Link to="/" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors group">
