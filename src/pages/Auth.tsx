@@ -251,7 +251,7 @@ const Auth = () => {
               <p className="text-xs text-muted-foreground">AI-Powered Avatar Videos</p>
             </div>
 
-            <div className="card-simple p-6 lg:p-8 backdrop-blur-sm relative overflow-visible">
+            <div className="card-simple p-5 lg:p-6 backdrop-blur-sm relative overflow-visible">
               {/* Orbiting avatar */}
               <OrbitingAvatar />
 
@@ -265,7 +265,7 @@ const Auth = () => {
               />
 
               {/* Tab switcher */}
-              <div className="flex mb-6 p-1 bg-muted rounded-lg relative">
+              <div className="flex mb-4 p-1 bg-muted rounded-lg relative">
                 <div
                   className="absolute top-1 bottom-1 rounded-md bg-background shadow-sm transition-all duration-300 ease-out"
                   style={{ width: 'calc(50% - 4px)', left: mode === 'signin' ? '4px' : 'calc(50%)' }}
@@ -285,12 +285,12 @@ const Auth = () => {
                 <span className="text-sm font-medium">Continue with Google</span>
               </button>
 
-              <div className="relative my-5">
+              <div className="relative my-3">
                 <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-border" /></div>
                 <div className="relative flex justify-center"><span className="px-3 bg-card text-xs text-muted-foreground">or</span></div>
               </div>
 
-              <form onSubmit={handleSubmit} className="space-y-4">
+              <form onSubmit={handleSubmit} className="space-y-3">
                 {/* Full Name (signup only) */}
                 <div className={`transition-all duration-500 ${mode === 'signup' ? 'max-h-24 opacity-100' : 'max-h-0 opacity-0 overflow-hidden'}`}>
                   <label className="block text-sm font-medium mb-1.5">Full Name</label>
