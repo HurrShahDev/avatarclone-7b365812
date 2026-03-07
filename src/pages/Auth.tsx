@@ -73,17 +73,31 @@ const PasswordFieldEye = ({ isTyping }: { isTyping: boolean }) => (
 const OrbitingAvatar = () => (
   <div
     className="absolute pointer-events-none z-20"
-    style={{ left: '50%', top: '50%', width: 0, height: 0, animation: 'orbitFloat 14s linear infinite' }}
+    style={{
+      left: '50%',
+      top: '50%',
+      width: 0,
+      height: 0,
+      animation: 'orbitFloat 14s linear infinite',
+    }}
   >
-    <div style={{ transform: 'translateX(210px)', animation: 'iconBob 3s ease-in-out infinite' }}>
+    <div
+      className="relative"
+      style={{
+        '--radius': '180px',
+        transform: 'translateX(var(--radius))',
+        animation: 'iconBob 3s ease-in-out infinite',
+      } as React.CSSProperties}
+    >
       <img
         src={orbitAvatar}
         alt=""
-        className="rounded-full"
+        className="rounded-full border-2 border-primary/30 shadow-lg"
         style={{
-          width: 44, height: 44,
+          width: 40,
+          height: 40,
           animation: 'orbitFloat 14s linear infinite reverse',
-          filter: 'drop-shadow(0 4px 12px hsl(220 60% 55% / 0.35))',
+          filter: 'drop-shadow(0 2px 8px hsl(220 60% 55% / 0.4))',
         }}
       />
     </div>
@@ -213,27 +227,27 @@ const Auth = () => {
   const strength = getPasswordStrength();
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="h-screen bg-background flex flex-col overflow-hidden">
       {/* Back arrow */}
-      <div className="w-full px-4 lg:px-8 py-3 z-20">
+      <div className="w-full px-4 lg:px-8 py-2 z-20 shrink-0">
         <Link to="/" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors group">
           <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
           Back to Home
         </Link>
       </div>
 
-      <div className="flex flex-1">
+      <div className="flex flex-1 min-h-0">
         {/* Left Side - Auth Form (40%) */}
-        <div className={`w-full lg:w-[40%] flex flex-col items-center justify-center p-6 lg:p-12 relative overflow-hidden transition-all duration-700 ${mounted ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-8'}`}>
+        <div className={`w-full lg:w-[40%] flex flex-col items-center justify-center p-4 lg:p-8 relative overflow-y-auto transition-all duration-700 ${mounted ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-8'}`}>
           <FloatingOrb delay={0} size={120} x="10%" y="20%" />
           <FloatingOrb delay={2} size={80} x="70%" y="70%" />
           <FloatingOrb delay={4} size={60} x="50%" y="10%" />
 
           <div className="w-full max-w-md relative z-10">
             {/* Centered logo + site name */}
-            <div className="flex flex-col items-center gap-2 mb-8">
-              <img src={logo} alt="AvatarClone" className="h-14 w-auto" />
-              <span className="font-bold text-xl tracking-tight">AvatarClone</span>
+            <div className="flex flex-col items-center gap-1 mb-4">
+              <img src={logo} alt="AvatarClone" className="h-10 w-auto" />
+              <span className="font-bold text-lg tracking-tight">AvatarClone</span>
               <p className="text-xs text-muted-foreground">AI-Powered Avatar Videos</p>
             </div>
 
