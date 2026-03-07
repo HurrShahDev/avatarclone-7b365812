@@ -238,7 +238,7 @@ const Auth = () => {
 
       <div className="flex flex-1 min-h-0">
         {/* Left Side - Auth Form (40%) */}
-        <div className={`w-full lg:w-[40%] flex flex-col items-center justify-center p-4 lg:p-8 relative overflow-y-auto transition-all duration-700 ${mounted ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-8'}`}>
+        <div className={`w-full lg:w-[40%] flex flex-col items-center justify-center p-4 lg:p-8 relative overflow-visible transition-all duration-700 ${mounted ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-8'}`}>
           <FloatingOrb delay={0} size={120} x="10%" y="20%" />
           <FloatingOrb delay={2} size={80} x="70%" y="70%" />
           <FloatingOrb delay={4} size={60} x="50%" y="10%" />
