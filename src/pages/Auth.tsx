@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useSearchParams, useNavigate, Link } from 'react-router-dom';
 import { Eye, EyeOff, Mail, Lock, User, AlertCircle, Play, Sparkles, Zap, ArrowLeft } from 'lucide-react';
 import logo from '@/assets/logo.png';
@@ -69,23 +69,48 @@ const PasswordFieldEye = ({ isTyping }: { isTyping: boolean }) => (
   </div>
 );
 
-/* Small robot avatar that orbits the auth form */
-const OrbitingAvatar = () => {
-  const [angle, setAngle] = useState(0);
+/* Small robot avatar that moves along the card border */
+const OrbitingAvatar = ({ cardRef }: { cardRef: React.RefObject<HTMLDivElement> }) => {
+  const [pos, setPos] = useState({ x: 0, y: 0, rotation: 0 });
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setAngle(prev => (prev + 0.8) % 360);
-    }, 30);
-    return () => clearInterval(interval);
-  }, []);
+    let progress = 0;
+    const speed = 0.003;
+    let rafId: number;
 
-  const radiusX = 260;
-  const radiusY = 300;
-  const rad = (angle * Math.PI) / 180;
-  const x = Math.cos(rad) * radiusX;
-  const y = Math.sin(rad) * radiusY;
-  const bob = Math.sin(rad * 2) * 5;
+    const animate = () => {
+      const card = cardRef.current;
+      if (!card) { rafId = requestAnimationFrame(animate); return; }
+
+      const w = card.offsetWidth;
+      const h = card.offsetHeight;
+      const perimeter = 2 * (w + h);
+      const dist = (progress % 1) * perimeter;
+
+      let x = 0, y = 0, rotation = 0;
+
+      if (dist < w) {
+        // Top edge: left to right
+        x = dist; y = 0; rotation = 90;
+      } else if (dist < w + h) {
+        // Right edge: top to bottom
+        x = w; y = dist - w; rotation = 180;
+      } else if (dist < 2 * w + h) {
+        // Bottom edge: right to left
+        x = w - (dist - w - h); y = h; rotation = 270;
+      } else {
+        // Left edge: bottom to top
+        x = 0; y = h - (dist - 2 * w - h); rotation = 0;
+      }
+
+      setPos({ x: x - 20, y: y - 20, rotation });
+      progress += speed;
+      rafId = requestAnimationFrame(animate);
+    };
+
+    rafId = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(rafId);
+  }, [cardRef]);
 
   return (
     <img
@@ -93,12 +118,12 @@ const OrbitingAvatar = () => {
       alt=""
       className="absolute rounded-full pointer-events-none z-30"
       style={{
-        width: 48,
-        height: 48,
-        left: `calc(50% + ${x}px - 24px)`,
-        top: `calc(50% + ${y + bob}px - 24px)`,
-        filter: 'drop-shadow(0 4px 12px hsl(220 60% 55% / 0.5))',
-        transition: 'none',
+        width: 40,
+        height: 40,
+        left: pos.x,
+        top: pos.y,
+        transform: `rotate(${pos.rotation}deg)`,
+        filter: 'drop-shadow(0 3px 8px hsl(220 60% 55% / 0.5))',
       }}
     />
   );
@@ -111,6 +136,7 @@ const Auth = () => {
     searchParams.get('mode') === 'signup' ? 'signup' : 'signin'
   );
   const [showPassword, setShowPassword] = useState(false);
+  const cardRef = useRef<HTMLDivElement>(null);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -243,19 +269,17 @@ const Auth = () => {
           <FloatingOrb delay={2} size={80} x="70%" y="70%" />
           <FloatingOrb delay={4} size={60} x="50%" y="10%" />
 
-          {/* Orbiting avatar around the whole form area */}
-          <OrbitingAvatar />
-
           <div className="w-full max-w-md relative z-10">
 
-            {/* Centered logo + site name */}
-            <div className="flex flex-col items-center gap-1 mb-4">
-              <img src={logo} alt="AvatarClone" className="h-10 w-auto" />
+            {/* Logo + site name inline */}
+            <div className="flex items-center gap-2 mb-4">
+              <img src={logo} alt="AvatarClone" className="h-8 w-auto" />
               <span className="font-bold text-lg tracking-tight">AvatarClone</span>
-              <p className="text-xs text-muted-foreground">AI-Powered Avatar Videos</p>
             </div>
 
-            <div className="card-simple p-5 lg:p-6 backdrop-blur-sm relative overflow-visible">
+            <div ref={cardRef} className="card-simple p-5 lg:p-6 backdrop-blur-sm relative overflow-visible">
+              {/* Orbiting avatar along card border */}
+              <OrbitingAvatar cardRef={cardRef} />
 
               {/* Glow on password focus */}
               <div
