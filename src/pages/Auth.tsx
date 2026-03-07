@@ -69,26 +69,40 @@ const PasswordFieldEye = ({ isTyping }: { isTyping: boolean }) => (
   </div>
 );
 
-/* Small avatar that orbits the auth card */
-const OrbitingAvatar = () => (
-  <div
-    className="absolute pointer-events-none z-20"
-    style={{ left: '50%', top: '50%', width: 0, height: 0, animation: 'orbitFloat 14s linear infinite' }}
-  >
-    <div style={{ transform: 'translateX(210px)', animation: 'iconBob 3s ease-in-out infinite' }}>
-      <img
-        src={orbitAvatar}
-        alt=""
-        className="rounded-full"
-        style={{
-          width: 44, height: 44,
-          animation: 'orbitFloat 14s linear infinite reverse',
-          filter: 'drop-shadow(0 4px 12px hsl(220 60% 55% / 0.35))',
-        }}
-      />
-    </div>
-  </div>
-);
+/* Small robot avatar that orbits the auth form */
+const OrbitingAvatar = () => {
+  const [angle, setAngle] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setAngle(prev => (prev + 0.8) % 360);
+    }, 30);
+    return () => clearInterval(interval);
+  }, []);
+
+  const radiusX = 260;
+  const radiusY = 300;
+  const rad = (angle * Math.PI) / 180;
+  const x = Math.cos(rad) * radiusX;
+  const y = Math.sin(rad) * radiusY;
+  const bob = Math.sin(rad * 2) * 5;
+
+  return (
+    <img
+      src={orbitAvatar}
+      alt=""
+      className="absolute rounded-full pointer-events-none z-30"
+      style={{
+        width: 48,
+        height: 48,
+        left: `calc(50% + ${x}px - 24px)`,
+        top: `calc(50% + ${y + bob}px - 24px)`,
+        filter: 'drop-shadow(0 4px 12px hsl(220 60% 55% / 0.5))',
+        transition: 'none',
+      }}
+    />
+  );
+};
 
 const Auth = () => {
   const [searchParams] = useSearchParams();
@@ -213,33 +227,35 @@ const Auth = () => {
   const strength = getPasswordStrength();
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="h-screen bg-background flex flex-col overflow-visible">
       {/* Back arrow */}
-      <div className="w-full px-4 lg:px-8 py-3 z-20">
+      <div className="w-full px-4 lg:px-8 py-2 z-20 shrink-0">
         <Link to="/" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors group">
           <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
           Back to Home
         </Link>
       </div>
 
-      <div className="flex flex-1">
+      <div className="flex flex-1 min-h-0">
         {/* Left Side - Auth Form (40%) */}
-        <div className={`w-full lg:w-[40%] flex flex-col items-center justify-center p-6 lg:p-12 relative overflow-hidden transition-all duration-700 ${mounted ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-8'}`}>
+        <div className={`w-full lg:w-[40%] flex flex-col items-center justify-center p-4 lg:p-8 relative overflow-visible transition-all duration-700 ${mounted ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-8'}`}>
           <FloatingOrb delay={0} size={120} x="10%" y="20%" />
           <FloatingOrb delay={2} size={80} x="70%" y="70%" />
           <FloatingOrb delay={4} size={60} x="50%" y="10%" />
 
+          {/* Orbiting avatar around the whole form area */}
+          <OrbitingAvatar />
+
           <div className="w-full max-w-md relative z-10">
+
             {/* Centered logo + site name */}
-            <div className="flex flex-col items-center gap-2 mb-8">
-              <img src={logo} alt="AvatarClone" className="h-14 w-auto" />
-              <span className="font-bold text-xl tracking-tight">AvatarClone</span>
+            <div className="flex flex-col items-center gap-1 mb-4">
+              <img src={logo} alt="AvatarClone" className="h-10 w-auto" />
+              <span className="font-bold text-lg tracking-tight">AvatarClone</span>
               <p className="text-xs text-muted-foreground">AI-Powered Avatar Videos</p>
             </div>
 
-            <div className="card-simple p-6 lg:p-8 backdrop-blur-sm relative overflow-visible">
-              {/* Orbiting avatar */}
-              <OrbitingAvatar />
+            <div className="card-simple p-5 lg:p-6 backdrop-blur-sm relative overflow-visible">
 
               {/* Glow on password focus */}
               <div
@@ -251,7 +267,7 @@ const Auth = () => {
               />
 
               {/* Tab switcher */}
-              <div className="flex mb-6 p-1 bg-muted rounded-lg relative">
+              <div className="flex mb-4 p-1 bg-muted rounded-lg relative">
                 <div
                   className="absolute top-1 bottom-1 rounded-md bg-background shadow-sm transition-all duration-300 ease-out"
                   style={{ width: 'calc(50% - 4px)', left: mode === 'signin' ? '4px' : 'calc(50%)' }}
@@ -271,12 +287,12 @@ const Auth = () => {
                 <span className="text-sm font-medium">Continue with Google</span>
               </button>
 
-              <div className="relative my-5">
+              <div className="relative my-3">
                 <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-border" /></div>
                 <div className="relative flex justify-center"><span className="px-3 bg-card text-xs text-muted-foreground">or</span></div>
               </div>
 
-              <form onSubmit={handleSubmit} className="space-y-4">
+              <form onSubmit={handleSubmit} className="space-y-3">
                 {/* Full Name (signup only) */}
                 <div className={`transition-all duration-500 ${mode === 'signup' ? 'max-h-24 opacity-100' : 'max-h-0 opacity-0 overflow-hidden'}`}>
                   <label className="block text-sm font-medium mb-1.5">Full Name</label>
