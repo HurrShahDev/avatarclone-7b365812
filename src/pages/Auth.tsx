@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useSearchParams, useNavigate, Link } from 'react-router-dom';
 import { Eye, EyeOff, Mail, Lock, User, AlertCircle, Play, Sparkles, Zap, ArrowLeft } from 'lucide-react';
 import logo from '@/assets/logo.png';
@@ -136,6 +136,7 @@ const Auth = () => {
     searchParams.get('mode') === 'signup' ? 'signup' : 'signin'
   );
   const [showPassword, setShowPassword] = useState(false);
+  const cardRef = useRef<HTMLDivElement>(null);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -268,19 +269,17 @@ const Auth = () => {
           <FloatingOrb delay={2} size={80} x="70%" y="70%" />
           <FloatingOrb delay={4} size={60} x="50%" y="10%" />
 
-          {/* Orbiting avatar around the whole form area */}
-          <OrbitingAvatar />
-
           <div className="w-full max-w-md relative z-10">
 
-            {/* Centered logo + site name */}
-            <div className="flex flex-col items-center gap-1 mb-4">
-              <img src={logo} alt="AvatarClone" className="h-10 w-auto" />
+            {/* Logo + site name inline */}
+            <div className="flex items-center gap-2 mb-4">
+              <img src={logo} alt="AvatarClone" className="h-8 w-auto" />
               <span className="font-bold text-lg tracking-tight">AvatarClone</span>
-              <p className="text-xs text-muted-foreground">AI-Powered Avatar Videos</p>
             </div>
 
-            <div className="card-simple p-5 lg:p-6 backdrop-blur-sm relative overflow-visible">
+            <div ref={cardRef} className="card-simple p-5 lg:p-6 backdrop-blur-sm relative overflow-visible">
+              {/* Orbiting avatar along card border */}
+              <OrbitingAvatar cardRef={cardRef} />
 
               {/* Glow on password focus */}
               <div
