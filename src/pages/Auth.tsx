@@ -245,6 +245,9 @@ const Auth = () => {
           <FloatingOrb delay={4} size={60} x="50%" y="10%" />
 
           <div className="w-full max-w-md relative z-10">
+            {/* Orbiting avatar around the whole form area */}
+            <OrbitingAvatar />
+
             {/* Centered logo + site name */}
             <div className="flex flex-col items-center gap-1 mb-4">
               <img src={logo} alt="AvatarClone" className="h-10 w-auto" />
@@ -253,8 +256,6 @@ const Auth = () => {
             </div>
 
             <div className="card-simple p-5 lg:p-6 backdrop-blur-sm relative overflow-visible">
-              {/* Orbiting avatar */}
-              <OrbitingAvatar />
 
               {/* Glow on password focus */}
               <div
