@@ -481,26 +481,13 @@ const Auth = () => {
           <div className="absolute top-1/4 left-1/3 w-80 h-80 rounded-full opacity-20 blur-[100px]" style={{ background: 'hsl(220 80% 55%)' }} />
           <div className="absolute bottom-1/4 right-1/4 w-64 h-64 rounded-full opacity-15 blur-[80px]" style={{ background: 'hsl(270 60% 55%)' }} />
 
-          <div className="relative z-10 text-center px-8 max-w-2xl">
-            <h2 className="text-3xl xl:text-4xl font-bold mb-3 leading-tight" style={{ color: 'hsl(0 0% 95%)' }}>
+          <div className="relative z-10 text-center px-8 max-w-2xl w-full">
+            <h2 className="text-3xl xl:text-4xl font-bold mb-6 leading-tight" style={{ color: 'hsl(0 0% 95%)' }}>
               CREATE PERSONALIZED<br />AI AVATAR VIDEOS
             </h2>
-            <p className="text-lg mb-10 leading-relaxed" style={{ color: 'hsl(220 15% 65%)' }}>
-              Transform your ideas, voice and face into<br />synchronized talking avatar videos
-            </p>
 
-            <div className="relative mx-auto w-full max-w-lg aspect-video rounded-2xl overflow-hidden shadow-2xl" style={{ border: '1px solid hsl(220 20% 20%)' }}>
-              <div className="absolute inset-0" style={{ background: 'linear-gradient(135deg, hsl(220 20% 14%) 0%, hsl(240 15% 18%) 100%)' }} />
-              <div className="absolute left-0 right-0 h-px opacity-30" style={{ background: 'linear-gradient(90deg, transparent, hsl(220 80% 60%), transparent)', animation: 'scanLine 4s linear infinite' }} />
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="w-16 h-16 rounded-full flex items-center justify-center cursor-pointer transition-transform duration-300 hover:scale-110" style={{ background: 'linear-gradient(135deg, hsl(220 60% 50%), hsl(270 50% 50%))', boxShadow: '0 0 30px hsl(220 60% 50% / 0.3)' }}>
-                  <Play className="w-6 h-6 ml-1" style={{ color: 'white' }} fill="white" />
-                </div>
-              </div>
-              <svg className="absolute top-3 left-3 w-6 h-6 opacity-30" viewBox="0 0 24 24" fill="none" stroke="hsl(220 60% 60%)" strokeWidth="1.5"><path d="M1 8V1h7" /></svg>
-              <svg className="absolute top-3 right-3 w-6 h-6 opacity-30" viewBox="0 0 24 24" fill="none" stroke="hsl(220 60% 60%)" strokeWidth="1.5"><path d="M23 8V1h-7" /></svg>
-              <svg className="absolute bottom-3 left-3 w-6 h-6 opacity-30" viewBox="0 0 24 24" fill="none" stroke="hsl(220 60% 60%)" strokeWidth="1.5"><path d="M1 16v7h7" /></svg>
-              <svg className="absolute bottom-3 right-3 w-6 h-6 opacity-30" viewBox="0 0 24 24" fill="none" stroke="hsl(220 60% 60%)" strokeWidth="1.5"><path d="M23 16v7h-7" /></svg>
+            <div className="relative mx-auto w-full max-w-lg aspect-video shadow-2xl">
+              <IntroVideoPlayer />
             </div>
           </div>
 
