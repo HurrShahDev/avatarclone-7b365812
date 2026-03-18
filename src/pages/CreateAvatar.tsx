@@ -54,7 +54,7 @@ const CreateAvatar = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const cameraStreamRef = useRef<MediaStream | null>(null);
-  const analysisIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const analysisIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const centeredHistoryRef = useRef<boolean[]>([]);
   const brightnessHistoryRef = useRef<('low' | 'ok' | 'high')[]>([]);
   const countdownRef = useRef<NodeJS.Timeout | null>(null);
