@@ -180,7 +180,7 @@ const Auth = () => {
   const [mounted, setMounted] = useState(false);
   const [passwordFocused, setPasswordFocused] = useState(false);
   const [isTypingPassword, setIsTypingPassword] = useState(false);
-  const [typingTimeout, setTypingTimeoutState] = useState<NodeJS.Timeout | null>(null);
+  const [typingTimeout, setTypingTimeoutState] = useState<ReturnType<typeof setTimeout> | null>(null);
 
   const [signInData, setSignInData] = useState({ email: '', password: '', rememberMe: false });
   const [signUpData, setSignUpData] = useState({ fullName: '', email: '', password: '', confirmPassword: '', consent: false });
