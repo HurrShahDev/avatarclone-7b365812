@@ -57,7 +57,7 @@ const CreateAvatar = () => {
   const analysisIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const centeredHistoryRef = useRef<boolean[]>([]);
   const brightnessHistoryRef = useRef<('low' | 'ok' | 'high')[]>([]);
-  const countdownRef = useRef<NodeJS.Timeout | null>(null);
+  const countdownRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const stableStartRef = useRef<number | null>(null);
 
   // Voice recording state
