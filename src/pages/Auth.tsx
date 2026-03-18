@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useSearchParams, useNavigate, Link } from 'react-router-dom';
-import { Eye, EyeOff, Mail, Lock, User, AlertCircle, Play, Sparkles, Zap, ArrowLeft } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock, User, AlertCircle, Sparkles, Zap, ArrowLeft } from 'lucide-react';
+import IntroVideoPlayer from '@/components/landing/IntroVideoPlayer';
 import logo from '@/assets/logo.png';
 import { Button } from '@/components/ui/button';
 import { auth } from '@/lib/firebase';
