@@ -2,7 +2,6 @@ import { useState, useEffect, useRef } from 'react';
 import { useSearchParams, useNavigate, Link } from 'react-router-dom';
 import { Eye, EyeOff, Mail, Lock, User, AlertCircle, Play, Sparkles, Zap, ArrowLeft } from 'lucide-react';
 import logo from '@/assets/logo.png';
-import orbitAvatar from '@/assets/orbit-avatar.png';
 import { Button } from '@/components/ui/button';
 import { auth } from '@/lib/firebase';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
@@ -25,19 +24,15 @@ const FloatingOrb = ({ delay, size, x, y }: { delay: number; size: number; x: st
 const PasswordFieldEye = ({ isTyping }: { isTyping: boolean }) => (
   <div className="absolute right-10 top-1/2 -translate-y-1/2 pointer-events-none flex items-center">
     <div className="relative" style={{ width: 22, height: 14 }}>
-      {/* Eye shape */}
       <div
         className="absolute inset-0 rounded-[50%] overflow-hidden transition-all duration-300"
         style={{
           background: 'radial-gradient(circle, hsl(0 0% 98%) 0%, hsl(0 0% 90%) 100%)',
           border: '1.5px solid hsl(var(--muted-foreground) / 0.3)',
           transform: isTyping ? 'scaleY(0.08)' : 'scaleY(1)',
-          boxShadow: isTyping
-            ? '0 0 0 transparent'
-            : '0 1px 3px hsl(0 0% 0% / 0.15), inset 0 -1px 2px hsl(0 0% 0% / 0.05)',
+          boxShadow: isTyping ? '0 0 0 transparent' : '0 1px 3px hsl(0 0% 0% / 0.15), inset 0 -1px 2px hsl(0 0% 0% / 0.05)',
         }}
       >
-        {/* Iris */}
         <div
           className="absolute rounded-full transition-all duration-300"
           style={{
@@ -48,13 +43,10 @@ const PasswordFieldEye = ({ isTyping }: { isTyping: boolean }) => (
             opacity: isTyping ? 0 : 1,
           }}
         >
-          {/* Pupil */}
           <div className="absolute rounded-full" style={{ width: 4, height: 4, top: '50%', left: '50%', transform: 'translate(-50%, -50%)', background: 'hsl(0 0% 5%)' }} />
-          {/* Reflection */}
           <div className="absolute rounded-full" style={{ width: 2, height: 2, top: 1, right: 1, background: 'hsl(0 0% 100%)' }} />
         </div>
       </div>
-      {/* Eyelashes when closed */}
       {isTyping && (
         <div className="absolute w-full top-1/2 -translate-y-1/2">
           <div className="w-full h-px rounded-full animate-fade-in" style={{ background: 'linear-gradient(90deg, transparent, hsl(var(--muted-foreground) / 0.5), transparent)' }} />
@@ -69,41 +61,95 @@ const PasswordFieldEye = ({ isTyping }: { isTyping: boolean }) => (
   </div>
 );
 
-/* Small robot avatar that moves along the card border */
-const OrbitingAvatar = ({ cardRef }: { cardRef: React.RefObject<HTMLDivElement> }) => {
-  const [pos, setPos] = useState({ x: 0, y: 0, rotation: 0 });
+/* Blue energy line orbiting around the card border */
+const OrbitingLine = ({ cardRef }: { cardRef: React.RefObject<HTMLDivElement> }) => {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
-    let progress = 0;
-    const speed = 0.003;
     let rafId: number;
+    let progress = 0;
+    const speed = 0.002;
+    const trailLength = 0.15; // 15% of perimeter
 
     const animate = () => {
       const card = cardRef.current;
-      if (!card) { rafId = requestAnimationFrame(animate); return; }
+      const canvas = canvasRef.current;
+      if (!card || !canvas) { rafId = requestAnimationFrame(animate); return; }
 
       const w = card.offsetWidth;
       const h = card.offsetHeight;
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = (w + 40) * dpr;
+      canvas.height = (h + 40) * dpr;
+      canvas.style.width = `${w + 40}px`;
+      canvas.style.height = `${h + 40}px`;
+      const ctx = canvas.getContext('2d')!;
+      ctx.scale(dpr, dpr);
+      ctx.clearRect(0, 0, w + 40, h + 40);
+
       const perimeter = 2 * (w + h);
-      const dist = (progress % 1) * perimeter;
+      const radius = 8;
+      const ox = 20, oy = 20;
 
-      let x = 0, y = 0, rotation = 0;
+      const getPoint = (p: number) => {
+        const d = ((p % 1) + 1) % 1 * perimeter;
+        if (d < w - radius) return { x: ox + radius + d, y: oy };
+        if (d < w - radius + Math.PI * radius / 2) {
+          const a = (d - (w - radius)) / radius;
+          return { x: ox + w - radius + Math.sin(a) * radius, y: oy + radius - Math.cos(a) * radius };
+        }
+        const d2 = d - (w - radius + Math.PI * radius / 2);
+        if (d2 < h - 2 * radius) return { x: ox + w, y: oy + radius + d2 };
+        if (d2 < h - 2 * radius + Math.PI * radius / 2) {
+          const a = (d2 - (h - 2 * radius)) / radius;
+          return { x: ox + w - radius + Math.cos(a) * radius, y: oy + h - radius + Math.sin(a) * radius };
+        }
+        const d3 = d2 - (h - 2 * radius + Math.PI * radius / 2);
+        if (d3 < w - 2 * radius) return { x: ox + w - radius - d3, y: oy + h };
+        if (d3 < w - 2 * radius + Math.PI * radius / 2) {
+          const a = (d3 - (w - 2 * radius)) / radius;
+          return { x: ox + radius - Math.sin(a) * radius, y: oy + h - radius + Math.cos(a) * radius };
+        }
+        const d4 = d3 - (w - 2 * radius + Math.PI * radius / 2);
+        if (d4 < h - 2 * radius) return { x: ox, y: oy + h - radius - d4 };
+        const a = (d4 - (h - 2 * radius)) / radius;
+        return { x: ox + radius - Math.cos(a) * radius, y: oy + radius - Math.sin(a) * radius };
+      };
 
-      if (dist < w) {
-        // Top edge: left to right
-        x = dist; y = 0; rotation = 90;
-      } else if (dist < w + h) {
-        // Right edge: top to bottom
-        x = w; y = dist - w; rotation = 180;
-      } else if (dist < 2 * w + h) {
-        // Bottom edge: right to left
-        x = w - (dist - w - h); y = h; rotation = 270;
-      } else {
-        // Left edge: bottom to top
-        x = 0; y = h - (dist - 2 * w - h); rotation = 0;
+      // Draw trail
+      const segments = 60;
+      for (let i = 0; i < segments; i++) {
+        const t = i / segments;
+        const p1 = getPoint(progress - t * trailLength);
+        const p2 = getPoint(progress - (t + 1 / segments) * trailLength);
+        const alpha = (1 - t) * 0.9;
+        const lineWidth = (1 - t) * 3 + 0.5;
+        ctx.beginPath();
+        ctx.moveTo(p1.x, p1.y);
+        ctx.lineTo(p2.x, p2.y);
+        ctx.strokeStyle = `hsla(210, 100%, 60%, ${alpha})`;
+        ctx.lineWidth = lineWidth;
+        ctx.lineCap = 'round';
+        ctx.stroke();
       }
 
-      setPos({ x: x - 20, y: y - 20, rotation });
+      // Draw head glow
+      const head = getPoint(progress);
+      const glow = ctx.createRadialGradient(head.x, head.y, 0, head.x, head.y, 12);
+      glow.addColorStop(0, 'hsla(210, 100%, 70%, 0.8)');
+      glow.addColorStop(0.5, 'hsla(210, 100%, 60%, 0.3)');
+      glow.addColorStop(1, 'hsla(210, 100%, 60%, 0)');
+      ctx.beginPath();
+      ctx.arc(head.x, head.y, 12, 0, Math.PI * 2);
+      ctx.fillStyle = glow;
+      ctx.fill();
+
+      // Bright dot at head
+      ctx.beginPath();
+      ctx.arc(head.x, head.y, 2.5, 0, Math.PI * 2);
+      ctx.fillStyle = 'hsl(210, 100%, 85%)';
+      ctx.fill();
+
       progress += speed;
       rafId = requestAnimationFrame(animate);
     };
@@ -113,18 +159,10 @@ const OrbitingAvatar = ({ cardRef }: { cardRef: React.RefObject<HTMLDivElement> 
   }, [cardRef]);
 
   return (
-    <img
-      src={orbitAvatar}
-      alt=""
-      className="absolute rounded-full pointer-events-none z-30"
-      style={{
-        width: 40,
-        height: 40,
-        left: pos.x,
-        top: pos.y,
-        transform: `rotate(${pos.rotation}deg)`,
-        filter: 'drop-shadow(0 3px 8px hsl(220 60% 55% / 0.5))',
-      }}
+    <canvas
+      ref={canvasRef}
+      className="absolute pointer-events-none z-30"
+      style={{ left: -20, top: -20 }}
     />
   );
 };
@@ -197,7 +235,9 @@ const Auth = () => {
       await signInWithPopup(auth, provider);
       navigate('/');
     } catch (error: any) {
-      setErrors({ email: error.message });
+      if (error.code !== 'auth/popup-closed-by-user') {
+        setErrors({ email: error.message });
+      }
     } finally {
       setIsLoading(false);
     }
@@ -253,7 +293,7 @@ const Auth = () => {
   const strength = getPasswordStrength();
 
   return (
-    <div className="h-screen bg-background flex flex-col overflow-visible">
+    <div className="h-screen bg-background flex flex-col overflow-hidden">
       {/* Back arrow */}
       <div className="w-full px-4 lg:px-8 py-2 z-20 shrink-0">
         <Link to="/" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors group">
@@ -264,22 +304,36 @@ const Auth = () => {
 
       <div className="flex flex-1 min-h-0">
         {/* Left Side - Auth Form (40%) */}
-        <div className={`w-full lg:w-[40%] flex flex-col items-center justify-center p-4 lg:p-8 relative overflow-visible transition-all duration-700 ${mounted ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-8'}`}>
+        <div className={`w-full lg:w-[40%] flex flex-col items-center justify-center p-4 lg:p-6 relative overflow-visible transition-all duration-700 ${mounted ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-8'}`}>
           <FloatingOrb delay={0} size={120} x="10%" y="20%" />
           <FloatingOrb delay={2} size={80} x="70%" y="70%" />
           <FloatingOrb delay={4} size={60} x="50%" y="10%" />
 
-          <div className="w-full max-w-md relative z-10">
+          {/* Floating particles */}
+          {[...Array(8)].map((_, i) => (
+            <div
+              key={i}
+              className="absolute w-1 h-1 rounded-full"
+              style={{
+                background: 'hsl(var(--primary))',
+                left: `${10 + i * 12}%`,
+                top: `${15 + (i % 4) * 20}%`,
+                opacity: 0.2,
+                animation: `authParticle ${4 + i * 0.7}s ease-in-out infinite ${i * 0.5}s`,
+              }}
+            />
+          ))}
 
-            {/* Logo + site name inline */}
-            <div className="flex items-center gap-2 mb-4">
-              <img src={logo} alt="AvatarClone" className="h-8 w-auto" />
-              <span className="font-bold text-lg tracking-tight">AvatarClone</span>
+          <div className="w-full max-w-md relative z-10">
+            {/* Logo + site name centered */}
+            <div className="flex items-center justify-center gap-2 mb-4">
+              <img src={logo} alt="AvatarClone" className="h-8 w-auto animate-fade-in" style={{ animationDelay: '0.1s' }} />
+              <span className="font-bold text-lg tracking-tight animate-fade-in" style={{ animationDelay: '0.2s' }}>AvatarClone</span>
             </div>
 
-            <div ref={cardRef} className="card-simple p-5 lg:p-6 backdrop-blur-sm relative overflow-visible">
-              {/* Orbiting avatar along card border */}
-              <OrbitingAvatar cardRef={cardRef} />
+            <div ref={cardRef} className="card-simple p-5 lg:p-6 backdrop-blur-sm relative overflow-visible animate-fade-in" style={{ animationDelay: '0.3s' }}>
+              {/* Blue orbit line */}
+              <OrbitingLine cardRef={cardRef} />
 
               {/* Glow on password focus */}
               <div
@@ -349,7 +403,6 @@ const Auth = () => {
                       onBlur={() => { setPasswordFocused(false); setIsTypingPassword(false); }}
                       className="input-field pl-10 pr-16"
                     />
-                    {/* Realistic eye animation */}
                     <PasswordFieldEye isTyping={isTypingPassword} />
                     <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors">
                       {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
