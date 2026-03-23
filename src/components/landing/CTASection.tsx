@@ -15,7 +15,7 @@ const CTASection = () => {
       <div className="absolute bottom-0 left-0 w-80 h-80 bg-accent/[0.04] rounded-full translate-y-1/2 -translate-x-1/3 blur-3xl pointer-events-none" />
 
       <div className="container mx-auto px-4 lg:px-8">
-        <div className="flex flex-col lg:flex-row items-center gap-10 lg:gap-16 max-w-5xl mx-auto">
+        <div className="flex flex-col lg:flex-row items-center gap-10 lg:gap-16 max-w-6xl mx-auto">
           {/* Text Content */}
           <div
             ref={textRef}

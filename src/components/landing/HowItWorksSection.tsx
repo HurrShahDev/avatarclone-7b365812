@@ -135,7 +135,7 @@ const HowItWorksSection = () => {
           </p>
         </div>
 
-        <div className="space-y-20 max-w-5xl mx-auto relative">
+        <div className="space-y-16 max-w-6xl mx-auto relative">
           {/* Vertical connector line */}
           <div className="hidden lg:block absolute left-6 top-6 bottom-6 w-px bg-gradient-to-b from-primary/20 via-primary/10 to-primary/20" />
 

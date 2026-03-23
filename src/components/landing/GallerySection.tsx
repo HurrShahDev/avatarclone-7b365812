@@ -38,7 +38,7 @@ const GallerySection = () => {
           </p>
         </div>
 
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-4xl mx-auto">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
           {samples.map((sample) => (
             <div key={sample.name} className="card-simple overflow-hidden">
               <div className="aspect-[4/5] relative group cursor-pointer">
