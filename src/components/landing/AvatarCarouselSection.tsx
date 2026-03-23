@@ -11,6 +11,7 @@ import avatar3vid from '@/assets/carousel-avatar-3.mp4';
 import avatar4vid from '@/assets/carousel-avatar-4.mp4';
 import avatar5vid from '@/assets/carousel-avatar-5.mp4';
 import avatar6vid from '@/assets/carousel-avatar-6.mp4';
+import { useScrollReveal } from '@/hooks/use-scroll-reveal';
 
 const avatars = [
   { img: avatar1img, vid: avatar1vid, name: 'Sarah' },
@@ -21,7 +22,6 @@ const avatars = [
   { img: avatar6img, vid: avatar6vid, name: 'Olivia' },
 ];
 
-// Duplicate for seamless loop
 const loopAvatars = [...avatars, ...avatars];
 
 interface AvatarCardProps {
@@ -52,15 +52,13 @@ const AvatarCard = ({ avatar, cardKey }: AvatarCardProps) => {
       onMouseLeave={() => setHovered(false)}
     >
       <div
-        className={`relative rounded-2xl overflow-hidden transition-all duration-300 ${
+        className={`relative rounded-2xl overflow-hidden transition-all duration-500 ${
           hovered
             ? 'scale-105 shadow-xl shadow-primary/20 ring-2 ring-primary/40'
-            : 'scale-100'
+            : 'scale-100 shadow-md'
         }`}
       >
-        {/* Container that maintains aspect ratio */}
         <div className="relative w-full aspect-[3/4]">
-          {/* Static image */}
           <img
             src={avatar.img}
             alt={`${avatar.name} AI avatar`}
@@ -70,7 +68,6 @@ const AvatarCard = ({ avatar, cardKey }: AvatarCardProps) => {
             draggable={false}
           />
 
-          {/* Video on hover — real face movement */}
           <video
             ref={videoRef}
             src={avatar.vid}
@@ -83,7 +80,12 @@ const AvatarCard = ({ avatar, cardKey }: AvatarCardProps) => {
             }`}
           />
 
-          {/* Name + waveform overlay when speaking */}
+          {/* Name overlay - always visible */}
+          <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent p-4 pt-10">
+            <span className="text-sm font-medium text-white/90">{avatar.name}</span>
+          </div>
+
+          {/* Waveform when speaking */}
           {hovered && (
             <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-transparent to-transparent flex flex-col items-center justify-end pb-4 animate-fade-in pointer-events-none">
               <div className="flex items-end gap-[3px] h-6 mb-1.5">
@@ -114,6 +116,7 @@ const AvatarCarouselSection = () => {
   const animationRef = useRef<number>(0);
   const scrollPos = useRef(0);
   const isPaused = useRef(false);
+  const { ref: headingRef, isVisible: headingVisible } = useScrollReveal();
 
   useEffect(() => {
     const el = scrollRef.current;
@@ -140,7 +143,17 @@ const AvatarCarouselSection = () => {
   return (
     <section className="pt-16 lg:pt-24 pb-6 bg-accent/20 overflow-hidden">
       <div className="container mx-auto px-4 lg:px-8 mb-10">
-        <div className="text-center max-w-2xl mx-auto">
+        <div
+          ref={headingRef}
+          className="text-center max-w-2xl mx-auto transition-all duration-700 ease-out"
+          style={{
+            opacity: headingVisible ? 1 : 0,
+            transform: headingVisible ? 'translateY(0)' : 'translateY(25px)',
+          }}
+        >
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent/10 border border-accent/20 text-accent text-xs font-medium mb-4">
+            Live Previews
+          </div>
           <h2 className="text-2xl lg:text-3xl font-bold mb-4">
             Meet Our AI Avatars
           </h2>
