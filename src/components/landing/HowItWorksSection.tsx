@@ -111,7 +111,7 @@ const HowItWorksSection = () => {
   const { ref: headingRef, isVisible: headingVisible } = useScrollReveal();
 
   return (
-    <section id="how-it-works" className="py-16 lg:py-24 bg-accent/30 relative overflow-hidden">
+    <section id="how-it-works" className="py-12 lg:py-16 bg-accent/30 relative overflow-hidden">
       {/* Decorative elements */}
       <div className="absolute bottom-0 left-0 w-72 h-72 bg-accent/[0.05] rounded-full translate-y-1/2 -translate-x-1/2 blur-3xl pointer-events-none" />
 

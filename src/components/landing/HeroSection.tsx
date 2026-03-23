@@ -14,7 +14,7 @@ const HeroSection = () => {
   };
 
   return (
-    <section className="relative py-16 lg:py-28 overflow-hidden">
+    <section className="relative py-12 lg:py-16 xl:py-20 overflow-hidden">
       {/* Cyber background */}
       <div
         className="absolute inset-0 pointer-events-none"

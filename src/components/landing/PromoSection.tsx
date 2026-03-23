@@ -39,7 +39,7 @@ const PromoSection = () => {
   };
 
   return (
-    <section id="demo-section" className="py-16 lg:py-24 bg-muted/20 relative overflow-hidden">
+    <section id="demo-section" className="py-12 lg:py-16 bg-muted/20 relative overflow-hidden">
       {/* Subtle decorative accent */}
       <div className="absolute top-0 right-0 w-96 h-96 bg-primary/[0.02] rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl pointer-events-none" />
 

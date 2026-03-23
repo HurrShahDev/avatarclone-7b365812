@@ -9,7 +9,7 @@ const CTASection = () => {
   const { ref: imgRef, isVisible: imgVisible } = useScrollReveal();
 
   return (
-    <section className="py-16 lg:py-24 bg-accent/20 relative overflow-hidden">
+    <section className="py-12 lg:py-16 bg-accent/20 relative overflow-hidden">
       {/* Background glow */}
       <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary/[0.03] rounded-full -translate-y-1/3 translate-x-1/3 blur-3xl pointer-events-none" />
       <div className="absolute bottom-0 left-0 w-80 h-80 bg-accent/[0.04] rounded-full translate-y-1/2 -translate-x-1/3 blur-3xl pointer-events-none" />
