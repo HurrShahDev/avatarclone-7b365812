@@ -141,7 +141,7 @@ const AvatarCarouselSection = () => {
   }, []);
 
   return (
-    <section className="pt-16 lg:pt-24 pb-6 bg-accent/20 overflow-hidden">
+    <section className="pt-12 lg:pt-16 pb-6 bg-accent/20 overflow-hidden">
       <div className="container mx-auto px-4 lg:px-8 mb-10">
         <div
           ref={headingRef}

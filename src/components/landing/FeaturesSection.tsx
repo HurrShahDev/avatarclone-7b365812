@@ -39,7 +39,7 @@ const FeaturesSection = () => {
   const { ref: gridRef, isVisible: gridVisible, getDelay } = useStaggerReveal(features.length);
 
   return (
-    <section id="features" className="py-16 lg:py-24 bg-muted/30 relative overflow-hidden">
+    <section id="features" className="py-12 lg:py-16 bg-muted/30 relative overflow-hidden">
       {/* Decorative background */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/[0.02] rounded-full blur-3xl pointer-events-none" />
 
@@ -63,7 +63,7 @@ const FeaturesSection = () => {
           </p>
         </div>
 
-        <div ref={gridRef} className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div ref={gridRef} className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-5">
           {features.map((feature, i) => (
             <div
               key={feature.title}
