@@ -15,7 +15,7 @@ const Header = ({ isLoggedIn = false }: HeaderProps) => {
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
+      setIsScrolled(window.scrollY > 20);
     };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
@@ -30,15 +30,17 @@ const Header = ({ isLoggedIn = false }: HeaderProps) => {
     : [];
 
   return (
-    <header className={`sticky top-0 z-50 border-b border-border backdrop-blur-md transition-all duration-300 ${
-      isScrolled ? 'bg-muted/40' : 'bg-muted/60'
+    <header className={`sticky top-0 z-50 transition-all duration-300 ${
+      isScrolled
+        ? 'bg-background/95 backdrop-blur-sm shadow-sm border-b border-border'
+        : 'bg-background border-b border-transparent'
     }`}>
       <div className="container mx-auto px-4 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between h-14">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2">
-            <img src={logo} alt="AvatarClone" className="h-10 w-auto" />
-            <span className="font-semibold text-foreground">AvatarClone</span>
+            <img src={logo} alt="AvatarClone" className="h-8 w-auto" />
+            <span className="font-semibold text-foreground text-base">AvatarClone</span>
           </Link>
 
           {/* Desktop Navigation */}
@@ -47,7 +49,7 @@ const Header = ({ isLoggedIn = false }: HeaderProps) => {
               <Link
                 key={link.href}
                 to={link.href}
-                className={`nav-link text-sm ${
+                className={`nav-link text-sm py-1 ${
                   location.pathname === link.href ? 'active' : ''
                 }`}
               >
@@ -57,7 +59,7 @@ const Header = ({ isLoggedIn = false }: HeaderProps) => {
           </nav>
 
           {/* Desktop Actions */}
-          <div className="hidden md:flex items-center gap-3">
+          <div className="hidden md:flex items-center gap-2">
             {isLoggedIn ? (
               <Link to="/settings">
                 <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground text-sm font-medium">
@@ -67,7 +69,7 @@ const Header = ({ isLoggedIn = false }: HeaderProps) => {
             ) : (
               <>
                 <Link to="/docs">
-                  <Button variant="ghost" size="sm">Docs</Button>
+                  <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">Docs</Button>
                 </Link>
                 <Link to="/auth">
                   <Button variant="outline" size="sm">Sign In</Button>
@@ -81,7 +83,7 @@ const Header = ({ isLoggedIn = false }: HeaderProps) => {
 
           {/* Mobile Menu Button */}
           <button
-            className="md:hidden p-2"
+            className="md:hidden p-2 -mr-2"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             aria-label="Toggle menu"
           >

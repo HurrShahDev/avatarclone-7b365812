@@ -24,12 +24,7 @@ const avatars = [
 
 const loopAvatars = [...avatars, ...avatars];
 
-interface AvatarCardProps {
-  avatar: typeof avatars[0];
-  cardKey: string;
-}
-
-const AvatarCard = ({ avatar, cardKey }: AvatarCardProps) => {
+const AvatarCard = ({ avatar }: { avatar: typeof avatars[0] }) => {
   const [hovered, setHovered] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
 
@@ -47,15 +42,13 @@ const AvatarCard = ({ avatar, cardKey }: AvatarCardProps) => {
 
   return (
     <div
-      className="flex-shrink-0 w-[220px] sm:w-[260px] lg:w-[280px] relative group"
+      className="flex-shrink-0 w-[220px] sm:w-[250px] lg:w-[270px]"
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
       <div
-        className={`relative rounded-2xl overflow-hidden transition-all duration-500 ${
-          hovered
-            ? 'scale-105 shadow-xl shadow-primary/20 ring-2 ring-primary/40'
-            : 'scale-100 shadow-md'
+        className={`relative rounded-xl overflow-hidden transition-all duration-300 ${
+          hovered ? 'scale-[1.03] shadow-lg' : 'shadow-sm'
         }`}
       >
         <div className="relative w-full aspect-[3/4]">
@@ -67,7 +60,6 @@ const AvatarCard = ({ avatar, cardKey }: AvatarCardProps) => {
             }`}
             draggable={false}
           />
-
           <video
             ref={videoRef}
             src={avatar.vid}
@@ -80,28 +72,28 @@ const AvatarCard = ({ avatar, cardKey }: AvatarCardProps) => {
             }`}
           />
 
-          {/* Name overlay - always visible */}
-          <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent p-4 pt-10">
-            <span className="text-sm font-medium text-white/90">{avatar.name}</span>
+          {/* Name overlay */}
+          <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-foreground/70 to-transparent p-4 pt-10">
+            <span className="text-sm font-medium text-primary-foreground">{avatar.name}</span>
           </div>
 
           {/* Waveform when speaking */}
           {hovered && (
-            <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-transparent to-transparent flex flex-col items-center justify-end pb-4 animate-fade-in pointer-events-none">
-              <div className="flex items-end gap-[3px] h-6 mb-1.5">
-                {Array.from({ length: 10 }).map((_, i) => (
+            <div className="absolute inset-0 bg-gradient-to-t from-foreground/60 via-transparent to-transparent flex flex-col items-center justify-end pb-4 animate-fade-in pointer-events-none">
+              <div className="flex items-end gap-[3px] h-5 mb-1">
+                {Array.from({ length: 8 }).map((_, i) => (
                   <div
                     key={i}
-                    className="w-[3px] rounded-full bg-primary"
+                    className="w-[3px] rounded-full bg-primary-foreground/80"
                     style={{
-                      height: `${6 + Math.sin(i * 0.9) * 8 + 6}px`,
+                      height: `${6 + Math.sin(i * 0.9) * 6 + 4}px`,
                       animation: `waveformBar 0.45s ease-in-out ${i * 0.06}s infinite alternate`,
                     }}
                   />
                 ))}
               </div>
-              <span className="text-[10px] font-semibold text-primary-foreground/90 tracking-widest uppercase">
-                AI Speaking…
+              <span className="text-[10px] font-medium text-primary-foreground/80 tracking-wider uppercase">
+                Speaking…
               </span>
             </div>
           )}
@@ -141,24 +133,22 @@ const AvatarCarouselSection = () => {
   }, []);
 
   return (
-    <section className="pt-12 lg:pt-16 pb-6 bg-accent/20 overflow-hidden">
+    <section className="section-padding overflow-hidden">
       <div className="container mx-auto px-4 lg:px-8 mb-10">
         <div
           ref={headingRef}
-          className="text-center max-w-2xl mx-auto transition-all duration-700 ease-out"
+          className="text-center max-w-xl mx-auto transition-all duration-700 ease-out"
           style={{
             opacity: headingVisible ? 1 : 0,
-            transform: headingVisible ? 'translateY(0)' : 'translateY(25px)',
+            transform: headingVisible ? 'translateY(0)' : 'translateY(20px)',
           }}
         >
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent/10 border border-accent/20 text-accent text-xs font-medium mb-4">
-            Live Previews
-          </div>
-          <h2 className="text-2xl lg:text-3xl font-bold mb-4">
+          <p className="text-sm text-primary font-semibold mb-3 tracking-wide uppercase">Live Previews</p>
+          <h2 className="section-heading">
             Meet Our AI Avatars
           </h2>
-          <p className="text-muted-foreground">
-            Hover over any avatar to see them come to life. These AI-generated personas can speak any script you write.
+          <p className="section-subtext">
+            Hover over any avatar to see them speak. These AI personas can deliver any script you write.
           </p>
         </div>
       </div>
@@ -173,7 +163,6 @@ const AvatarCarouselSection = () => {
           <AvatarCard
             key={`${avatar.name}-${index}`}
             avatar={avatar}
-            cardKey={`${avatar.name}-${index}`}
           />
         ))}
       </div>
