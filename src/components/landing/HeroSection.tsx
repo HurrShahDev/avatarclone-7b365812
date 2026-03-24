@@ -14,47 +14,25 @@ const HeroSection = () => {
   };
 
   return (
-    <section className="relative py-12 lg:py-16 xl:py-20 overflow-hidden">
-      {/* Cyber background */}
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          background:
-            'radial-gradient(ellipse 80% 60% at 70% 50%, hsla(210, 100%, 60%, 0.05) 0%, transparent 60%), radial-gradient(ellipse 60% 50% at 30% 60%, hsla(270, 80%, 60%, 0.04) 0%, transparent 50%)',
-        }}
-      />
-
-      {/* Subtle floating particles */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        {[...Array(6)].map((_, i) => (
-          <div
-            key={i}
-            className="absolute w-1 h-1 rounded-full bg-primary/20"
-            style={{
-              left: `${15 + i * 15}%`,
-              top: `${20 + (i % 3) * 25}%`,
-              animation: `float ${4 + i * 0.7}s ease-in-out ${i * 0.5}s infinite`,
-            }}
-          />
-        ))}
-      </div>
+    <section className="relative section-padding overflow-hidden">
+      {/* Clean subtle background */}
+      <div className="absolute inset-0 pointer-events-none bg-secondary/30" />
 
       <div className="container mx-auto px-4 lg:px-8 relative z-10">
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-8 items-center">
+        <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           {/* Left: Text Content */}
           <div
             ref={textRef}
             className="text-left transition-all duration-700 ease-out"
             style={{
               opacity: textVisible ? 1 : 0,
-              transform: textVisible ? 'translateY(0)' : 'translateY(30px)',
+              transform: textVisible ? 'translateY(0)' : 'translateY(24px)',
             }}
           >
             <p
-              className="text-sm text-primary font-medium mb-4 tracking-wide uppercase transition-all duration-500"
+              className="text-sm text-primary font-semibold mb-4 tracking-wide uppercase transition-all duration-500"
               style={{
                 opacity: textVisible ? 1 : 0,
-                transform: textVisible ? 'translateX(0)' : 'translateX(-20px)',
                 transitionDelay: '100ms',
               }}
             >
@@ -62,50 +40,49 @@ const HeroSection = () => {
             </p>
 
             <h1
-              className="text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight mb-6 text-foreground transition-all duration-700"
+              className="text-3xl sm:text-4xl lg:text-5xl font-bold leading-[1.15] mb-5 text-foreground transition-all duration-700"
               style={{
                 opacity: textVisible ? 1 : 0,
-                transform: textVisible ? 'translateY(0)' : 'translateY(20px)',
+                transform: textVisible ? 'translateY(0)' : 'translateY(16px)',
                 transitionDelay: '200ms',
               }}
             >
-              Create a Lifelike AI Avatar Using Your Voice & Face
+              Create Realistic AI Avatar Videos
             </h1>
 
             <p
-              className="text-lg text-muted-foreground mb-8 max-w-xl transition-all duration-700"
+              className="text-lg text-muted-foreground mb-8 max-w-lg leading-relaxed transition-all duration-700"
               style={{
                 opacity: textVisible ? 1 : 0,
-                transform: textVisible ? 'translateY(0)' : 'translateY(20px)',
+                transform: textVisible ? 'translateY(0)' : 'translateY(16px)',
                 transitionDelay: '350ms',
               }}
             >
-              Upload a short voice sample and a headshot — our models generate a
-              realistic avatar video you can preview, edit, and download.
+              Upload a headshot and voice sample — generate professional talking avatar videos in minutes. No camera needed.
             </p>
 
             <div
-              className="flex flex-col sm:flex-row gap-3 mb-8 transition-all duration-700"
+              className="flex flex-col sm:flex-row gap-3 mb-10 transition-all duration-700"
               style={{
                 opacity: textVisible ? 1 : 0,
-                transform: textVisible ? 'translateY(0)' : 'translateY(20px)',
+                transform: textVisible ? 'translateY(0)' : 'translateY(16px)',
                 transitionDelay: '450ms',
               }}
             >
-              <Button asChild size="lg" className="group">
+              <Button asChild size="lg" className="group shadow-md shadow-primary/15">
                 <Link to="/auth?mode=signup">
                   Get Started Free
                   <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
                 </Link>
               </Button>
               <Button variant="outline" size="lg" onClick={scrollToDemo} className="group">
-                <Play className="w-4 h-4 transition-transform group-hover:scale-110" />
+                <Play className="w-4 h-4" />
                 Watch Demo
               </Button>
             </div>
 
             <div
-              className="flex flex-wrap items-center gap-5 text-sm text-muted-foreground transition-all duration-700"
+              className="flex flex-wrap items-center gap-6 text-sm text-muted-foreground transition-all duration-700"
               style={{
                 opacity: textVisible ? 1 : 0,
                 transitionDelay: '550ms',
@@ -115,22 +92,22 @@ const HeroSection = () => {
                 { icon: Shield, label: 'Secure storage' },
                 { icon: UserCheck, label: 'Consent required' },
                 { icon: Lock, label: 'Privacy focused' },
-              ].map(({ icon: Icon, label }, i) => (
-                <span key={label} className="flex items-center gap-1.5 transition-all duration-500" style={{ transitionDelay: `${600 + i * 100}ms`, opacity: textVisible ? 1 : 0, transform: textVisible ? 'translateY(0)' : 'translateY(10px)' }}>
-                  <Icon className="w-3.5 h-3.5 text-accent" />
+              ].map(({ icon: Icon, label }) => (
+                <span key={label} className="flex items-center gap-1.5">
+                  <Icon className="w-4 h-4 text-accent" />
                   {label}
                 </span>
               ))}
             </div>
           </div>
 
-          {/* Right: Holographic AI Animation */}
+          {/* Right: AI Animation */}
           <div
             ref={animRef}
             className="relative flex items-center justify-center lg:justify-end transition-all duration-1000 ease-out"
             style={{
               opacity: animVisible ? 1 : 0,
-              transform: animVisible ? 'translateX(0) scale(1)' : 'translateX(40px) scale(0.95)',
+              transform: animVisible ? 'translateX(0) scale(1)' : 'translateX(30px) scale(0.97)',
               transitionDelay: '300ms',
             }}
           >
