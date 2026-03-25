@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Check, ArrowRight, Play } from 'lucide-react';
+import { Check, ArrowRight, Play, Pause } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useRef, useState } from 'react';
 import { useScrollReveal, useStaggerReveal } from '@/hooks/use-scroll-reveal';
@@ -38,11 +38,17 @@ const PromoSection = () => {
     }
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      togglePlay();
+    }
+  };
+
   return (
-    <section id="demo-section" className="section-padding relative overflow-hidden">
+    <section id="demo-section" className="section-padding relative overflow-hidden" aria-label="Product demo">
       <div className="container mx-auto px-4 lg:px-8">
         <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-20 max-w-7xl mx-auto">
-          {/* Text Content */}
           <div className="flex-1 order-1">
             <div
               ref={textRef}
@@ -75,7 +81,7 @@ const PromoSection = () => {
                   }}
                 >
                   <div className="flex-shrink-0 w-6 h-6 bg-primary/10 rounded-full flex items-center justify-center mt-0.5">
-                    <Check className="w-3.5 h-3.5 text-primary" />
+                    <Check className="w-3.5 h-3.5 text-primary" aria-hidden="true" />
                   </div>
                   <div>
                     <h4 className="font-semibold text-foreground mb-0.5 text-base">
@@ -99,7 +105,7 @@ const PromoSection = () => {
               <Button asChild size="lg" className="group shadow-md shadow-primary/15">
                 <Link to="/create">
                   Build Your Avatar
-                  <ArrowRight className="w-4 h-4 ml-1 transition-transform group-hover:translate-x-1" />
+                  <ArrowRight className="w-4 h-4 ml-1 transition-transform group-hover:translate-x-1" aria-hidden="true" />
                 </Link>
               </Button>
             </div>
@@ -119,6 +125,10 @@ const PromoSection = () => {
               <div
                 className="relative aspect-video rounded-xl overflow-hidden cursor-pointer group border border-border shadow-lg"
                 onClick={togglePlay}
+                onKeyDown={handleKeyDown}
+                role="button"
+                tabIndex={0}
+                aria-label={isPlaying ? 'Pause demo video' : 'Play demo video'}
               >
                 <video
                   ref={videoRef}
@@ -126,16 +136,26 @@ const PromoSection = () => {
                   src="/demo-video.mp4"
                   playsInline
                   loop
+                  preload="metadata"
                   onEnded={() => setIsPlaying(false)}
+                  aria-label="AvatarClone product demo video"
                 />
                 <div
-                  className="absolute inset-0 flex items-center justify-center transition-all duration-400 bg-foreground/5"
+                  className="absolute inset-0 flex items-center justify-center transition-all duration-300 bg-foreground/5"
                   style={{ opacity: isPlaying ? 0 : 1, pointerEvents: isPlaying ? 'none' : 'auto' }}
+                  aria-hidden="true"
                 >
                   <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center hover:bg-primary/90 transition-all duration-300 shadow-lg">
                     <Play className="w-6 h-6 text-primary-foreground ml-0.5" />
                   </div>
                 </div>
+                {isPlaying && (
+                  <div className="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                    <div className="w-10 h-10 bg-background/80 backdrop-blur-sm rounded-full flex items-center justify-center">
+                      <Pause className="w-4 h-4 text-foreground" />
+                    </div>
+                  </div>
+                )}
                 {!isPlaying && (
                   <div className="absolute bottom-3 left-3 bg-background/90 backdrop-blur-sm px-3 py-1.5 rounded-lg text-sm font-medium border border-border">
                     Watch Demo

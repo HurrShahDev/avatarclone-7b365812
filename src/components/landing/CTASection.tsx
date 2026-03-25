@@ -7,7 +7,7 @@ const CTASection = () => {
   const { ref: textRef, isVisible: textVisible } = useScrollReveal();
 
   return (
-    <section className="section-padding relative">
+    <section className="section-padding relative" aria-label="Call to action">
       <div className="container mx-auto px-4 lg:px-8">
         <div
           ref={textRef}
@@ -31,23 +31,22 @@ const CTASection = () => {
               transitionDelay: '300ms',
             }}
           >
-            <Button asChild size="lg" className="group shadow-md shadow-primary/15">
+            <Button asChild size="lg" className="group shadow-md shadow-primary/15 min-h-[44px]">
               <Link to="/auth?mode=signup">
                 Get Started Free
-                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" aria-hidden="true" />
               </Link>
             </Button>
-            <Button variant="outline" size="lg">
+            <Button variant="outline" size="lg" className="min-h-[44px]">
               View Pricing
             </Button>
           </div>
 
-          {/* Trust indicators */}
           <div
             className="flex items-center gap-4 mt-10 justify-center transition-all duration-700"
             style={{ opacity: textVisible ? 1 : 0, transitionDelay: '500ms' }}
           >
-            <div className="flex -space-x-2">
+            <div className="flex -space-x-2" aria-hidden="true">
               {[...Array(4)].map((_, i) => (
                 <div
                   key={i}
