@@ -17,7 +17,7 @@ const Header = ({ isLoggedIn = false }: HeaderProps) => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
     };
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
@@ -30,21 +30,22 @@ const Header = ({ isLoggedIn = false }: HeaderProps) => {
     : [];
 
   return (
-    <header className={`sticky top-0 z-50 transition-all duration-300 ${
-      isScrolled
-        ? 'bg-background/95 backdrop-blur-sm shadow-sm border-b border-border'
-        : 'bg-background border-b border-transparent'
-    }`}>
+    <header
+      className={`sticky top-0 z-50 transition-all duration-300 ${
+        isScrolled
+          ? 'bg-background/95 backdrop-blur-sm shadow-sm border-b border-border'
+          : 'bg-background border-b border-transparent'
+      }`}
+      role="banner"
+    >
       <div className="container mx-auto px-4 lg:px-8">
         <div className="flex items-center justify-between h-14">
-          {/* Logo */}
-          <Link to="/" className="flex items-center gap-2">
-            <img src={logo} alt="AvatarClone" className="h-8 w-auto" />
+          <Link to="/" className="flex items-center gap-2" aria-label="AvatarClone home">
+            <img src={logo} alt="" className="h-8 w-auto" aria-hidden="true" />
             <span className="font-semibold text-foreground text-base">AvatarClone</span>
           </Link>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-8">
+          <nav className="hidden md:flex items-center gap-8" aria-label="Main navigation">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
@@ -52,16 +53,16 @@ const Header = ({ isLoggedIn = false }: HeaderProps) => {
                 className={`nav-link text-sm py-1 ${
                   location.pathname === link.href ? 'active' : ''
                 }`}
+                aria-current={location.pathname === link.href ? 'page' : undefined}
               >
                 {link.label}
               </Link>
             ))}
           </nav>
 
-          {/* Desktop Actions */}
           <div className="hidden md:flex items-center gap-2">
             {isLoggedIn ? (
-              <Link to="/settings">
+              <Link to="/settings" aria-label="Account settings">
                 <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground text-sm font-medium">
                   A
                 </div>
@@ -71,37 +72,37 @@ const Header = ({ isLoggedIn = false }: HeaderProps) => {
                 <Link to="/docs">
                   <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">Docs</Button>
                 </Link>
-                <Link to="/auth">
+                <Link to="/auth" aria-label="Sign in to your account">
                   <Button variant="outline" size="sm">Sign In</Button>
                 </Link>
-                <Link to="/auth?mode=signup">
+                <Link to="/auth?mode=signup" aria-label="Create a free account">
                   <Button size="sm">Get Started</Button>
                 </Link>
               </>
             )}
           </div>
 
-          {/* Mobile Menu Button */}
           <button
-            className="md:hidden p-2 -mr-2"
+            className="md:hidden p-2 -mr-2 min-w-[44px] min-h-[44px] flex items-center justify-center"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            aria-label="Toggle menu"
+            aria-label={isMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
+            aria-expanded={isMenuOpen}
+            aria-controls="mobile-menu"
           >
             {isMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
         </div>
       </div>
 
-      {/* Mobile Menu */}
       {isMenuOpen && (
-        <div className="md:hidden border-t border-border bg-background animate-fade-in">
+        <div id="mobile-menu" className="md:hidden border-t border-border bg-background animate-fade-in" role="navigation" aria-label="Mobile navigation">
           <div className="container mx-auto px-4 py-4">
             <nav className="flex flex-col gap-3">
               {navLinks.map((link) => (
                 <Link
                   key={link.href}
                   to={link.href}
-                  className="py-2 text-foreground"
+                  className="py-2 text-foreground min-h-[44px] flex items-center"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   {link.label}
@@ -110,10 +111,10 @@ const Header = ({ isLoggedIn = false }: HeaderProps) => {
               {!isLoggedIn && (
                 <div className="flex flex-col gap-2 pt-4 border-t border-border">
                   <Link to="/auth" onClick={() => setIsMenuOpen(false)}>
-                    <Button variant="outline" className="w-full">Sign In</Button>
+                    <Button variant="outline" className="w-full min-h-[44px]">Sign In</Button>
                   </Link>
                   <Link to="/auth?mode=signup" onClick={() => setIsMenuOpen(false)}>
-                    <Button className="w-full">Get Started</Button>
+                    <Button className="w-full min-h-[44px]">Get Started</Button>
                   </Link>
                 </div>
               )}

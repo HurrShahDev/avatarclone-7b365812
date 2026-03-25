@@ -14,13 +14,11 @@ const HeroSection = () => {
   };
 
   return (
-    <section className="relative section-padding overflow-hidden">
-      {/* Clean subtle background */}
-      <div className="absolute inset-0 pointer-events-none bg-secondary/30" />
+    <section className="relative section-padding overflow-hidden" aria-label="Hero">
+      <div className="absolute inset-0 pointer-events-none bg-secondary/30" aria-hidden="true" />
 
       <div className="container mx-auto px-4 lg:px-8 relative z-10">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-          {/* Left: Text Content */}
           <div
             ref={textRef}
             className="text-left transition-all duration-700 ease-out"
@@ -69,14 +67,20 @@ const HeroSection = () => {
                 transitionDelay: '450ms',
               }}
             >
-              <Button asChild size="lg" className="group shadow-md shadow-primary/15">
+              <Button asChild size="lg" className="group shadow-md shadow-primary/15 min-h-[44px]">
                 <Link to="/auth?mode=signup">
                   Get Started Free
-                  <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                  <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" aria-hidden="true" />
                 </Link>
               </Button>
-              <Button variant="outline" size="lg" onClick={scrollToDemo} className="group">
-                <Play className="w-4 h-4" />
+              <Button
+                variant="outline"
+                size="lg"
+                onClick={scrollToDemo}
+                className="group min-h-[44px]"
+                aria-label="Watch product demo video"
+              >
+                <Play className="w-4 h-4" aria-hidden="true" />
                 Watch Demo
               </Button>
             </div>
@@ -87,21 +91,22 @@ const HeroSection = () => {
                 opacity: textVisible ? 1 : 0,
                 transitionDelay: '550ms',
               }}
+              role="list"
+              aria-label="Security features"
             >
               {[
                 { icon: Shield, label: 'Secure storage' },
                 { icon: UserCheck, label: 'Consent required' },
                 { icon: Lock, label: 'Privacy focused' },
               ].map(({ icon: Icon, label }) => (
-                <span key={label} className="flex items-center gap-1.5">
-                  <Icon className="w-4 h-4 text-accent" />
+                <span key={label} className="flex items-center gap-1.5" role="listitem">
+                  <Icon className="w-4 h-4 text-accent" aria-hidden="true" />
                   {label}
                 </span>
               ))}
             </div>
           </div>
 
-          {/* Right: AI Animation */}
           <div
             ref={animRef}
             className="relative flex items-center justify-center lg:justify-end transition-all duration-1000 ease-out"
@@ -110,6 +115,7 @@ const HeroSection = () => {
               transform: animVisible ? 'translateX(0) scale(1)' : 'translateX(30px) scale(0.97)',
               transitionDelay: '300ms',
             }}
+            aria-hidden="true"
           >
             <div className="w-full max-w-lg aspect-square">
               <HeroAnimation />

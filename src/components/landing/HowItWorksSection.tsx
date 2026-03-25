@@ -52,10 +52,9 @@ const StepCard = ({ step, index }: { step: typeof steps[0]; index: number }) => 
         transform: isVisible ? 'translateY(0)' : 'translateY(30px)',
       }}
     >
-      {/* Content */}
       <div className="flex-1">
         <div className="flex items-center gap-4 mb-4">
-          <div className="w-11 h-11 rounded-xl bg-primary text-primary-foreground flex items-center justify-center font-bold text-lg">
+          <div className="w-11 h-11 rounded-xl bg-primary text-primary-foreground flex items-center justify-center font-bold text-lg" aria-hidden="true">
             {step.number}
           </div>
           <div>
@@ -64,10 +63,11 @@ const StepCard = ({ step, index }: { step: typeof steps[0]; index: number }) => 
           </div>
         </div>
         <p className="text-muted-foreground mb-5 leading-relaxed">{step.description}</p>
-        <ul className="space-y-3">
+        <ul className="space-y-3" role="list">
           {step.details.map((detail, i) => (
             <li
               key={i}
+              role="listitem"
               className="flex items-center gap-3 text-sm text-muted-foreground transition-all duration-500"
               style={{
                 opacity: isVisible ? 1 : 0,
@@ -75,14 +75,13 @@ const StepCard = ({ step, index }: { step: typeof steps[0]; index: number }) => 
                 transitionDelay: `${400 + i * 100}ms`,
               }}
             >
-              <span className="w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" />
+              <span className="w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" aria-hidden="true" />
               {detail}
             </li>
           ))}
         </ul>
       </div>
 
-      {/* Image */}
       <div
         className="flex-1 w-full transition-all duration-700 ease-out"
         style={{
@@ -94,8 +93,9 @@ const StepCard = ({ step, index }: { step: typeof steps[0]; index: number }) => 
         <div className="rounded-xl overflow-hidden border border-border shadow-md">
           <img
             src={step.image}
-            alt={`${step.title} illustration`}
+            alt={`Step ${step.number}: ${step.title} — ${step.description}`}
             className="w-full aspect-video object-cover"
+            loading="lazy"
           />
         </div>
       </div>
@@ -107,7 +107,7 @@ const HowItWorksSection = () => {
   const { ref: headingRef, isVisible: headingVisible } = useScrollReveal();
 
   return (
-    <section id="how-it-works" className="section-padding bg-secondary/30 relative">
+    <section id="how-it-works" className="section-padding bg-secondary/30 relative" aria-label="How it works">
       <div className="container mx-auto px-4 lg:px-8">
         <div
           ref={headingRef}

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import avatar1img from '@/assets/carousel-avatar-1.jpg';
 import avatar2img from '@/assets/carousel-avatar-2.jpg';
 import avatar3img from '@/assets/carousel-avatar-3.jpg';
@@ -45,6 +45,11 @@ const AvatarCard = ({ avatar }: { avatar: typeof avatars[0] }) => {
       className="flex-shrink-0 w-[220px] sm:w-[250px] lg:w-[270px]"
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
+      onFocus={() => setHovered(true)}
+      onBlur={() => setHovered(false)}
+      tabIndex={0}
+      role="group"
+      aria-label={`${avatar.name} AI avatar preview`}
     >
       <div
         className={`relative rounded-xl overflow-hidden transition-all duration-300 ${
@@ -59,6 +64,7 @@ const AvatarCard = ({ avatar }: { avatar: typeof avatars[0] }) => {
               hovered ? 'opacity-0' : 'opacity-100'
             }`}
             draggable={false}
+            loading="lazy"
           />
           <video
             ref={videoRef}
@@ -66,21 +72,20 @@ const AvatarCard = ({ avatar }: { avatar: typeof avatars[0] }) => {
             loop
             muted
             playsInline
-            preload="auto"
+            preload="none"
             className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${
               hovered ? 'opacity-100' : 'opacity-0'
             }`}
+            aria-hidden="true"
           />
 
-          {/* Name overlay */}
           <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-foreground/70 to-transparent p-4 pt-10">
             <span className="text-sm font-medium text-primary-foreground">{avatar.name}</span>
           </div>
 
-          {/* Waveform when speaking */}
           {hovered && (
             <div className="absolute inset-0 bg-gradient-to-t from-foreground/60 via-transparent to-transparent flex flex-col items-center justify-end pb-4 animate-fade-in pointer-events-none">
-              <div className="flex items-end gap-[3px] h-5 mb-1">
+              <div className="flex items-end gap-[3px] h-5 mb-1" aria-hidden="true">
                 {Array.from({ length: 8 }).map((_, i) => (
                   <div
                     key={i}
@@ -110,30 +115,34 @@ const AvatarCarouselSection = () => {
   const isPaused = useRef(false);
   const { ref: headingRef, isVisible: headingVisible } = useScrollReveal();
 
-  useEffect(() => {
+  // Use reduced motion preference
+  const prefersReducedMotion = useRef(
+    typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  );
+
+  const animate = useCallback(() => {
     const el = scrollRef.current;
-    if (!el) return;
+    if (!el || prefersReducedMotion.current) return;
 
-    const speed = 0.5;
-
-    const animate = () => {
-      if (!isPaused.current && el) {
-        scrollPos.current += speed;
-        const halfWidth = el.scrollWidth / 2;
-        if (scrollPos.current >= halfWidth) {
-          scrollPos.current = 0;
-        }
-        el.scrollLeft = scrollPos.current;
+    if (!isPaused.current) {
+      scrollPos.current += 0.5;
+      const halfWidth = el.scrollWidth / 2;
+      if (scrollPos.current >= halfWidth) {
+        scrollPos.current = 0;
       }
-      animationRef.current = requestAnimationFrame(animate);
-    };
-
+      el.scrollLeft = scrollPos.current;
+    }
     animationRef.current = requestAnimationFrame(animate);
-    return () => cancelAnimationFrame(animationRef.current);
   }, []);
 
+  useEffect(() => {
+    if (prefersReducedMotion.current) return;
+    animationRef.current = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(animationRef.current);
+  }, [animate]);
+
   return (
-    <section className="section-padding overflow-hidden">
+    <section className="section-padding overflow-hidden" aria-label="AI Avatar gallery">
       <div className="container mx-auto px-4 lg:px-8 mb-10">
         <div
           ref={headingRef}
@@ -158,6 +167,8 @@ const AvatarCarouselSection = () => {
         className="flex gap-5 overflow-hidden cursor-grab px-4"
         onMouseEnter={() => { isPaused.current = true; }}
         onMouseLeave={() => { isPaused.current = false; }}
+        role="region"
+        aria-label="Scrolling avatar carousel"
       >
         {loopAvatars.map((avatar, index) => (
           <AvatarCard

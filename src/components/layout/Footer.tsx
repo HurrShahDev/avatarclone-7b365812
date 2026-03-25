@@ -5,13 +5,12 @@ const Footer = () => {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-secondary/50 border-t border-border py-14">
+    <footer className="bg-secondary/50 border-t border-border py-14" role="contentinfo">
       <div className="container mx-auto px-4 lg:px-8">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-10 mb-10">
-          {/* Brand */}
           <div className="col-span-2 md:col-span-1">
-            <Link to="/" className="flex items-center gap-2 mb-4">
-              <img src={logo} alt="AvatarClone" className="h-8 w-auto" />
+            <Link to="/" className="flex items-center gap-2 mb-4" aria-label="AvatarClone home">
+              <img src={logo} alt="" className="h-8 w-auto" aria-hidden="true" />
               <span className="font-semibold text-foreground">AvatarClone</span>
             </Link>
             <p className="text-sm text-muted-foreground leading-relaxed">
@@ -19,7 +18,6 @@ const Footer = () => {
             </p>
           </div>
 
-          {/* Product */}
           <div>
             <h4 className="font-semibold text-foreground mb-4 text-sm">Product</h4>
             <ul className="space-y-3 text-sm text-muted-foreground">
@@ -29,7 +27,6 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* Legal */}
           <div>
             <h4 className="font-semibold text-foreground mb-4 text-sm">Legal</h4>
             <ul className="space-y-3 text-sm text-muted-foreground">
@@ -38,7 +35,6 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* Contact */}
           <div>
             <h4 className="font-semibold text-foreground mb-4 text-sm">Contact</h4>
             <ul className="space-y-3 text-sm text-muted-foreground">

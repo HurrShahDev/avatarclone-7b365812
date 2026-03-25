@@ -34,7 +34,7 @@ const FeaturesSection = () => {
   const { ref: gridRef, isVisible: gridVisible, getDelay } = useStaggerReveal(features.length);
 
   return (
-    <section id="features" className="section-padding bg-secondary/40 relative">
+    <section id="features" className="section-padding bg-secondary/40 relative" aria-label="Platform features">
       <div className="container mx-auto px-4 lg:px-8">
         <div
           ref={headingRef}
@@ -53,10 +53,11 @@ const FeaturesSection = () => {
           </p>
         </div>
 
-        <div ref={gridRef} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+        <div ref={gridRef} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6" role="list">
           {features.map((feature, i) => (
             <div
               key={feature.title}
+              role="listitem"
               className="group bg-card p-6 rounded-xl border border-border hover:border-primary/20 hover:shadow-md transition-all duration-300 ease-out"
               style={{
                 opacity: gridVisible ? 1 : 0,
@@ -65,7 +66,7 @@ const FeaturesSection = () => {
               }}
             >
               <div className="w-10 h-10 rounded-lg bg-primary/8 flex items-center justify-center mb-4 group-hover:bg-primary/12 transition-colors duration-300">
-                <feature.icon className="w-5 h-5 text-primary" />
+                <feature.icon className="w-5 h-5 text-primary" aria-hidden="true" />
               </div>
               <h3 className="font-semibold mb-2 text-foreground">{feature.title}</h3>
               <p className="text-sm text-muted-foreground leading-relaxed">{feature.description}</p>
