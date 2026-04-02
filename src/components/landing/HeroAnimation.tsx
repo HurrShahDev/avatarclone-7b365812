@@ -35,7 +35,7 @@ const HeroAnimation = () => {
         className="absolute -inset-4 rounded-3xl blur-2xl opacity-40 pointer-events-none"
         style={{
           background:
-            'radial-gradient(ellipse at 50% 40%, hsla(210, 100%, 55%, 0.25), hsla(270, 80%, 50%, 0.15), transparent 70%)',
+            'radial-gradient(ellipse at 50% 40%, hsla(239, 84%, 67%, 0.25), hsla(263, 83%, 58%, 0.15), transparent 70%)',
         }}
       />
 
@@ -56,7 +56,7 @@ const HeroAnimation = () => {
         <div
           className="absolute left-0 right-0 h-px pointer-events-none"
           style={{
-            background: 'linear-gradient(90deg, transparent, hsla(210, 100%, 60%, 0.5), transparent)',
+            background: 'linear-gradient(90deg, transparent, hsla(239, 84%, 67%, 0.5), transparent)',
             animation: 'scanLine 3s ease-in-out infinite',
           }}
         />
@@ -66,22 +66,22 @@ const HeroAnimation = () => {
           className="absolute inset-0 pointer-events-none opacity-[0.04]"
           style={{
             backgroundImage:
-              'linear-gradient(hsla(210, 100%, 70%, 1) 1px, transparent 1px), linear-gradient(90deg, hsla(210, 100%, 70%, 1) 1px, transparent 1px)',
+              'linear-gradient(hsla(239, 84%, 75%, 1) 1px, transparent 1px), linear-gradient(90deg, hsla(239, 84%, 75%, 1) 1px, transparent 1px)',
             backgroundSize: '40px 40px',
           }}
         />
 
         {/* Corner brackets */}
-        <svg className="absolute top-3 left-3 w-6 h-6 opacity-40" viewBox="0 0 24 24" fill="none" stroke="hsla(210, 100%, 65%, 0.8)" strokeWidth="1.5">
+        <svg className="absolute top-3 left-3 w-6 h-6 opacity-40" viewBox="0 0 24 24" fill="none" stroke="hsla(239, 84%, 70%, 0.8)" strokeWidth="1.5">
           <path d="M2 8V2h6M2 16v6h6" />
         </svg>
-        <svg className="absolute top-3 right-3 w-6 h-6 opacity-40" viewBox="0 0 24 24" fill="none" stroke="hsla(210, 100%, 65%, 0.8)" strokeWidth="1.5">
+        <svg className="absolute top-3 right-3 w-6 h-6 opacity-40" viewBox="0 0 24 24" fill="none" stroke="hsla(239, 84%, 70%, 0.8)" strokeWidth="1.5">
           <path d="M22 8V2h-6M22 16v6h-6" />
         </svg>
-        <svg className="absolute bottom-14 left-3 w-6 h-6 opacity-40" viewBox="0 0 24 24" fill="none" stroke="hsla(270, 80%, 65%, 0.8)" strokeWidth="1.5">
+        <svg className="absolute bottom-14 left-3 w-6 h-6 opacity-40" viewBox="0 0 24 24" fill="none" stroke="hsla(263, 83%, 65%, 0.8)" strokeWidth="1.5">
           <path d="M2 8V2h6M2 16v6h6" />
         </svg>
-        <svg className="absolute bottom-14 right-3 w-6 h-6 opacity-40" viewBox="0 0 24 24" fill="none" stroke="hsla(270, 80%, 65%, 0.8)" strokeWidth="1.5">
+        <svg className="absolute bottom-14 right-3 w-6 h-6 opacity-40" viewBox="0 0 24 24" fill="none" stroke="hsla(263, 83%, 65%, 0.8)" strokeWidth="1.5">
           <path d="M22 8V2h-6M22 16v6h-6" />
         </svg>
 
@@ -93,7 +93,7 @@ const HeroAnimation = () => {
               className="flex-1 rounded-full"
               style={{
                 height: `${20 + Math.sin(i * 0.5 + Date.now() * 0.001) * 60}%`,
-                background: `linear-gradient(to top, hsla(210, 100%, 60%, 0.7), hsla(270, 80%, 60%, 0.5))`,
+                background: `linear-gradient(to top, hsla(239, 84%, 67%, 0.7), hsla(263, 83%, 58%, 0.5))`,
                 animation: `waveBar 1.5s ease-in-out ${i * 0.05}s infinite alternate`,
               }}
             />
@@ -104,7 +104,7 @@ const HeroAnimation = () => {
         <div
           className="absolute bottom-0 left-0 right-0 px-4 py-3 flex items-center justify-between transition-opacity duration-500"
           style={{
-            background: 'linear-gradient(to top, hsla(220, 30%, 8%, 0.95), transparent)',
+            background: 'linear-gradient(to top, hsla(222, 84%, 5%, 0.95), transparent)',
             opacity: isTransitioning ? 0 : 1,
           }}
         >
@@ -112,7 +112,7 @@ const HeroAnimation = () => {
             <p className="text-sm font-medium" style={{ color: 'hsla(0, 0%, 95%, 0.9)' }}>
               {avatar.name}
             </p>
-            <p className="text-xs" style={{ color: 'hsla(210, 100%, 70%, 0.7)' }}>
+            <p className="text-xs" style={{ color: 'hsla(239, 84%, 80%, 0.7)' }}>
               {avatar.role}
             </p>
           </div>
@@ -120,11 +120,11 @@ const HeroAnimation = () => {
             <span
               className="w-1.5 h-1.5 rounded-full"
               style={{
-                backgroundColor: 'hsla(140, 70%, 50%, 0.9)',
+                backgroundColor: 'hsla(189, 95%, 43%, 0.9)',
                 animation: 'pulse 2s ease-in-out infinite',
               }}
             />
-            <span className="text-xs" style={{ color: 'hsla(140, 70%, 60%, 0.8)' }}>
+            <span className="text-xs" style={{ color: 'hsla(189, 95%, 55%, 0.8)' }}>
               AI Speaking
             </span>
           </div>
@@ -134,9 +134,9 @@ const HeroAnimation = () => {
         <div
           className="absolute top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full text-[10px] tracking-widest uppercase font-medium"
           style={{
-            background: 'hsla(220, 30%, 10%, 0.7)',
-            color: 'hsla(210, 100%, 70%, 0.8)',
-            border: '1px solid hsla(210, 100%, 60%, 0.15)',
+            background: 'hsla(222, 84%, 5%, 0.7)',
+            color: 'hsla(239, 84%, 80%, 0.8)',
+            border: '1px solid hsla(239, 84%, 67%, 0.15)',
             backdropFilter: 'blur(8px)',
           }}
         >
@@ -152,7 +152,7 @@ const HeroAnimation = () => {
               style={{
                 backgroundColor:
                   i === activeIndex
-                    ? 'hsla(210, 100%, 65%, 0.9)'
+                    ? 'hsla(239, 84%, 70%, 0.9)'
                     : 'hsla(0, 0%, 100%, 0.25)',
                 transform: i === activeIndex ? 'scale(1.5)' : 'scale(1)',
               }}
@@ -165,9 +165,9 @@ const HeroAnimation = () => {
       <div
         className="absolute -right-3 top-1/4 px-2 py-1 rounded text-[9px] font-mono opacity-50"
         style={{
-          color: 'hsla(210, 100%, 70%, 0.7)',
-          border: '1px solid hsla(210, 100%, 60%, 0.15)',
-          background: 'hsla(220, 30%, 10%, 0.5)',
+          color: 'hsla(239, 84%, 75%, 0.7)',
+          border: '1px solid hsla(239, 84%, 67%, 0.15)',
+          background: 'hsla(222, 84%, 5%, 0.5)',
           animation: 'float 4s ease-in-out infinite',
         }}
       >
@@ -176,9 +176,9 @@ const HeroAnimation = () => {
       <div
         className="absolute -left-3 top-1/3 px-2 py-1 rounded text-[9px] font-mono opacity-50"
         style={{
-          color: 'hsla(270, 80%, 70%, 0.7)',
-          border: '1px solid hsla(270, 80%, 60%, 0.15)',
-          background: 'hsla(220, 30%, 10%, 0.5)',
+          color: 'hsla(263, 83%, 70%, 0.7)',
+          border: '1px solid hsla(263, 83%, 58%, 0.15)',
+          background: 'hsla(222, 84%, 5%, 0.5)',
           animation: 'float 5s ease-in-out 1s infinite',
         }}
       >
@@ -187,9 +187,9 @@ const HeroAnimation = () => {
       <div
         className="absolute -right-2 bottom-1/3 px-2 py-1 rounded text-[9px] font-mono opacity-50"
         style={{
-          color: 'hsla(160, 60%, 55%, 0.7)',
-          border: '1px solid hsla(160, 60%, 50%, 0.15)',
-          background: 'hsla(220, 30%, 10%, 0.5)',
+          color: 'hsla(189, 95%, 50%, 0.7)',
+          border: '1px solid hsla(189, 95%, 43%, 0.15)',
+          background: 'hsla(222, 84%, 5%, 0.5)',
           animation: 'float 4.5s ease-in-out 0.5s infinite',
         }}
       >
