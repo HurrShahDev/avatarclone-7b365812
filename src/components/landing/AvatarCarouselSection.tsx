@@ -52,7 +52,7 @@ const AvatarCard = ({ avatar }: { avatar: typeof avatars[0] }) => {
       aria-label={`${avatar.name} AI avatar preview`}
     >
       <div
-        className={`relative rounded-xl overflow-hidden transition-all duration-300 ${
+        className={`relative rounded-xl overflow-hidden will-change-transform transition-all duration-300 ${
           hovered ? 'scale-[1.03] shadow-lg' : 'shadow-sm'
         }`}
       >
