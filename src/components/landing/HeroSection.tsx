@@ -5,8 +5,8 @@ import HeroAnimation from './HeroAnimation';
 import { useScrollReveal } from '@/hooks/use-scroll-reveal';
 
 const HeroSection = () => {
-  const { ref: textRef, isVisible: textVisible } = useScrollReveal({ threshold: 0.1 });
-  const { ref: animRef, isVisible: animVisible } = useScrollReveal({ threshold: 0.1 });
+  const { ref: textRef, isVisible: textVisible } = useScrollReveal({ threshold: 0.1, immediate: true });
+  const { ref: animRef, isVisible: animVisible } = useScrollReveal({ threshold: 0.1, immediate: true });
 
   const scrollToDemo = () => {
     const el = document.getElementById('demo-section');

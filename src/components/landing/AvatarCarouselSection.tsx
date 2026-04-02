@@ -52,7 +52,7 @@ const AvatarCard = ({ avatar }: { avatar: typeof avatars[0] }) => {
       aria-label={`${avatar.name} AI avatar preview`}
     >
       <div
-        className={`relative rounded-xl overflow-hidden transition-all duration-300 ${
+        className={`relative rounded-xl overflow-hidden will-change-transform transition-all duration-300 ${
           hovered ? 'scale-[1.03] shadow-lg' : 'shadow-sm'
         }`}
       >
@@ -152,12 +152,12 @@ const AvatarCarouselSection = () => {
             transform: headingVisible ? 'translateY(0)' : 'translateY(20px)',
           }}
         >
-          <p className="text-sm text-primary font-semibold mb-3 tracking-wide uppercase">Live Previews</p>
+          <p className="text-sm text-primary font-semibold mb-3 tracking-wide uppercase">Sample Preview</p>
           <h2 className="section-heading">
-            Meet Our AI Avatars
+            Your AI Avatar in Action
           </h2>
           <p className="section-subtext">
-            Hover over any avatar to see them speak. These AI personas can deliver any script you write.
+            View sample videos showcasing how your real avatar can deliver messages naturally. These examples highlight the style and output your personalized video can achieve.
           </p>
         </div>
       </div>

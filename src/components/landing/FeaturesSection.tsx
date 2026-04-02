@@ -58,7 +58,7 @@ const FeaturesSection = () => {
             <div
               key={feature.title}
               role="listitem"
-              className="group bg-card p-6 rounded-xl border border-border hover:border-primary/20 hover:shadow-md transition-all duration-300 ease-out"
+              className="group bg-card p-6 rounded-xl border border-border hover:border-primary/20 hover:shadow-md will-change-transform transition-all duration-300 ease-out"
               style={{
                 opacity: gridVisible ? 1 : 0,
                 transform: gridVisible ? 'translateY(0)' : 'translateY(20px)',
