@@ -152,12 +152,12 @@ const AvatarCarouselSection = () => {
             transform: headingVisible ? 'translateY(0)' : 'translateY(20px)',
           }}
         >
-          <p className="text-sm text-primary font-semibold mb-3 tracking-wide uppercase">Live Previews</p>
+          <p className="text-sm text-primary font-semibold mb-3 tracking-wide uppercase">Sample Preview</p>
           <h2 className="section-heading">
-            Meet Our AI Avatars
+            Your AI Avatar in Action
           </h2>
           <p className="section-subtext">
-            Hover over any avatar to see them speak. These AI personas can deliver any script you write.
+            View sample videos showcasing how your real avatar can deliver messages naturally. These examples highlight the style and output your personalized video can achieve.
           </p>
         </div>
       </div>
