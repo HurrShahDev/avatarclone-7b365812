@@ -192,11 +192,32 @@
   }
 
   .section-heading {
-    @apply text-2xl lg:text-3xl font-bold mb-3 text-foreground;
+    @apply text-2xl lg:text-3xl font-bold mb-3;
+    background: var(--gradient-heading);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
   }
 
   .section-subtext {
     @apply text-muted-foreground text-base leading-relaxed;
+  }
+
+  /* Dark section theming */
+  .dark-section {
+    background: hsl(var(--dark-bg));
+    color: hsl(var(--dark-text));
+  }
+
+  .dark-section .section-heading {
+    background: var(--gradient-heading);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .dark-section .section-subtext {
+    color: hsl(var(--dark-text-muted));
   }
 }
 
