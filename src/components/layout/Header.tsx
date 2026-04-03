@@ -77,7 +77,7 @@ const Header = ({ isLoggedIn = false }: HeaderProps) => {
                   <Button variant="outline" size="sm">Sign In</Button>
                 </Link>
                 <Link to="/auth?mode=signup" aria-label="Create a free account">
-                  <Button size="sm">Get Started</Button>
+                  <Button size="sm" className="bg-[#0F172A] hover:bg-[#1E293B] text-white border border-primary/40">Get Started</Button>
                 </Link>
               </>
             )}
