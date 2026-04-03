@@ -54,7 +54,7 @@ const StepCard = ({ step, index }: { step: typeof steps[0]; index: number }) => 
     >
       <div className="flex-1">
         <div className="flex items-center gap-4 mb-4">
-          <div className="w-11 h-11 rounded-xl bg-primary text-primary-foreground flex items-center justify-center font-bold text-lg" aria-hidden="true">
+          <div className="w-11 h-11 rounded-xl flex items-center justify-center font-bold text-lg" style={{ background: 'linear-gradient(135deg, #6366F1, #8B5CF6)', color: '#fff' }} aria-hidden="true">
             {step.number}
           </div>
           <div>
