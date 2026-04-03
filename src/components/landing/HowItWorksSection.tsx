@@ -117,7 +117,7 @@ const HowItWorksSection = () => {
             transform: headingVisible ? 'translateY(0)' : 'translateY(20px)',
           }}
         >
-          <p className="text-sm text-primary font-semibold mb-3 tracking-wide uppercase">3 Simple Steps</p>
+          <p className="text-sm font-semibold mb-3 tracking-wide uppercase" style={{ color: '#A5B4FC' }}>3 Simple Steps</p>
           <h2 className="section-heading">
             How It Works
           </h2>
