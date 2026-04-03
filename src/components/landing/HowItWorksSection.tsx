@@ -107,7 +107,7 @@ const HowItWorksSection = () => {
   const { ref: headingRef, isVisible: headingVisible } = useScrollReveal();
 
   return (
-    <section id="how-it-works" className="section-padding bg-secondary/30 relative" aria-label="How it works">
+    <section id="how-it-works" className="section-padding dark-section relative" aria-label="How it works">
       <div className="container mx-auto px-4 lg:px-8">
         <div
           ref={headingRef}
