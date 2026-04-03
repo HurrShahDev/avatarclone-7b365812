@@ -90,7 +90,7 @@ const StepCard = ({ step, index }: { step: typeof steps[0]; index: number }) => 
           transitionDelay: '200ms',
         }}
       >
-        <div className="rounded-xl overflow-hidden border border-border shadow-md">
+        <div className="rounded-xl overflow-hidden shadow-md" style={{ border: '1px solid hsl(215, 25%, 17%)' }}>
           <img
             src={step.image}
             alt={`Step ${step.number}: ${step.title} — ${step.description}`}
