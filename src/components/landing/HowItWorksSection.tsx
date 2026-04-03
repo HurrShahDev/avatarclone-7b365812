@@ -75,7 +75,7 @@ const StepCard = ({ step, index }: { step: typeof steps[0]; index: number }) => 
                 transitionDelay: `${400 + i * 100}ms`,
               }}
             >
-              <span className="w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" aria-hidden="true" />
+              <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: '#A5B4FC' }} aria-hidden="true" />
               {detail}
             </li>
           ))}
