@@ -62,7 +62,7 @@ const StepCard = ({ step, index }: { step: typeof steps[0]; index: number }) => 
             <h3 className="text-xl font-bold" style={{ color: '#fff' }}>{step.title}</h3>
           </div>
         </div>
-        <p className="text-muted-foreground mb-5 leading-relaxed">{step.description}</p>
+        <p className="mb-5 leading-relaxed" style={{ color: 'hsl(215, 16%, 65%)' }}>{step.description}</p>
         <ul className="space-y-3" role="list">
           {step.details.map((detail, i) => (
             <li
