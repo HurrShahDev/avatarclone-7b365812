@@ -15,7 +15,7 @@ const HeroSection = () => {
 
   return (
     <section className="relative section-padding overflow-hidden" aria-label="Hero">
-      <div className="absolute inset-0 pointer-events-none bg-secondary/30" aria-hidden="true" />
+      <div className="absolute inset-0 pointer-events-none" aria-hidden="true" />
 
       <div className="container mx-auto px-4 lg:px-8 relative z-10">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">

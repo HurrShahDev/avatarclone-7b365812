@@ -10,7 +10,7 @@ import CTASection from '@/components/landing/CTASection';
 
 const Landing = () => {
   return (
-    <div className="min-h-screen bg-background overflow-x-hidden">
+    <div className="min-h-screen overflow-x-hidden" style={{ background: 'var(--gradient-bg)' }}>
       <Header />
       <main>
         <HeroSection />

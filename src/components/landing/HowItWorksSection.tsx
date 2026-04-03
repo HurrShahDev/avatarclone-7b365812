@@ -54,28 +54,29 @@ const StepCard = ({ step, index }: { step: typeof steps[0]; index: number }) => 
     >
       <div className="flex-1">
         <div className="flex items-center gap-4 mb-4">
-          <div className="w-11 h-11 rounded-xl bg-primary text-primary-foreground flex items-center justify-center font-bold text-lg" aria-hidden="true">
+          <div className="w-11 h-11 rounded-xl flex items-center justify-center font-bold text-lg" style={{ background: 'linear-gradient(135deg, #6366F1, #8B5CF6)', color: '#fff' }} aria-hidden="true">
             {step.number}
           </div>
           <div>
-            <p className="text-xs uppercase tracking-widest text-primary font-semibold mb-0.5">Step {step.number}</p>
-            <h3 className="text-xl font-bold text-foreground">{step.title}</h3>
+            <p className="text-xs uppercase tracking-widest font-semibold mb-0.5" style={{ color: '#A5B4FC' }}>Step {step.number}</p>
+            <h3 className="text-xl font-bold" style={{ color: '#fff' }}>{step.title}</h3>
           </div>
         </div>
-        <p className="text-muted-foreground mb-5 leading-relaxed">{step.description}</p>
+        <p className="mb-5 leading-relaxed" style={{ color: 'hsl(215, 16%, 65%)' }}>{step.description}</p>
         <ul className="space-y-3" role="list">
           {step.details.map((detail, i) => (
             <li
               key={i}
               role="listitem"
-              className="flex items-center gap-3 text-sm text-muted-foreground transition-all duration-500"
+              className="flex items-center gap-3 text-sm transition-all duration-500"
               style={{
+                color: 'hsl(215, 16%, 65%)',
                 opacity: isVisible ? 1 : 0,
                 transform: isVisible ? 'translateX(0)' : 'translateX(-12px)',
                 transitionDelay: `${400 + i * 100}ms`,
               }}
             >
-              <span className="w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" aria-hidden="true" />
+              <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: '#A5B4FC' }} aria-hidden="true" />
               {detail}
             </li>
           ))}
@@ -90,7 +91,7 @@ const StepCard = ({ step, index }: { step: typeof steps[0]; index: number }) => 
           transitionDelay: '200ms',
         }}
       >
-        <div className="rounded-xl overflow-hidden border border-border shadow-md">
+        <div className="rounded-xl overflow-hidden shadow-md" style={{ border: '1px solid hsl(215, 25%, 17%)' }}>
           <img
             src={step.image}
             alt={`Step ${step.number}: ${step.title} — ${step.description}`}
@@ -107,7 +108,7 @@ const HowItWorksSection = () => {
   const { ref: headingRef, isVisible: headingVisible } = useScrollReveal();
 
   return (
-    <section id="how-it-works" className="section-padding bg-secondary/30 relative" aria-label="How it works">
+    <section id="how-it-works" className="section-padding dark-section relative" aria-label="How it works">
       <div className="container mx-auto px-4 lg:px-8">
         <div
           ref={headingRef}
@@ -117,7 +118,7 @@ const HowItWorksSection = () => {
             transform: headingVisible ? 'translateY(0)' : 'translateY(20px)',
           }}
         >
-          <p className="text-sm text-primary font-semibold mb-3 tracking-wide uppercase">3 Simple Steps</p>
+          <p className="text-sm font-semibold mb-3 tracking-wide uppercase" style={{ color: '#A5B4FC' }}>3 Simple Steps</p>
           <h2 className="section-heading">
             How It Works
           </h2>

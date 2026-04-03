@@ -33,9 +33,10 @@ const Header = ({ isLoggedIn = false }: HeaderProps) => {
     <header
       className={`sticky top-0 z-50 transition-all duration-300 ${
         isScrolled
-          ? 'bg-background/95 backdrop-blur-sm shadow-sm border-b border-border'
-          : 'bg-background border-b border-transparent'
+          ? 'backdrop-blur-sm shadow-sm border-b border-border'
+          : 'border-b border-transparent'
       }`}
+      style={{ backgroundColor: isScrolled ? 'rgba(241,245,249,0.95)' : 'transparent' }}
       role="banner"
     >
       <div className="container mx-auto px-4 lg:px-8">
@@ -76,7 +77,7 @@ const Header = ({ isLoggedIn = false }: HeaderProps) => {
                   <Button variant="outline" size="sm">Sign In</Button>
                 </Link>
                 <Link to="/auth?mode=signup" aria-label="Create a free account">
-                  <Button size="sm">Get Started</Button>
+                  <Button size="sm" className="bg-[#0F172A] hover:bg-[#1E293B] text-white border border-primary/40">Get Started</Button>
                 </Link>
               </>
             )}
