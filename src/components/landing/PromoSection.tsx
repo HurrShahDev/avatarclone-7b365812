@@ -58,7 +58,7 @@ const PromoSection = () => {
                 transform: textVisible ? 'translateY(0)' : 'translateY(24px)',
               }}
             >
-              <p className="text-sm text-primary font-semibold mb-3 tracking-wide uppercase">
+              <p className="text-sm font-semibold mb-3 tracking-wide uppercase" style={{ color: '#6366F1' }}>
                 See It in Action
               </p>
               <h2 className="section-heading text-2xl lg:text-3xl">

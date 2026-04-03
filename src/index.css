@@ -272,6 +272,11 @@
   50% { transform: translateY(-15px) scale(1.3); opacity: 0.4; }
 }
 
+@keyframes floatDot {
+  0%, 100% { transform: translateY(0) scale(1); opacity: 0.3; }
+  50% { transform: translateY(-12px) scale(1.2); opacity: 0.6; }
+}
+
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
