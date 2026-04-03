@@ -68,7 +68,7 @@ const StepCard = ({ step, index }: { step: typeof steps[0]; index: number }) => 
             <li
               key={i}
               role="listitem"
-              className="flex items-center gap-3 text-sm text-muted-foreground transition-all duration-500"
+              className="flex items-center gap-3 text-sm transition-all duration-500"
               style={{
                 opacity: isVisible ? 1 : 0,
                 transform: isVisible ? 'translateX(0)' : 'translateX(-12px)',
