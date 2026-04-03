@@ -58,8 +58,8 @@ const StepCard = ({ step, index }: { step: typeof steps[0]; index: number }) => 
             {step.number}
           </div>
           <div>
-            <p className="text-xs uppercase tracking-widest text-primary font-semibold mb-0.5">Step {step.number}</p>
-            <h3 className="text-xl font-bold text-foreground">{step.title}</h3>
+            <p className="text-xs uppercase tracking-widest font-semibold mb-0.5" style={{ color: '#A5B4FC' }}>Step {step.number}</p>
+            <h3 className="text-xl font-bold" style={{ color: '#fff' }}>{step.title}</h3>
           </div>
         </div>
         <p className="text-muted-foreground mb-5 leading-relaxed">{step.description}</p>
