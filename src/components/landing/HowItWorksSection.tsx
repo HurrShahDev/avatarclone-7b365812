@@ -70,6 +70,7 @@ const StepCard = ({ step, index }: { step: typeof steps[0]; index: number }) => 
               role="listitem"
               className="flex items-center gap-3 text-sm transition-all duration-500"
               style={{
+                color: 'hsl(215, 16%, 65%)',
                 opacity: isVisible ? 1 : 0,
                 transform: isVisible ? 'translateX(0)' : 'translateX(-12px)',
                 transitionDelay: `${400 + i * 100}ms`,
