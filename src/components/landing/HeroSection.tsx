@@ -27,30 +27,49 @@ const HeroSection = () => {
               transform: textVisible ? 'translateY(0)' : 'translateY(24px)',
             }}
           >
-            <p
-              className="text-sm text-primary font-semibold mb-4 tracking-wide uppercase transition-all duration-500"
+            {/* Pill badge like SmartML */}
+            <div
+              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full mb-6 text-sm font-medium transition-all duration-500"
               style={{
+                background: 'rgba(255,255,255,0.7)',
+                backdropFilter: 'blur(8px)',
+                border: '1px solid #C7D2FE',
+                color: '#4F46E5',
                 opacity: textVisible ? 1 : 0,
                 transitionDelay: '100ms',
               }}
             >
-              AI Avatar Generator
-            </p>
+              <span className="w-1.5 h-1.5 rounded-full bg-primary" />
+              AvatarClone • AI-Powered Avatar Generator
+            </div>
 
             <h1
-              className="text-3xl sm:text-4xl lg:text-5xl font-bold leading-[1.15] mb-5 text-foreground transition-all duration-700"
+              className="text-3xl sm:text-4xl lg:text-5xl font-bold leading-[1.15] mb-5 transition-all duration-700"
               style={{
                 opacity: textVisible ? 1 : 0,
                 transform: textVisible ? 'translateY(0)' : 'translateY(16px)',
                 transitionDelay: '200ms',
               }}
             >
-              Create Realistic AI Avatar Videos
+              <span style={{ color: '#111827' }}>Create Realistic </span>
+              <span
+                style={{
+                  background: 'linear-gradient(90deg, #1D4ED8, #6366F1, #A855F7)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text',
+                }}
+              >
+                AI Avatar
+              </span>
+              <br />
+              <span style={{ color: '#111827' }}>Videos</span>
             </h1>
 
             <p
-              className="text-lg text-muted-foreground mb-8 max-w-lg leading-relaxed transition-all duration-700"
+              className="text-lg mb-8 max-w-lg leading-relaxed transition-all duration-700"
               style={{
+                color: '#334155',
                 opacity: textVisible ? 1 : 0,
                 transform: textVisible ? 'translateY(0)' : 'translateY(16px)',
                 transitionDelay: '350ms',
@@ -67,7 +86,16 @@ const HeroSection = () => {
                 transitionDelay: '450ms',
               }}
             >
-              <Button asChild size="lg" className="group shadow-md shadow-primary/15 min-h-[44px]">
+              {/* Primary CTA with gradient border-bottom like SmartML */}
+              <Button
+                asChild
+                size="lg"
+                className="group min-h-[44px] relative overflow-hidden"
+                style={{
+                  background: 'linear-gradient(135deg, #4F46E5, #6366F1)',
+                  boxShadow: '0 4px 14px rgba(99, 102, 241, 0.35), 0 2px 0 0 #06B6D4',
+                }}
+              >
                 <Link to="/auth?mode=signup">
                   Get Started Free
                   <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" aria-hidden="true" />
@@ -78,6 +106,7 @@ const HeroSection = () => {
                 size="lg"
                 onClick={scrollToDemo}
                 className="group min-h-[44px]"
+                style={{ borderColor: '#C7D2FE', color: '#1E293B' }}
                 aria-label="Watch product demo video"
               >
                 <Play className="w-4 h-4" aria-hidden="true" />
@@ -86,8 +115,9 @@ const HeroSection = () => {
             </div>
 
             <div
-              className="flex flex-wrap items-center gap-6 text-sm text-muted-foreground transition-all duration-700"
+              className="flex flex-wrap items-center gap-6 text-sm transition-all duration-700"
               style={{
+                color: '#6B7280',
                 opacity: textVisible ? 1 : 0,
                 transitionDelay: '550ms',
               }}
