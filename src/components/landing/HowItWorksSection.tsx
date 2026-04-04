@@ -28,12 +28,12 @@ const HowItWorksSection = () => {
 
   return (
     <section id="how-it-works" className="section-padding dark-section relative overflow-hidden" aria-label="How it works">
-      {/* Background dots pattern */}
+      {/* Background dots pattern - larger size */}
       <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
         <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
           <defs>
-            <pattern id="dotPattern" x="0" y="0" width="30" height="30" patternUnits="userSpaceOnUse">
-              <circle cx="1" cy="1" r="0.8" fill="#334155" opacity="0.5" />
+            <pattern id="dotPattern" x="0" y="0" width="24" height="24" patternUnits="userSpaceOnUse">
+              <circle cx="2" cy="2" r="1.2" fill="#334155" opacity="0.6" />
             </pattern>
           </defs>
           <rect width="100%" height="100%" fill="url(#dotPattern)" />
@@ -84,9 +84,9 @@ const HowItWorksSection = () => {
                     {step.number}
                   </div>
 
-                  {/* Circle icon */}
+                  {/* Circle icon with pulse animation */}
                   <div
-                    className="w-24 h-24 lg:w-28 lg:h-28 rounded-full flex items-center justify-center mb-5 transition-all duration-300 hover:scale-105"
+                    className="w-24 h-24 lg:w-28 lg:h-28 rounded-full flex items-center justify-center mb-5 transition-all duration-300 hover:scale-105 icon-pulse"
                     style={{
                       background: '#0F172A',
                       border: '2px solid #1E293B',

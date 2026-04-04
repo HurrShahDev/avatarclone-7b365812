@@ -18,7 +18,7 @@ const HeroSection = () => {
       className="relative section-padding overflow-hidden"
       aria-label="Hero"
       style={{
-        background: 'linear-gradient(180deg, #EEF2FF 0%, #DBEAFE 30%, #C7D2FE 60%, #A5B4FC 100%)',
+        background: 'linear-gradient(180deg, #EEF2FF 0%, #DBEAFE 25%, #B4C6EE 55%, #818CF8 100%)',
       }}
     >
       <div className="absolute inset-0 pointer-events-none" aria-hidden="true" />
@@ -96,7 +96,7 @@ const HeroSection = () => {
               <Button
                 asChild
                 size="lg"
-                className="group min-h-[44px] relative overflow-hidden"
+                className="group min-h-[44px] relative overflow-hidden btn-glow"
                 style={{
                   background: 'linear-gradient(135deg, #4F46E5, #6366F1)',
                   boxShadow: '0 4px 14px rgba(99, 102, 241, 0.35), 0 2px 0 0 #06B6D4',

@@ -63,7 +63,7 @@ const FeaturesSection = () => {
             <div
               key={feature.title}
               role="listitem"
-              className="group p-6 rounded-xl will-change-transform transition-all duration-300 ease-out hover:shadow-lg hover:-translate-y-1"
+              className="group p-6 rounded-xl will-change-transform transition-all duration-300 ease-out card-hover"
               style={{
                 opacity: gridVisible ? 1 : 0,
                 transform: gridVisible ? 'translateY(0)' : 'translateY(20px)',

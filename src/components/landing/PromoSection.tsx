@@ -102,7 +102,7 @@ const PromoSection = () => {
                 transitionDelay: '500ms',
               }}
             >
-              <Button asChild size="lg" className="group shadow-md shadow-primary/15">
+              <Button asChild size="lg" className="group shadow-md shadow-primary/15 btn-glow">
                 <Link to="/create">
                   Build Your Avatar
                   <ArrowRight className="w-4 h-4 ml-1 transition-transform group-hover:translate-x-1" aria-hidden="true" />
