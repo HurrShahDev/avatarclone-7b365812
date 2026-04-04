@@ -43,7 +43,7 @@ const Header = ({ isLoggedIn = false }: HeaderProps) => {
         <div className="flex items-center justify-between h-14">
           <Link to="/" className="flex items-center gap-2" aria-label="AvatarClone home">
             <img src={logo} alt="" className="h-8 w-auto" aria-hidden="true" />
-            <span className="font-semibold text-foreground text-base">AvatarClone</span>
+            <span className="font-bold text-base" style={{ background: 'linear-gradient(90deg, #4F46E5, #6366F1)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>AvatarClone</span>
           </Link>
 
           <nav className="hidden md:flex items-center gap-8" aria-label="Main navigation">

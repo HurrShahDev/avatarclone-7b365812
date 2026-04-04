@@ -96,7 +96,7 @@ const HeroSection = () => {
               <Button
                 asChild
                 size="lg"
-                className="group min-h-[44px] relative overflow-hidden"
+                className="group min-h-[44px] relative overflow-hidden btn-glow"
                 style={{
                   background: 'linear-gradient(135deg, #4F46E5, #6366F1)',
                   boxShadow: '0 4px 14px rgba(99, 102, 241, 0.35), 0 2px 0 0 #06B6D4',

@@ -7,7 +7,13 @@ const CTASection = () => {
   const { ref: textRef, isVisible: textVisible } = useScrollReveal();
 
   return (
-    <section className="section-padding relative" aria-label="Call to action">
+    <section
+      className="section-padding relative"
+      aria-label="Call to action"
+      style={{
+        background: 'linear-gradient(180deg, #DBEAFE 0%, #C7D2FE 40%, #A5B4FC 80%, #818CF8 100%)',
+      }}
+    >
       <div className="container mx-auto px-4 lg:px-8">
         <div
           ref={textRef}
@@ -34,7 +40,7 @@ const CTASection = () => {
             </span>
             ?
           </h2>
-          <p className="section-subtext mb-8 text-lg">
+          <p className="text-lg mb-8 leading-relaxed" style={{ color: '#334155' }}>
             Get started free — no credit card required. Create your first avatar video in under 5 minutes.
           </p>
 
@@ -48,7 +54,7 @@ const CTASection = () => {
             <Button
               asChild
               size="lg"
-              className="group min-h-[44px]"
+              className="group min-h-[44px] btn-glow"
               style={{
                 background: 'linear-gradient(135deg, #4F46E5, #6366F1)',
                 boxShadow: '0 4px 14px rgba(99, 102, 241, 0.35)',
@@ -63,7 +69,7 @@ const CTASection = () => {
               variant="outline"
               size="lg"
               className="min-h-[44px]"
-              style={{ borderColor: '#C7D2FE', color: '#1E293B' }}
+              style={{ borderColor: '#C7D2FE', color: '#1E293B', background: 'rgba(255,255,255,0.6)' }}
             >
               View Pricing
             </Button>
@@ -80,7 +86,7 @@ const CTASection = () => {
                   className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium"
                   style={{
                     background: '#E2E8F0',
-                    border: '2px solid #F8FAFC',
+                    border: '2px solid rgba(255,255,255,0.8)',
                     color: '#6B7280',
                   }}
                 >
@@ -88,7 +94,7 @@ const CTASection = () => {
                 </div>
               ))}
             </div>
-            <p className="text-sm" style={{ color: '#6B7280' }}>
+            <p className="text-sm" style={{ color: '#475569' }}>
               <span className="font-semibold" style={{ color: '#111827' }}>500+</span> creators already on board
             </p>
           </div>

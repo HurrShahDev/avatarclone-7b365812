@@ -1,10 +1,6 @@
 import { useScrollReveal } from '@/hooks/use-scroll-reveal';
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from '@/components/ui/accordion';
+import { ChevronDown } from 'lucide-react';
+import { useState } from 'react';
 
 const faqs = [
   {
@@ -51,9 +47,16 @@ const faqs = [
 
 const FAQSection = () => {
   const { ref, isVisible } = useScrollReveal();
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   return (
-    <section className="section-padding" aria-label="Frequently asked questions">
+    <section
+      className="section-padding"
+      aria-label="Frequently asked questions"
+      style={{
+        background: 'linear-gradient(180deg, #EEF2FF 0%, #E0E7FF 50%, #C7D2FE 100%)',
+      }}
+    >
       <div className="container mx-auto px-4 lg:px-8">
         <div
           ref={ref}
@@ -75,33 +78,69 @@ const FAQSection = () => {
           </p>
         </div>
 
-        <div className="max-w-3xl mx-auto">
-          <Accordion type="single" collapsible className="space-y-3">
-            {faqs.map((faq, i) => (
-              <AccordionItem
+        <div className="max-w-4xl mx-auto space-y-4">
+          {faqs.map((faq, i) => {
+            const isOpen = openIndex === i;
+            return (
+              <div
                 key={i}
-                value={`item-${i}`}
-                className="rounded-xl px-6 border"
+                className="transition-all duration-500 ease-out"
                 style={{
-                  background: '#FFFFFF',
-                  borderColor: '#E5E7EB',
+                  opacity: isVisible ? 1 : 0,
+                  transform: isVisible ? 'translateY(0)' : 'translateY(16px)',
+                  transitionDelay: `${i * 60}ms`,
                 }}
               >
-                <AccordionTrigger
-                  className="text-left text-sm lg:text-base font-semibold py-5 hover:no-underline"
-                  style={{ color: '#111827' }}
+                <button
+                  onClick={() => setOpenIndex(isOpen ? null : i)}
+                  className="w-full flex items-center justify-between px-6 sm:px-8 py-5 rounded-2xl text-left transition-all duration-300"
+                  style={{
+                    background: isOpen
+                      ? 'linear-gradient(135deg, rgba(99,102,241,0.08), rgba(168,85,247,0.06))'
+                      : '#FFFFFF',
+                    border: isOpen ? '1px solid rgba(99,102,241,0.2)' : '1px solid #E5E7EB',
+                    boxShadow: isOpen
+                      ? '0 4px 20px rgba(99,102,241,0.1)'
+                      : '0 1px 3px rgba(0,0,0,0.04)',
+                  }}
+                  aria-expanded={isOpen}
                 >
-                  {faq.question}
-                </AccordionTrigger>
-                <AccordionContent
-                  className="text-sm leading-relaxed pb-5"
-                  style={{ color: '#6B7280' }}
+                  <span
+                    className="text-sm sm:text-base font-semibold pr-4"
+                    style={{ color: '#111827' }}
+                  >
+                    {faq.question}
+                  </span>
+                  <div
+                    className="flex-shrink-0 w-9 h-9 rounded-full flex items-center justify-center transition-all duration-300"
+                    style={{
+                      background: isOpen
+                        ? 'linear-gradient(135deg, #6366F1, #A855F7)'
+                        : 'linear-gradient(135deg, #6366F1, #818CF8)',
+                      transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+                      boxShadow: '0 2px 8px rgba(99,102,241,0.3)',
+                    }}
+                  >
+                    <ChevronDown className="w-4 h-4 text-white" />
+                  </div>
+                </button>
+                <div
+                  className="overflow-hidden transition-all duration-300 ease-out"
+                  style={{
+                    maxHeight: isOpen ? '200px' : '0px',
+                    opacity: isOpen ? 1 : 0,
+                  }}
                 >
-                  {faq.answer}
-                </AccordionContent>
-              </AccordionItem>
-            ))}
-          </Accordion>
+                  <p
+                    className="px-6 sm:px-8 pt-3 pb-1 text-sm leading-relaxed"
+                    style={{ color: '#6B7280' }}
+                  >
+                    {faq.answer}
+                  </p>
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
     </section>
