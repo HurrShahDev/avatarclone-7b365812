@@ -14,7 +14,13 @@ const HeroSection = () => {
   };
 
   return (
-    <section className="relative section-padding overflow-hidden" aria-label="Hero">
+    <section
+      className="relative section-padding overflow-hidden"
+      aria-label="Hero"
+      style={{
+        background: 'linear-gradient(180deg, #EEF2FF 0%, #DBEAFE 30%, #C7D2FE 60%, #A5B4FC 100%)',
+      }}
+    >
       <div className="absolute inset-0 pointer-events-none" aria-hidden="true" />
 
       <div className="container mx-auto px-4 lg:px-8 relative z-10">
