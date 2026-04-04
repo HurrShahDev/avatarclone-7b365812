@@ -6,7 +6,7 @@ import PromoSection from '@/components/landing/PromoSection';
 import FeaturesSection from '@/components/landing/FeaturesSection';
 import AvatarCarouselSection from '@/components/landing/AvatarCarouselSection';
 import HowItWorksSection from '@/components/landing/HowItWorksSection';
-import TrustSignalsSection from '@/components/landing/TrustSignalsSection';
+import FAQSection from '@/components/landing/FAQSection';
 import CTASection from '@/components/landing/CTASection';
 
 const Landing = () => {
