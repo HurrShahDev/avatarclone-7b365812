@@ -1,7 +1,6 @@
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import HeroSection from '@/components/landing/HeroSection';
-
 import PromoSection from '@/components/landing/PromoSection';
 import FeaturesSection from '@/components/landing/FeaturesSection';
 import AvatarCarouselSection from '@/components/landing/AvatarCarouselSection';
@@ -15,12 +14,11 @@ const Landing = () => {
       <Header />
       <main>
         <HeroSection />
-        <HeroTransition />
         <PromoSection />
         <FeaturesSection />
         <AvatarCarouselSection />
         <HowItWorksSection />
-        <TrustSignalsSection />
+        <FAQSection />
         <CTASection />
       </main>
       <Footer />
