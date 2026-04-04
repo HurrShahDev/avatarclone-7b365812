@@ -18,7 +18,7 @@ const HeroSection = () => {
       className="relative section-padding overflow-hidden"
       aria-label="Hero"
       style={{
-        background: 'linear-gradient(180deg, #EEF2FF 0%, #DBEAFE 30%, #C7D2FE 60%, #A5B4FC 100%)',
+        background: 'linear-gradient(180deg, #EEF2FF 0%, #DBEAFE 25%, #B4C6EE 55%, #818CF8 100%)',
       }}
     >
       <div className="absolute inset-0 pointer-events-none" aria-hidden="true" />
