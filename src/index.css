@@ -6,7 +6,7 @@
 
 @layer base {
   :root {
-    --background: 210 40% 98%;
+    --background: 0 0% 100%;
     --foreground: 222 47% 11%;
 
     --card: 0 0% 100%;
@@ -21,7 +21,7 @@
     --secondary: 263 70% 58%;
     --secondary-foreground: 0 0% 100%;
 
-    --muted: 214 32% 91%;
+    --muted: 220 14% 96%;
     --muted-foreground: 215 16% 47%;
 
     --accent: 189 95% 43%;
@@ -36,12 +36,9 @@
 
     --radius: 0.5rem;
 
-    /* SmartML gradients */
     --gradient-heading: linear-gradient(90deg, #1D4ED8, #6366F1, #A855F7, #EC4899);
     --gradient-brand: linear-gradient(90deg, #6366F1, #8B5CF6, #EC4899);
-    --gradient-bg: linear-gradient(180deg, #F1F5F9 0%, #E2E8F0 40%, #CBD5F5 75%, #A5B4FC 100%);
 
-    /* Dark section tokens */
     --dark-bg: 222 84% 3%;
     --dark-surface: 217 33% 10%;
     --dark-border: 215 25% 17%;
@@ -186,34 +183,27 @@
     @apply border-border bg-muted text-muted-foreground;
   }
 
-  /* Section consistent spacing */
   .section-padding {
     @apply py-16 lg:py-24;
   }
 
   .section-heading {
     @apply text-2xl lg:text-3xl font-bold mb-3;
-    background: var(--gradient-heading);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    color: #0F172A;
   }
 
   .section-subtext {
-    @apply text-muted-foreground text-base leading-relaxed;
+    @apply text-base leading-relaxed;
+    color: #64748B;
   }
 
-  /* Dark section theming */
   .dark-section {
     background: hsl(var(--dark-bg));
     color: hsl(var(--dark-text));
   }
 
   .dark-section .section-heading {
-    background: var(--gradient-heading);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    color: #F1F5F9;
   }
 
   .dark-section .section-subtext {
@@ -231,28 +221,28 @@
   }
 }
 
-/* Button glow animation */
+/* Button glow */
 .btn-glow {
   position: relative;
   transition: box-shadow 0.3s ease, transform 0.2s ease;
 }
 .btn-glow:hover {
-  box-shadow: 0 0 20px rgba(99, 102, 241, 0.4), 0 0 40px rgba(99, 102, 241, 0.15) !important;
+  box-shadow: 0 0 20px rgba(99, 102, 241, 0.3), 0 0 40px rgba(99, 102, 241, 0.1) !important;
   transform: translateY(-1px);
 }
 
-/* Icon pulse on hover */
-.icon-pulse:hover {
-  box-shadow: 0 0 0 6px rgba(99, 102, 241, 0.15), 0 0 30px rgba(99, 102, 241, 0.12) !important;
-}
-
-/* Card hover lift */
+/* Card hover */
 .card-hover {
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 .card-hover:hover {
   transform: translateY(-4px);
-  box-shadow: 0 8px 30px rgba(99, 102, 241, 0.12);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+}
+
+/* Icon pulse */
+.icon-pulse:hover {
+  box-shadow: 0 0 0 6px rgba(99, 102, 241, 0.1), 0 0 20px rgba(99, 102, 241, 0.08) !important;
 }
 
 @keyframes fadeIn {
@@ -261,14 +251,8 @@
 }
 
 @keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes scanLine {
@@ -288,17 +272,12 @@
 
 @keyframes waveformBar {
   from { transform: scaleY(0.3); }
-  to   { transform: scaleY(1); }
+  to { transform: scaleY(1); }
 }
 
 @keyframes authParticle {
   0%, 100% { transform: translateY(0) scale(1); opacity: 0.2; }
   50% { transform: translateY(-15px) scale(1.3); opacity: 0.4; }
-}
-
-@keyframes floatDot {
-  0%, 100% { transform: translateY(0) scale(1); opacity: 0.3; }
-  50% { transform: translateY(-12px) scale(1.2); opacity: 0.6; }
 }
 
 ::-webkit-scrollbar {

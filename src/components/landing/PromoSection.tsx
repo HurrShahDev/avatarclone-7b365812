@@ -46,9 +46,9 @@ const PromoSection = () => {
   };
 
   return (
-    <section id="demo-section" className="section-padding relative overflow-hidden" aria-label="Product demo">
+    <section id="demo-section" className="py-20 lg:py-28 relative" aria-label="Product demo" style={{ background: '#FFFFFF' }}>
       <div className="container mx-auto px-4 lg:px-8">
-        <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-20 max-w-7xl mx-auto">
+        <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-20 max-w-6xl mx-auto">
           <div className="flex-1 order-1">
             <div
               ref={textRef}
@@ -58,18 +58,18 @@ const PromoSection = () => {
                 transform: textVisible ? 'translateY(0)' : 'translateY(24px)',
               }}
             >
-              <p className="text-sm font-semibold mb-3 tracking-wide uppercase" style={{ color: '#6366F1' }}>
+              <p className="text-sm font-semibold mb-3 tracking-wide uppercase" style={{ color: '#4F46E5' }}>
                 See It in Action
               </p>
-              <h2 className="section-heading text-2xl lg:text-3xl">
+              <h2 className="text-2xl lg:text-4xl font-bold mb-4 leading-tight" style={{ color: '#0F172A' }}>
                 Professional AI Avatar & Voice Clone
               </h2>
-              <p className="section-subtext mb-8 max-w-lg">
+              <p className="text-base text-gray-500 mb-8 max-w-lg leading-relaxed">
                 Create highly realistic AI avatars using our personalized cloning system. Perfect for presentations, content, and demos.
               </p>
             </div>
 
-            <div ref={benefitsRef} className="space-y-5 mb-8">
+            <div ref={benefitsRef} className="space-y-4 mb-8">
               {benefits.map((benefit, index) => (
                 <div
                   key={index}
@@ -80,14 +80,14 @@ const PromoSection = () => {
                     ...getDelay(index),
                   }}
                 >
-                  <div className="flex-shrink-0 w-6 h-6 bg-primary/10 rounded-full flex items-center justify-center mt-0.5">
-                    <Check className="w-3.5 h-3.5 text-primary" aria-hidden="true" />
+                  <div className="flex-shrink-0 w-6 h-6 bg-indigo-50 rounded-full flex items-center justify-center mt-0.5">
+                    <Check className="w-3.5 h-3.5 text-indigo-600" aria-hidden="true" />
                   </div>
                   <div>
-                    <h4 className="font-semibold text-foreground mb-0.5 text-base">
+                    <h4 className="font-semibold text-gray-900 mb-0.5 text-base">
                       {benefit.title}
                     </h4>
-                    <p className="text-muted-foreground text-sm leading-relaxed">
+                    <p className="text-gray-500 text-sm leading-relaxed">
                       {benefit.description}
                     </p>
                   </div>
@@ -102,7 +102,7 @@ const PromoSection = () => {
                 transitionDelay: '500ms',
               }}
             >
-              <Button asChild size="lg" className="group shadow-md shadow-primary/15 btn-glow">
+              <Button asChild size="lg" className="group bg-indigo-600 hover:bg-indigo-700 text-white shadow-md shadow-indigo-200 btn-glow">
                 <Link to="/create">
                   Build Your Avatar
                   <ArrowRight className="w-4 h-4 ml-1 transition-transform group-hover:translate-x-1" aria-hidden="true" />
@@ -111,7 +111,6 @@ const PromoSection = () => {
             </div>
           </div>
 
-          {/* Demo Video */}
           <div className="flex-1 w-full order-2">
             <div
               ref={videoWrapRef}
@@ -123,12 +122,16 @@ const PromoSection = () => {
               }}
             >
               <div
-                className="relative aspect-video rounded-xl overflow-hidden cursor-pointer group border border-border shadow-lg"
+                className="relative aspect-video rounded-2xl overflow-hidden cursor-pointer group"
                 onClick={togglePlay}
                 onKeyDown={handleKeyDown}
                 role="button"
                 tabIndex={0}
                 aria-label={isPlaying ? 'Pause demo video' : 'Play demo video'}
+                style={{
+                  border: '1px solid #E5E7EB',
+                  boxShadow: '0 4px 30px rgba(0,0,0,0.08)',
+                }}
               >
                 <video
                   ref={videoRef}
@@ -141,23 +144,23 @@ const PromoSection = () => {
                   aria-label="AvatarClone product demo video"
                 />
                 <div
-                  className="absolute inset-0 flex items-center justify-center transition-all duration-300 bg-foreground/5"
+                  className="absolute inset-0 flex items-center justify-center transition-all duration-300 bg-black/5"
                   style={{ opacity: isPlaying ? 0 : 1, pointerEvents: isPlaying ? 'none' : 'auto' }}
                   aria-hidden="true"
                 >
-                  <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center hover:bg-primary/90 transition-all duration-300 shadow-lg">
-                    <Play className="w-6 h-6 text-primary-foreground ml-0.5" />
+                  <div className="w-16 h-16 bg-indigo-600 rounded-full flex items-center justify-center hover:bg-indigo-700 transition-all duration-300 shadow-xl shadow-indigo-200">
+                    <Play className="w-6 h-6 text-white ml-0.5" />
                   </div>
                 </div>
                 {isPlaying && (
                   <div className="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                    <div className="w-10 h-10 bg-background/80 backdrop-blur-sm rounded-full flex items-center justify-center">
-                      <Pause className="w-4 h-4 text-foreground" />
+                    <div className="w-10 h-10 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center">
+                      <Pause className="w-4 h-4 text-gray-800" />
                     </div>
                   </div>
                 )}
                 {!isPlaying && (
-                  <div className="absolute bottom-3 left-3 bg-background/90 backdrop-blur-sm px-3 py-1.5 rounded-lg text-sm font-medium border border-border">
+                  <div className="absolute bottom-3 left-3 bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-lg text-sm font-medium text-gray-700">
                     Watch Demo
                   </div>
                 )}
