@@ -15,13 +15,15 @@ const HeroSection = () => {
 
   return (
     <section
-      className="relative section-padding overflow-hidden"
+      className="relative overflow-hidden pt-28 pb-20 lg:pt-36 lg:pb-28"
       aria-label="Hero"
       style={{
-        background: 'linear-gradient(180deg, #EEF2FF 0%, #DBEAFE 25%, #B4C6EE 55%, #818CF8 100%)',
+        background: 'linear-gradient(180deg, #F8FAFF 0%, #EEF2FF 20%, #E0E7FF 45%, #C7D2FE 70%, #A5B4FC 90%, #818CF8 100%)',
       }}
     >
-      <div className="absolute inset-0 pointer-events-none" aria-hidden="true" />
+      {/* Subtle decorative elements */}
+      <div className="absolute top-20 right-[10%] w-72 h-72 rounded-full opacity-20 blur-3xl pointer-events-none" style={{ background: '#818CF8' }} aria-hidden="true" />
+      <div className="absolute bottom-10 left-[5%] w-96 h-96 rounded-full opacity-10 blur-3xl pointer-events-none" style={{ background: '#6366F1' }} aria-hidden="true" />
 
       <div className="container mx-auto px-4 lg:px-8 relative z-10">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
@@ -33,34 +35,32 @@ const HeroSection = () => {
               transform: textVisible ? 'translateY(0)' : 'translateY(24px)',
             }}
           >
-            {/* Pill badge like SmartML */}
             <div
-              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full mb-6 text-sm font-medium transition-all duration-500"
+              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full mb-8 text-sm font-medium transition-all duration-500"
               style={{
-                background: 'rgba(255,255,255,0.7)',
-                backdropFilter: 'blur(8px)',
+                background: 'rgba(255,255,255,0.85)',
                 border: '1px solid #C7D2FE',
-                color: '#4F46E5',
+                color: '#4338CA',
                 opacity: textVisible ? 1 : 0,
                 transitionDelay: '100ms',
               }}
             >
-              <span className="w-1.5 h-1.5 rounded-full bg-primary" />
-              AvatarClone • AI-Powered Avatar Generator
+              <span className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse" />
+              AI-Powered Avatar Generator
             </div>
 
             <h1
-              className="text-3xl sm:text-4xl lg:text-5xl font-bold leading-[1.15] mb-5 transition-all duration-700"
+              className="text-4xl sm:text-5xl lg:text-[3.5rem] font-extrabold leading-[1.1] mb-6 transition-all duration-700"
               style={{
                 opacity: textVisible ? 1 : 0,
                 transform: textVisible ? 'translateY(0)' : 'translateY(16px)',
                 transitionDelay: '200ms',
               }}
             >
-              <span style={{ color: '#111827' }}>Create Realistic </span>
+              <span style={{ color: '#0F172A' }}>Create Realistic </span>
               <span
                 style={{
-                  background: 'linear-gradient(90deg, #1D4ED8, #6366F1, #A855F7)',
+                  background: 'linear-gradient(135deg, #4338CA, #6366F1, #8B5CF6)',
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent',
                   backgroundClip: 'text',
@@ -69,13 +69,13 @@ const HeroSection = () => {
                 AI Avatar
               </span>
               <br />
-              <span style={{ color: '#111827' }}>Videos</span>
+              <span style={{ color: '#0F172A' }}>Videos</span>
             </h1>
 
             <p
-              className="text-lg mb-8 max-w-lg leading-relaxed transition-all duration-700"
+              className="text-lg mb-10 max-w-lg leading-relaxed transition-all duration-700"
               style={{
-                color: '#334155',
+                color: '#475569',
                 opacity: textVisible ? 1 : 0,
                 transform: textVisible ? 'translateY(0)' : 'translateY(16px)',
                 transitionDelay: '350ms',
@@ -92,14 +92,13 @@ const HeroSection = () => {
                 transitionDelay: '450ms',
               }}
             >
-              {/* Primary CTA with gradient border-bottom like SmartML */}
               <Button
                 asChild
                 size="lg"
-                className="group min-h-[44px] relative overflow-hidden btn-glow"
+                className="group min-h-[48px] text-base font-semibold px-7 btn-glow"
                 style={{
-                  background: 'linear-gradient(135deg, #4F46E5, #6366F1)',
-                  boxShadow: '0 4px 14px rgba(99, 102, 241, 0.35), 0 2px 0 0 #06B6D4',
+                  background: 'linear-gradient(135deg, #4338CA, #4F46E5)',
+                  boxShadow: '0 4px 20px rgba(67, 56, 202, 0.35)',
                 }}
               >
                 <Link to="/auth?mode=signup">
@@ -111,8 +110,13 @@ const HeroSection = () => {
                 variant="outline"
                 size="lg"
                 onClick={scrollToDemo}
-                className="group min-h-[44px]"
-                style={{ borderColor: '#C7D2FE', color: '#1E293B' }}
+                className="group min-h-[48px] text-base font-medium"
+                style={{
+                  borderColor: '#C7D2FE',
+                  color: '#1E293B',
+                  background: 'rgba(255,255,255,0.7)',
+                  backdropFilter: 'blur(8px)',
+                }}
                 aria-label="Watch product demo video"
               >
                 <Play className="w-4 h-4" aria-hidden="true" />
@@ -121,9 +125,9 @@ const HeroSection = () => {
             </div>
 
             <div
-              className="flex flex-wrap items-center gap-6 text-sm transition-all duration-700"
+              className="flex flex-wrap items-center gap-5 text-sm transition-all duration-700"
               style={{
-                color: '#6B7280',
+                color: '#64748B',
                 opacity: textVisible ? 1 : 0,
                 transitionDelay: '550ms',
               }}
@@ -136,7 +140,7 @@ const HeroSection = () => {
                 { icon: Lock, label: 'Privacy focused' },
               ].map(({ icon: Icon, label }) => (
                 <span key={label} className="flex items-center gap-1.5" role="listitem">
-                  <Icon className="w-4 h-4 text-accent" aria-hidden="true" />
+                  <Icon className="w-4 h-4 text-indigo-500" aria-hidden="true" />
                   {label}
                 </span>
               ))}

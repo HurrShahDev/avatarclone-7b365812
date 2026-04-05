@@ -52,8 +52,8 @@ const AvatarCard = ({ avatar }: { avatar: typeof avatars[0] }) => {
       aria-label={`${avatar.name} AI avatar preview`}
     >
       <div
-        className={`relative rounded-xl overflow-hidden will-change-transform transition-all duration-300 ${
-          hovered ? 'scale-[1.03] shadow-lg' : 'shadow-sm'
+        className={`relative rounded-2xl overflow-hidden will-change-transform transition-all duration-300 ${
+          hovered ? 'scale-[1.03] shadow-xl' : 'shadow-md'
         }`}
       >
         <div className="relative w-full aspect-[3/4]">
@@ -78,18 +78,16 @@ const AvatarCard = ({ avatar }: { avatar: typeof avatars[0] }) => {
             }`}
             aria-hidden="true"
           />
-
-          <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-foreground/70 to-transparent p-4 pt-10">
-            <span className="text-sm font-medium text-primary-foreground">{avatar.name}</span>
+          <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/60 to-transparent p-4 pt-10">
+            <span className="text-sm font-medium text-white">{avatar.name}</span>
           </div>
-
           {hovered && (
-            <div className="absolute inset-0 bg-gradient-to-t from-foreground/60 via-transparent to-transparent flex flex-col items-center justify-end pb-4 animate-fade-in pointer-events-none">
+            <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent flex flex-col items-center justify-end pb-4 animate-fade-in pointer-events-none">
               <div className="flex items-end gap-[3px] h-5 mb-1" aria-hidden="true">
                 {Array.from({ length: 8 }).map((_, i) => (
                   <div
                     key={i}
-                    className="w-[3px] rounded-full bg-primary-foreground/80"
+                    className="w-[3px] rounded-full bg-white/80"
                     style={{
                       height: `${6 + Math.sin(i * 0.9) * 6 + 4}px`,
                       animation: `waveformBar 0.45s ease-in-out ${i * 0.06}s infinite alternate`,
@@ -97,7 +95,7 @@ const AvatarCard = ({ avatar }: { avatar: typeof avatars[0] }) => {
                   />
                 ))}
               </div>
-              <span className="text-[10px] font-medium text-primary-foreground/80 tracking-wider uppercase">
+              <span className="text-[10px] font-medium text-white/80 tracking-wider uppercase">
                 Speaking…
               </span>
             </div>
@@ -115,7 +113,6 @@ const AvatarCarouselSection = () => {
   const isPaused = useRef(false);
   const { ref: headingRef, isVisible: headingVisible } = useScrollReveal();
 
-  // Use reduced motion preference
   const prefersReducedMotion = useRef(
     typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
   );
@@ -123,13 +120,10 @@ const AvatarCarouselSection = () => {
   const animate = useCallback(() => {
     const el = scrollRef.current;
     if (!el || prefersReducedMotion.current) return;
-
     if (!isPaused.current) {
       scrollPos.current += 0.5;
       const halfWidth = el.scrollWidth / 2;
-      if (scrollPos.current >= halfWidth) {
-        scrollPos.current = 0;
-      }
+      if (scrollPos.current >= halfWidth) scrollPos.current = 0;
       el.scrollLeft = scrollPos.current;
     }
     animationRef.current = requestAnimationFrame(animate);
@@ -142,22 +136,22 @@ const AvatarCarouselSection = () => {
   }, [animate]);
 
   return (
-    <section className="section-padding overflow-hidden" aria-label="AI Avatar gallery" style={{ background: 'linear-gradient(180deg, #F8FAFC 0%, #EEF2FF 50%, #E0E7FF 100%)' }}>
-      <div className="container mx-auto px-4 lg:px-8 mb-10">
+    <section className="py-20 lg:py-28 overflow-hidden" aria-label="AI Avatar gallery" style={{ background: '#FFFFFF' }}>
+      <div className="container mx-auto px-4 lg:px-8 mb-12">
         <div
           ref={headingRef}
-          className="text-center max-w-xl mx-auto transition-all duration-700 ease-out"
+          className="text-center max-w-2xl mx-auto transition-all duration-700 ease-out"
           style={{
             opacity: headingVisible ? 1 : 0,
             transform: headingVisible ? 'translateY(0)' : 'translateY(20px)',
           }}
         >
-          <p className="text-sm text-primary font-semibold mb-3 tracking-wide uppercase">Sample Preview</p>
-          <h2 className="section-heading">
+          <p className="text-sm font-semibold mb-3 tracking-wide uppercase" style={{ color: '#4F46E5' }}>Sample Preview</p>
+          <h2 className="text-2xl lg:text-4xl font-bold mb-4" style={{ color: '#0F172A' }}>
             Your AI Avatar in Action
           </h2>
-          <p className="section-subtext">
-            View sample videos showcasing how your real avatar can deliver messages naturally. These examples highlight the style and output your personalized video can achieve.
+          <p className="text-base text-gray-500 leading-relaxed">
+            View sample videos showcasing how your real avatar can deliver messages naturally.
           </p>
         </div>
       </div>
@@ -171,10 +165,7 @@ const AvatarCarouselSection = () => {
         aria-label="Scrolling avatar carousel"
       >
         {loopAvatars.map((avatar, index) => (
-          <AvatarCard
-            key={`${avatar.name}-${index}`}
-            avatar={avatar}
-          />
+          <AvatarCard key={`${avatar.name}-${index}`} avatar={avatar} />
         ))}
       </div>
     </section>
