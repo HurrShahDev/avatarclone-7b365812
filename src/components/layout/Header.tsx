@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import logo from '@/assets/logo.png';
+import logoIcon from '@/assets/logo-icon.png';
 
 interface HeaderProps {
   isLoggedIn?: boolean;
@@ -29,12 +29,6 @@ const Header = ({ isLoggedIn = false }: HeaderProps) => {
       ]
     : [];
 
-  const scrollToPricing = (e: React.MouseEvent) => {
-    e.preventDefault();
-    setIsMenuOpen(false);
-    const el = document.getElementById('pricing');
-    if (el) el.scrollIntoView({ behavior: 'smooth' });
-  };
 
   return (
     <header
@@ -53,7 +47,7 @@ const Header = ({ isLoggedIn = false }: HeaderProps) => {
       <div className="container mx-auto px-4 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <Link to="/" className="flex items-center gap-2.5" aria-label="AvatarClone home">
-            <img src={logo} alt="" className="h-8 w-auto" aria-hidden="true" />
+            <img src={logoIcon} alt="" className="h-9 w-auto" aria-hidden="true" />
             <span className="font-bold text-lg tracking-tight" style={{ color: '#1E293B' }}>
               Avatar<span style={{ color: '#4F46E5' }}>Clone</span>
             </span>
@@ -74,13 +68,6 @@ const Header = ({ isLoggedIn = false }: HeaderProps) => {
                 {link.label}
               </Link>
             ))}
-            <a
-              href="#pricing"
-              onClick={scrollToPricing}
-              className="px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-colors"
-            >
-              Pricing
-            </a>
           </nav>
 
           <div className="hidden md:flex items-center gap-2">
@@ -94,6 +81,9 @@ const Header = ({ isLoggedIn = false }: HeaderProps) => {
               <>
                 <Link to="/docs">
                   <Button variant="ghost" size="sm" className="text-gray-500 hover:text-gray-800 font-medium">Docs</Button>
+                </Link>
+                <Link to="/pricing">
+                  <Button variant="ghost" size="sm" className="text-gray-700 hover:text-gray-900 font-medium">Pricing</Button>
                 </Link>
                 <Link to="/auth" aria-label="Sign in to your account">
                   <Button variant="ghost" size="sm" className="text-gray-700 hover:text-gray-900 font-medium">Sign In</Button>
@@ -131,13 +121,13 @@ const Header = ({ isLoggedIn = false }: HeaderProps) => {
                   {link.label}
                 </Link>
               ))}
-              <a
-                href="#pricing"
-                onClick={scrollToPricing}
+              <Link
+                to="/pricing"
                 className="py-2.5 px-3 rounded-lg text-gray-700 hover:bg-gray-50 min-h-[44px] flex items-center font-medium"
+                onClick={() => setIsMenuOpen(false)}
               >
                 Pricing
-              </a>
+              </Link>
               {!isLoggedIn && (
                 <div className="flex flex-col gap-2 pt-4 mt-2 border-t border-gray-100">
                   <Link to="/auth" onClick={() => setIsMenuOpen(false)}>
