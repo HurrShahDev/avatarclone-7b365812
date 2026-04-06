@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import logo from '@/assets/logo.png';
+import logoIcon from '@/assets/logo-icon.png';
 
 interface HeaderProps {
   isLoggedIn?: boolean;
@@ -47,7 +47,7 @@ const Header = ({ isLoggedIn = false }: HeaderProps) => {
       <div className="container mx-auto px-4 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <Link to="/" className="flex items-center gap-2.5" aria-label="AvatarClone home">
-            <img src={logo} alt="" className="h-8 w-auto" aria-hidden="true" />
+            <img src={logoIcon} alt="" className="h-9 w-auto" aria-hidden="true" />
             <span className="font-bold text-lg tracking-tight" style={{ color: '#1E293B' }}>
               Avatar<span style={{ color: '#4F46E5' }}>Clone</span>
             </span>
