@@ -29,12 +29,6 @@ const Header = ({ isLoggedIn = false }: HeaderProps) => {
       ]
     : [];
 
-  const scrollToPricing = (e: React.MouseEvent) => {
-    e.preventDefault();
-    setIsMenuOpen(false);
-    const el = document.getElementById('pricing');
-    if (el) el.scrollIntoView({ behavior: 'smooth' });
-  };
 
   return (
     <header
@@ -74,13 +68,16 @@ const Header = ({ isLoggedIn = false }: HeaderProps) => {
                 {link.label}
               </Link>
             ))}
-            <a
-              href="#pricing"
-              onClick={scrollToPricing}
-              className="px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-colors"
+            <Link
+              to="/pricing"
+              className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                location.pathname === '/pricing'
+                  ? 'text-indigo-600 bg-indigo-50'
+                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+              }`}
             >
               Pricing
-            </a>
+            </Link>
           </nav>
 
           <div className="hidden md:flex items-center gap-2">
@@ -94,6 +91,9 @@ const Header = ({ isLoggedIn = false }: HeaderProps) => {
               <>
                 <Link to="/docs">
                   <Button variant="ghost" size="sm" className="text-gray-500 hover:text-gray-800 font-medium">Docs</Button>
+                </Link>
+                <Link to="/pricing">
+                  <Button variant="ghost" size="sm" className="text-gray-700 hover:text-gray-900 font-medium">Pricing</Button>
                 </Link>
                 <Link to="/auth" aria-label="Sign in to your account">
                   <Button variant="ghost" size="sm" className="text-gray-700 hover:text-gray-900 font-medium">Sign In</Button>
@@ -131,13 +131,13 @@ const Header = ({ isLoggedIn = false }: HeaderProps) => {
                   {link.label}
                 </Link>
               ))}
-              <a
-                href="#pricing"
-                onClick={scrollToPricing}
+              <Link
+                to="/pricing"
                 className="py-2.5 px-3 rounded-lg text-gray-700 hover:bg-gray-50 min-h-[44px] flex items-center font-medium"
+                onClick={() => setIsMenuOpen(false)}
               >
                 Pricing
-              </a>
+              </Link>
               {!isLoggedIn && (
                 <div className="flex flex-col gap-2 pt-4 mt-2 border-t border-gray-100">
                   <Link to="/auth" onClick={() => setIsMenuOpen(false)}>
