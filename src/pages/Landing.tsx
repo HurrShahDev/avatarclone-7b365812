@@ -5,7 +5,7 @@ import PromoSection from '@/components/landing/PromoSection';
 import FeaturesSection from '@/components/landing/FeaturesSection';
 import AvatarCarouselSection from '@/components/landing/AvatarCarouselSection';
 import HowItWorksSection from '@/components/landing/HowItWorksSection';
-import PricingSection from '@/components/landing/PricingSection';
+import ComparisonSection from '@/components/landing/ComparisonSection';
 import FAQSection from '@/components/landing/FAQSection';
 import CTASection from '@/components/landing/CTASection';
 
@@ -19,7 +19,7 @@ const Landing = () => {
         <FeaturesSection />
         <AvatarCarouselSection />
         <HowItWorksSection />
-        <PricingSection />
+        <ComparisonSection />
         <FAQSection />
         <CTASection />
       </main>

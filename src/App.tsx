@@ -11,6 +11,10 @@ import NotFound from "./pages/NotFound";
 import AvatarVideoGeneration from "./pages/AvatarVideoGeneration";
 import VoiceCloning from "./pages/VoiceCloning";
 import TextToSpeech from "./pages/TextToSpeech";
+import Pricing from "./pages/Pricing";
+import Privacy from "./pages/Privacy";
+import Terms from "./pages/Terms";
+import About from "./pages/About";
 
 const queryClient = new QueryClient();
 
@@ -25,6 +29,10 @@ const App = () => (
           <Route path="/auth" element={<Auth />} />
           <Route path="/create" element={<CreateAvatar />} />
           <Route path="/docs" element={<Docs />} />
+          <Route path="/pricing" element={<Pricing />} />
+          <Route path="/privacy" element={<Privacy />} />
+          <Route path="/terms" element={<Terms />} />
+          <Route path="/about" element={<About />} />
           <Route path="/products/avatar-video" element={<AvatarVideoGeneration />} />
           <Route path="/products/voice-cloning" element={<VoiceCloning />} />
           <Route path="/products/text-to-speech" element={<TextToSpeech />} />

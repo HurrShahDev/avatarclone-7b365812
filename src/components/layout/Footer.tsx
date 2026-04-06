@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import logo from '@/assets/logo.png';
+import logoIcon from '@/assets/logo-icon.png';
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -10,7 +11,7 @@ const Footer = () => {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-10 mb-12">
           <div className="col-span-2 md:col-span-1">
             <Link to="/" className="flex items-center gap-2.5 mb-4" aria-label="AvatarClone home">
-              <img src={logo} alt="" className="h-8 w-auto brightness-0 invert" aria-hidden="true" />
+              <img src={logoIcon} alt="" className="h-10 w-auto" aria-hidden="true" />
               <span className="font-bold text-lg text-white tracking-tight">
                 Avatar<span style={{ color: '#818CF8' }}>Clone</span>
               </span>
