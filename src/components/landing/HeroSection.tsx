@@ -2,16 +2,12 @@ import { Link } from 'react-router-dom';
 import { ArrowRight, Play, Shield, UserCheck, Lock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import HeroAnimation from './HeroAnimation';
+import HeroBackground3D from './HeroBackground3D';
 import { useScrollReveal } from '@/hooks/use-scroll-reveal';
 
 const HeroSection = () => {
   const { ref: textRef, isVisible: textVisible } = useScrollReveal({ threshold: 0.1, immediate: true });
   const { ref: animRef, isVisible: animVisible } = useScrollReveal({ threshold: 0.1, immediate: true });
-
-  const scrollToDemo = () => {
-    const el = document.getElementById('demo-section');
-    if (el) el.scrollIntoView({ behavior: 'smooth' });
-  };
 
   return (
     <section
@@ -21,9 +17,12 @@ const HeroSection = () => {
         background: 'linear-gradient(180deg, #F8FAFF 0%, #EEF2FF 20%, #E0E7FF 45%, #C7D2FE 70%, #A5B4FC 90%, #818CF8 100%)',
       }}
     >
+      {/* 3D Background */}
+      <HeroBackground3D />
+
       {/* Subtle decorative elements */}
-      <div className="absolute top-20 right-[10%] w-72 h-72 rounded-full opacity-20 blur-3xl pointer-events-none" style={{ background: '#818CF8' }} aria-hidden="true" />
-      <div className="absolute bottom-10 left-[5%] w-96 h-96 rounded-full opacity-10 blur-3xl pointer-events-none" style={{ background: '#6366F1' }} aria-hidden="true" />
+      <div className="absolute top-20 right-[10%] w-72 h-72 rounded-full opacity-20 blur-3xl pointer-events-none" style={{ background: '#818CF8', zIndex: 2 }} aria-hidden="true" />
+      <div className="absolute bottom-10 left-[5%] w-96 h-96 rounded-full opacity-10 blur-3xl pointer-events-none" style={{ background: '#6366F1', zIndex: 2 }} aria-hidden="true" />
 
       <div className="container mx-auto px-4 lg:px-8 relative z-10">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
@@ -109,7 +108,7 @@ const HeroSection = () => {
               <Button
                 variant="outline"
                 size="lg"
-                onClick={scrollToDemo}
+                asChild
                 className="group min-h-[48px] text-base font-medium"
                 style={{
                   borderColor: '#C7D2FE',
@@ -117,10 +116,11 @@ const HeroSection = () => {
                   background: 'rgba(255,255,255,0.7)',
                   backdropFilter: 'blur(8px)',
                 }}
-                aria-label="Watch product demo video"
               >
-                <Play className="w-4 h-4" aria-hidden="true" />
-                Watch Demo
+                <Link to="/demo" aria-label="Watch product demo video">
+                  <Play className="w-4 h-4" aria-hidden="true" />
+                  Watch Demo
+                </Link>
               </Button>
             </div>
 

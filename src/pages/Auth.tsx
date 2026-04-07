@@ -234,7 +234,7 @@ const Auth = () => {
     try {
       const provider = new GoogleAuthProvider();
       await signInWithPopup(auth, provider);
-      navigate('/');
+      navigate('/create');
     } catch (error: any) {
       if (error.code !== 'auth/popup-closed-by-user') {
         setErrors({ email: error.message });
@@ -272,7 +272,7 @@ const Auth = () => {
         switchMode('signin');
       } else {
         await signInWithEmailAndPassword(auth, signInData.email, signInData.password);
-        navigate('/');
+        navigate('/create');
       }
     } catch (error: any) {
       const code = error.code || '';
