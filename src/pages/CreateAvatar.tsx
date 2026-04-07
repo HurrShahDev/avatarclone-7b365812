@@ -878,7 +878,7 @@ const CreateAvatar = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen flex flex-col" style={{ background: 'linear-gradient(180deg, #F8FAFF 0%, #EEF2FF 40%, #E0E7FF 100%)' }}>
       {/* Header */}
       <header className="border-b border-border bg-background sticky top-0 z-40">
         <div className="container mx-auto px-4 py-3 flex items-center justify-between">

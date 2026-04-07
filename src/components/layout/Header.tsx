@@ -1,41 +1,45 @@
-import { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { Menu, X } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Menu, X, LogOut, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import logoIcon from '@/assets/logo-icon.png';
+import { useAuth } from '@/hooks/use-auth';
 
-interface HeaderProps {
-  isLoggedIn?: boolean;
-}
-
-const Header = ({ isLoggedIn = false }: HeaderProps) => {
+const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const profileRef = useRef<HTMLDivElement>(null);
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, logout, getInitials } = useAuth();
 
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 10);
-    };
+    const handleScroll = () => setIsScrolled(window.scrollY > 10);
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const navLinks = isLoggedIn
-    ? [
-        { label: 'Dashboard', href: '/dashboard' },
-        { label: 'Create Avatar', href: '/create' },
-        { label: 'Docs', href: '/docs' },
-      ]
-    : [];
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (profileRef.current && !profileRef.current.contains(e.target as Node)) {
+        setShowProfileMenu(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
+  const handleSignOut = async () => {
+    await logout();
+    setShowProfileMenu(false);
+    navigate('/');
+  };
 
   return (
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled
-          ? 'shadow-sm border-b border-gray-200/60'
-          : 'border-b border-transparent'
+        isScrolled ? 'shadow-sm border-b border-gray-200/60' : 'border-b border-transparent'
       }`}
       style={{
         backgroundColor: isScrolled ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.6)',
@@ -54,29 +58,43 @@ const Header = ({ isLoggedIn = false }: HeaderProps) => {
           </Link>
 
           <nav className="hidden md:flex items-center gap-1" aria-label="Main navigation">
-            {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                to={link.href}
-                className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  location.pathname === link.href
-                    ? 'text-indigo-600 bg-indigo-50'
-                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
-                }`}
-                aria-current={location.pathname === link.href ? 'page' : undefined}
-              >
-                {link.label}
-              </Link>
-            ))}
+            {/* Empty for non-logged-in, could add nav links */}
           </nav>
 
           <div className="hidden md:flex items-center gap-2">
-            {isLoggedIn ? (
-              <Link to="/settings" aria-label="Account settings">
-                <div className="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center text-white text-sm font-medium">
-                  A
-                </div>
-              </Link>
+            {user ? (
+              <div ref={profileRef} className="relative">
+                <button
+                  onClick={() => setShowProfileMenu(!showProfileMenu)}
+                  className="flex items-center gap-2 px-2 py-1 rounded-lg hover:bg-gray-100 transition-colors"
+                >
+                  <div
+                    className="w-9 h-9 rounded-full flex items-center justify-center text-white text-sm font-bold"
+                    style={{ background: 'linear-gradient(135deg, #4338CA, #6366F1)' }}
+                  >
+                    {getInitials()}
+                  </div>
+                  <ChevronDown className="w-4 h-4 text-gray-500" />
+                </button>
+                {showProfileMenu && (
+                  <div
+                    className="absolute right-0 top-12 w-48 bg-white rounded-xl shadow-xl border border-gray-100 py-2 animate-fade-in"
+                    style={{ boxShadow: '0 8px 30px rgba(0,0,0,0.12)' }}
+                  >
+                    <div className="px-4 py-2 border-b border-gray-100">
+                      <p className="text-sm font-medium text-gray-900 truncate">{user.displayName || 'User'}</p>
+                      <p className="text-xs text-gray-500 truncate">{user.email}</p>
+                    </div>
+                    <button
+                      onClick={handleSignOut}
+                      className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                    >
+                      <LogOut className="w-4 h-4" />
+                      Sign Out
+                    </button>
+                  </div>
+                )}
+              </div>
             ) : (
               <>
                 <Link to="/docs">
@@ -100,7 +118,6 @@ const Header = ({ isLoggedIn = false }: HeaderProps) => {
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             aria-label={isMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
             aria-expanded={isMenuOpen}
-            aria-controls="mobile-menu"
           >
             {isMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
@@ -108,27 +125,27 @@ const Header = ({ isLoggedIn = false }: HeaderProps) => {
       </div>
 
       {isMenuOpen && (
-        <div id="mobile-menu" className="md:hidden border-t border-gray-100 bg-white animate-fade-in" role="navigation" aria-label="Mobile navigation">
+        <div className="md:hidden border-t border-gray-100 bg-white animate-fade-in" role="navigation">
           <div className="container mx-auto px-4 py-4">
             <nav className="flex flex-col gap-1">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.href}
-                  to={link.href}
-                  className="py-2.5 px-3 rounded-lg text-gray-700 hover:bg-gray-50 min-h-[44px] flex items-center font-medium"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  {link.label}
-                </Link>
-              ))}
-              <Link
-                to="/pricing"
-                className="py-2.5 px-3 rounded-lg text-gray-700 hover:bg-gray-50 min-h-[44px] flex items-center font-medium"
-                onClick={() => setIsMenuOpen(false)}
-              >
+              <Link to="/pricing" className="py-2.5 px-3 rounded-lg text-gray-700 hover:bg-gray-50 min-h-[44px] flex items-center font-medium" onClick={() => setIsMenuOpen(false)}>
                 Pricing
               </Link>
-              {!isLoggedIn && (
+              {user ? (
+                <div className="flex flex-col gap-2 pt-4 mt-2 border-t border-gray-100">
+                  <div className="px-3 py-2">
+                    <p className="text-sm font-medium text-gray-900">{user.displayName || 'User'}</p>
+                    <p className="text-xs text-gray-500">{user.email}</p>
+                  </div>
+                  <button
+                    onClick={() => { handleSignOut(); setIsMenuOpen(false); }}
+                    className="flex items-center gap-2 py-2.5 px-3 text-red-600 hover:bg-red-50 rounded-lg min-h-[44px]"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    Sign Out
+                  </button>
+                </div>
+              ) : (
                 <div className="flex flex-col gap-2 pt-4 mt-2 border-t border-gray-100">
                   <Link to="/auth" onClick={() => setIsMenuOpen(false)}>
                     <Button variant="outline" className="w-full min-h-[44px]">Sign In</Button>

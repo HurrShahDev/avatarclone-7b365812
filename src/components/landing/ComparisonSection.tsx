@@ -1,8 +1,28 @@
 import { useScrollReveal } from '@/hooks/use-scroll-reveal';
+import { useRef, useState } from 'react';
+import { Play, Pause } from 'lucide-react';
+import otherToolsVideo from '@/assets/comparison-other-tools.mp4.asset.json';
+import avatarCloneVideo from '@/assets/comparison-avatarclone.mp4.asset.json';
 
 const ComparisonSection = () => {
   const { ref: headingRef, isVisible: headingVisible } = useScrollReveal();
   const { ref: cardsRef, isVisible: cardsVisible } = useScrollReveal();
+  const otherVideoRef = useRef<HTMLVideoElement>(null);
+  const cloneVideoRef = useRef<HTMLVideoElement>(null);
+  const [otherPlaying, setOtherPlaying] = useState(false);
+  const [clonePlaying, setClonePlaying] = useState(false);
+
+  const toggleOther = () => {
+    if (!otherVideoRef.current) return;
+    if (otherVideoRef.current.paused) { otherVideoRef.current.play(); setOtherPlaying(true); }
+    else { otherVideoRef.current.pause(); setOtherPlaying(false); }
+  };
+
+  const toggleClone = () => {
+    if (!cloneVideoRef.current) return;
+    if (cloneVideoRef.current.paused) { cloneVideoRef.current.play(); setClonePlaying(true); }
+    else { cloneVideoRef.current.pause(); setClonePlaying(false); }
+  };
 
   return (
     <section className="py-20 lg:py-28" aria-label="Avatar comparison" style={{ background: '#F8FAFC' }}>
@@ -34,27 +54,33 @@ const ComparisonSection = () => {
             transform: cardsVisible ? 'translateY(0)' : 'translateY(24px)',
           }}
         >
+          {/* Other Tools Card */}
           <div className="rounded-2xl overflow-hidden" style={{ border: '1px solid #E5E7EB', background: '#FFFFFF' }}>
-            <div className="relative aspect-video" style={{ background: '#1E293B' }}>
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="text-center">
-                  <div
-                    className="w-24 h-24 mx-auto mb-4 rounded-full flex items-center justify-center"
-                    style={{ background: '#334155', border: '2px solid #475569' }}
-                  >
-                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" strokeWidth="1.5">
-                      <circle cx="12" cy="8" r="4" />
-                      <path d="M6 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2" />
-                    </svg>
-                  </div>
-                  <div className="flex items-center justify-center gap-2 mb-2">
-                    <div className="w-8 h-1 rounded-full bg-slate-600 animate-pulse" />
-                    <div className="w-12 h-1 rounded-full bg-slate-600 animate-pulse" style={{ animationDelay: '0.3s' }} />
-                    <div className="w-6 h-1 rounded-full bg-slate-600 animate-pulse" style={{ animationDelay: '0.6s' }} />
-                  </div>
-                  <p className="text-slate-500 text-xs">Static lip sync only</p>
+            <div className="relative aspect-video cursor-pointer group" onClick={toggleOther} style={{ background: '#1E293B' }}>
+              <video
+                ref={otherVideoRef}
+                className="absolute inset-0 w-full h-full object-cover"
+                src={otherToolsVideo.url}
+                playsInline
+                loop
+                muted
+                preload="metadata"
+              />
+              <div
+                className="absolute inset-0 flex items-center justify-center transition-opacity duration-300"
+                style={{ opacity: otherPlaying ? 0 : 1, pointerEvents: otherPlaying ? 'none' : 'auto' }}
+              >
+                <div className="w-14 h-14 bg-gray-700 rounded-full flex items-center justify-center">
+                  <Play className="w-5 h-5 text-white ml-0.5" />
                 </div>
               </div>
+              {otherPlaying && (
+                <div className="absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div className="w-8 h-8 bg-white/70 backdrop-blur-sm rounded-full flex items-center justify-center">
+                    <Pause className="w-3 h-3 text-gray-800" />
+                  </div>
+                </div>
+              )}
             </div>
             <div className="p-5">
               <div className="flex items-center gap-2 mb-2">
@@ -67,42 +93,33 @@ const ComparisonSection = () => {
             </div>
           </div>
 
+          {/* AvatarClone Card */}
           <div className="rounded-2xl overflow-hidden" style={{ border: '2px solid #6366F1', background: '#FFFFFF', boxShadow: '0 8px 40px rgba(99,102,241,0.1)' }}>
-            <div className="relative aspect-video" style={{ background: 'linear-gradient(135deg, #312E81, #4338CA)' }}>
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="text-center">
-                  <div
-                    className="w-24 h-24 mx-auto mb-4 rounded-full flex items-center justify-center relative overflow-hidden"
-                    style={{ background: 'linear-gradient(135deg, #4F46E5, #7C3AED)', border: '2px solid #818CF8' }}
-                  >
-                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#E0E7FF" strokeWidth="1.5">
-                      <circle cx="12" cy="8" r="4" />
-                      <path d="M6 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2" />
-                    </svg>
-                    <div className="absolute -bottom-1 left-1/2 -translate-x-1/2">
-                      <div className="flex gap-0.5">
-                        {[1,2,3,4,5].map(i => (
-                          <div
-                            key={i}
-                            className="w-0.5 bg-indigo-300 rounded-full animate-pulse"
-                            style={{ height: `${8 + Math.random() * 10}px`, animationDelay: `${i * 0.15}s`, animationDuration: '0.8s' }}
-                          />
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-center gap-1 mb-2">
-                    {[1,2,3,4,5,6,7].map(i => (
-                      <div
-                        key={i}
-                        className="w-1 bg-indigo-400 rounded-full animate-pulse"
-                        style={{ height: `${4 + Math.random() * 12}px`, animationDelay: `${i * 0.1}s`, animationDuration: '0.6s' }}
-                      />
-                    ))}
-                  </div>
-                  <p className="text-indigo-200 text-xs">Lifelike expression & voice</p>
+            <div className="relative aspect-video cursor-pointer group" onClick={toggleClone} style={{ background: 'linear-gradient(135deg, #312E81, #4338CA)' }}>
+              <video
+                ref={cloneVideoRef}
+                className="absolute inset-0 w-full h-full object-cover"
+                src={avatarCloneVideo.url}
+                playsInline
+                loop
+                muted
+                preload="metadata"
+              />
+              <div
+                className="absolute inset-0 flex items-center justify-center transition-opacity duration-300"
+                style={{ opacity: clonePlaying ? 0 : 1, pointerEvents: clonePlaying ? 'none' : 'auto' }}
+              >
+                <div className="w-14 h-14 rounded-full flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #4F46E5, #7C3AED)' }}>
+                  <Play className="w-5 h-5 text-white ml-0.5" />
                 </div>
               </div>
+              {clonePlaying && (
+                <div className="absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div className="w-8 h-8 bg-white/70 backdrop-blur-sm rounded-full flex items-center justify-center">
+                    <Pause className="w-3 h-3 text-gray-800" />
+                  </div>
+                </div>
+              )}
             </div>
             <div className="p-5">
               <div className="flex items-center gap-2 mb-2">
