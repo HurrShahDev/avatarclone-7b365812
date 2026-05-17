@@ -536,17 +536,49 @@ const CreateAvatar = () => {
     }
   };
 
-  const handleAudioFileSelect = (file: File) => {
+  const validateAudioFile = async (file: File): Promise<{ ok: boolean; reason?: string; duration?: number }> => {
+    try {
+      const arrayBuf = await file.arrayBuffer();
+      const Ctx = (window.AudioContext || (window as any).webkitAudioContext) as typeof AudioContext;
+      const ctx = new Ctx();
+      const audioBuf = await ctx.decodeAudioData(arrayBuf.slice(0));
+      const channel = audioBuf.getChannelData(0);
+      // Compute RMS and peak
+      let sumSq = 0;
+      let peak = 0;
+      const step = Math.max(1, Math.floor(channel.length / 50000));
+      let count = 0;
+      for (let i = 0; i < channel.length; i += step) {
+        const v = channel[i];
+        sumSq += v * v;
+        if (Math.abs(v) > peak) peak = Math.abs(v);
+        count++;
+      }
+      const rms = Math.sqrt(sumSq / count);
+      ctx.close().catch(() => {});
+      if (audioBuf.duration < 3) return { ok: false, reason: 'Audio is too short. Please upload at least 3 seconds of speech.' };
+      if (peak < 0.02 || rms < 0.005) return { ok: false, reason: 'Audio is too quiet or silent. Please upload a clearly audible recording.' };
+      return { ok: true, duration: Math.round(audioBuf.duration) };
+    } catch {
+      return { ok: false, reason: 'Could not read this audio file. Please upload a valid MP3 or WAV file.' };
+    }
+  };
+
+  const handleAudioFileSelect = async (file: File) => {
     if (!file.type.match(/^audio\/(mpeg|wav|mp3|x-wav|webm)$/)) {
       alert('Please upload an MP3 or WAV file only.');
+      return;
+    }
+    const validation = await validateAudioFile(file);
+    if (!validation.ok) {
+      alert(validation.reason || 'Audio file is not suitable for processing.');
       return;
     }
     const url = URL.createObjectURL(file);
     if (audioUrl) URL.revokeObjectURL(audioUrl);
     setAudioBlob(file);
     setAudioUrl(url);
-    const audio = new Audio(url);
-    audio.onloadedmetadata = () => setAudioDuration(Math.round(audio.duration));
+    setAudioDuration(validation.duration || 0);
   };
 
   const togglePlayback = () => {
