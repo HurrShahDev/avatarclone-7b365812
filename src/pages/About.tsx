@@ -3,8 +3,11 @@ import Footer from '@/components/layout/Footer';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ArrowRight } from 'lucide-react';
+import { useAuth } from '@/hooks/use-auth';
 
 const About = () => {
+  const { user } = useAuth();
+  const ctaHref = user ? '/create' : '/auth?mode=signup';
   return (
     <div className="min-h-screen overflow-x-hidden bg-white">
       <Header />
