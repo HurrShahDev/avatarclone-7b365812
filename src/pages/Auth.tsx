@@ -248,14 +248,15 @@ const Auth = () => {
     e.preventDefault();
     const newErrors: Record<string, string> = {};
 
+    const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
     if (mode === 'signup') {
       if (!signUpData.fullName.trim()) newErrors.fullName = 'Name is required';
-      if (!signUpData.email.includes('@')) newErrors.email = 'Enter a valid email';
+      if (!EMAIL_RE.test(signUpData.email.trim())) newErrors.email = 'Enter a valid email address';
       if (signUpData.password !== signUpData.confirmPassword) newErrors.confirmPassword = 'Passwords do not match';
       if (getPasswordStrength() < 2) newErrors.password = 'Use at least 8 characters with a number and special character';
       if (!signUpData.consent) newErrors.consent = 'Consent is required';
     } else {
-      if (!signInData.email.includes('@')) newErrors.email = 'Enter a valid email';
+      if (!EMAIL_RE.test(signInData.email.trim())) newErrors.email = 'Enter a valid email address';
       if (!signInData.password) newErrors.password = 'Password is required';
     }
 
@@ -443,7 +444,7 @@ const Auth = () => {
                       <input type="checkbox" checked={signInData.rememberMe} onChange={(e) => setSignInData({ ...signInData, rememberMe: e.target.checked })} className="w-4 h-4 rounded border-border" />
                       <span className="text-sm text-muted-foreground">Remember me</span>
                     </label>
-                    <a href="/forgot-password" className="text-sm text-primary hover:underline">Forgot password?</a>
+                    <Link to="/forgot-password" className="text-sm text-primary hover:underline">Forgot password?</Link>
                   </div>
                 )}
 
