@@ -42,7 +42,7 @@ const About = () => {
 
           <div className="mt-12 pt-8 border-t border-gray-100">
             <Button asChild size="lg" className="bg-indigo-600 hover:bg-indigo-700 text-white shadow-md shadow-indigo-200 btn-glow group">
-              <Link to="/auth?mode=signup">
+              <Link to={ctaHref}>
                 Get Started Free
                 <ArrowRight className="w-4 h-4 ml-1 transition-transform group-hover:translate-x-1" />
               </Link>
