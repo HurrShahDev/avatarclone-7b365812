@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useScrollReveal, useStaggerReveal } from '@/hooks/use-scroll-reveal';
+import { useAuth } from '@/hooks/use-auth';
 
 const plans = [
   {
@@ -57,6 +58,8 @@ const plans = [
 const PricingSection = () => {
   const { ref: headingRef, isVisible: headingVisible } = useScrollReveal();
   const { ref: gridRef, isVisible: gridVisible, getDelay } = useStaggerReveal(plans.length);
+  const { user } = useAuth();
+  const ctaHref = user ? '/create' : '/auth?mode=signup';
 
   return (
     <section id="pricing" className="py-20 lg:py-28" aria-label="Pricing" style={{ background: '#F8FAFC' }}>
@@ -133,7 +136,7 @@ const PricingSection = () => {
                     : { borderColor: '#E5E7EB', color: '#374151' }
                 }
               >
-                <Link to="/auth?mode=signup">{plan.cta}</Link>
+                <Link to={ctaHref}>{plan.cta}</Link>
               </Button>
             </div>
           ))}

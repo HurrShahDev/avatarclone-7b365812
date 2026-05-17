@@ -2,12 +2,14 @@ import { Link } from 'react-router-dom';
 import { ArrowRight, Play, Shield, UserCheck, Lock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import HeroAnimation from './HeroAnimation';
-import HeroBackground3D from './HeroBackground3D';
 import { useScrollReveal } from '@/hooks/use-scroll-reveal';
+import { useAuth } from '@/hooks/use-auth';
 
 const HeroSection = () => {
   const { ref: textRef, isVisible: textVisible } = useScrollReveal({ threshold: 0.1, immediate: true });
   const { ref: animRef, isVisible: animVisible } = useScrollReveal({ threshold: 0.1, immediate: true });
+  const { user } = useAuth();
+  const ctaHref = user ? '/create' : '/auth?mode=signup';
 
   return (
     <section
@@ -17,9 +19,6 @@ const HeroSection = () => {
         background: 'linear-gradient(180deg, #F8FAFF 0%, #EEF2FF 20%, #E0E7FF 45%, #C7D2FE 70%, #A5B4FC 90%, #818CF8 100%)',
       }}
     >
-      {/* 3D Background */}
-      <HeroBackground3D />
-
       {/* Subtle decorative elements */}
       <div className="absolute top-20 right-[10%] w-72 h-72 rounded-full opacity-20 blur-3xl pointer-events-none" style={{ background: '#818CF8', zIndex: 2 }} aria-hidden="true" />
       <div className="absolute bottom-10 left-[5%] w-96 h-96 rounded-full opacity-10 blur-3xl pointer-events-none" style={{ background: '#6366F1', zIndex: 2 }} aria-hidden="true" />
@@ -100,7 +99,7 @@ const HeroSection = () => {
                   boxShadow: '0 4px 20px rgba(67, 56, 202, 0.35)',
                 }}
               >
-                <Link to="/auth?mode=signup">
+                <Link to={ctaHref}>
                   Get Started Free
                   <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" aria-hidden="true" />
                 </Link>

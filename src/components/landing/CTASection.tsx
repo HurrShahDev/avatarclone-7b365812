@@ -2,9 +2,12 @@ import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useScrollReveal } from '@/hooks/use-scroll-reveal';
+import { useAuth } from '@/hooks/use-auth';
 
 const CTASection = () => {
   const { ref: textRef, isVisible: textVisible } = useScrollReveal();
+  const { user } = useAuth();
+  const ctaHref = user ? '/create' : '/auth?mode=signup';
 
   return (
     <section
@@ -47,19 +50,19 @@ const CTASection = () => {
                 boxShadow: '0 4px 20px rgba(67, 56, 202, 0.35)',
               }}
             >
-              <Link to="/auth?mode=signup">
+              <Link to={ctaHref}>
                 Get Started Free
                 <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" aria-hidden="true" />
               </Link>
             </Button>
             <Button
+              asChild
               variant="outline"
               size="lg"
               className="min-h-[48px] text-base font-medium"
               style={{ borderColor: '#C7D2FE', color: '#1E293B', background: 'rgba(255,255,255,0.7)' }}
-              onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })}
             >
-              View Pricing
+              <Link to="/pricing">View Pricing</Link>
             </Button>
           </div>
         </div>

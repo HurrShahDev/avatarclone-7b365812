@@ -89,11 +89,80 @@ const CreateAvatar = () => {
     };
   }, []);
 
+  // Validate uploaded image: brightness + face centered
+  const validateUploadedImage = async (file: File): Promise<{ ok: boolean; reason?: string }> => {
+    return new Promise((resolve) => {
+      const url = URL.createObjectURL(file);
+      const img = new Image();
+      img.onload = async () => {
+        const canvas = document.createElement('canvas');
+        const w = (canvas.width = img.naturalWidth);
+        const h = (canvas.height = img.naturalHeight);
+        const ctx = canvas.getContext('2d');
+        if (!ctx) { URL.revokeObjectURL(url); resolve({ ok: true }); return; }
+        ctx.drawImage(img, 0, 0);
+
+        // Brightness
+        const data = ctx.getImageData(0, 0, w, h).data;
+        let total = 0, count = 0;
+        for (let i = 0; i < data.length; i += 48) {
+          total += data[i] * 0.299 + data[i + 1] * 0.587 + data[i + 2] * 0.114;
+          count++;
+        }
+        const avg = total / count;
+        if (avg < 60) { URL.revokeObjectURL(url); resolve({ ok: false, reason: 'Image is too dark. Please upload a well-lit photo.' }); return; }
+        if (avg > 220) { URL.revokeObjectURL(url); resolve({ ok: false, reason: 'Image is overexposed. Please reduce the brightness or use softer lighting.' }); return; }
+
+        // Face centering — try FaceDetector API
+        if (hasFaceDetectorRef.current && faceDetectorRef.current) {
+          try {
+            const faces = await faceDetectorRef.current.detect(canvas);
+            if (!faces || faces.length === 0) { URL.revokeObjectURL(url); resolve({ ok: false, reason: 'No face detected. Please upload a clear front-facing photo of your face.' }); return; }
+            const f = faces[0].boundingBox;
+            const fx = f.x + f.width / 2;
+            const fy = f.y + f.height / 2;
+            const xOff = Math.abs(fx - w / 2) / w;
+            const yOff = Math.abs(fy - h / 2) / h;
+            if (xOff > 0.2 || yOff > 0.2) { URL.revokeObjectURL(url); resolve({ ok: false, reason: 'Your face is not centered. Please crop or retake the photo so your face is in the middle of the frame.' }); return; }
+            URL.revokeObjectURL(url); resolve({ ok: true }); return;
+          } catch { /* fall through */ }
+        }
+
+        // Fallback: variance-based centering heuristic
+        const cw = Math.floor(w * 0.5), ch = Math.floor(h * 0.65);
+        const cx = Math.floor((w - cw) / 2), cy = Math.floor(h * 0.1);
+        const centerData = ctx.getImageData(cx, cy, cw, ch).data;
+        const edgeW = Math.floor(w * 0.15);
+        const leftData = ctx.getImageData(0, 0, edgeW, h).data;
+        const rightData = ctx.getImageData(w - edgeW, 0, edgeW, h).data;
+        const centerVariance = calcVariance(centerData, 8);
+        const edgeVariance = (calcVariance(leftData, 8) + calcVariance(rightData, 8)) / 2;
+        if (centerVariance < 350 || centerVariance < edgeVariance * 1.3) {
+          URL.revokeObjectURL(url);
+          resolve({ ok: false, reason: 'Could not detect a centered face. Please upload a clear, front-facing photo with your face centered.' });
+          return;
+        }
+        URL.revokeObjectURL(url);
+        resolve({ ok: true });
+      };
+      img.onerror = () => { URL.revokeObjectURL(url); resolve({ ok: false, reason: 'Could not read this image file.' }); };
+      img.src = url;
+    });
+  };
+
   // Handle image file selection
-  const handleImageSelect = (file: File) => {
+  const handleImageSelect = async (file: File) => {
     if (!file.type.match(/^image\/(jpeg|png)$/)) {
       alert('Please upload a JPG or PNG image only.');
       return;
+    }
+    // Validate face & brightness (skip for camera captures — already guided)
+    if (file.name !== 'camera-photo.png') {
+      const validation = await validateUploadedImage(file);
+      if (!validation.ok) {
+        alert(validation.reason || 'Please upload a clearer photo.');
+        return;
+      }
     }
     const url = URL.createObjectURL(file);
     const img = new Image();
@@ -467,17 +536,49 @@ const CreateAvatar = () => {
     }
   };
 
-  const handleAudioFileSelect = (file: File) => {
+  const validateAudioFile = async (file: File): Promise<{ ok: boolean; reason?: string; duration?: number }> => {
+    try {
+      const arrayBuf = await file.arrayBuffer();
+      const Ctx = (window.AudioContext || (window as any).webkitAudioContext) as typeof AudioContext;
+      const ctx = new Ctx();
+      const audioBuf = await ctx.decodeAudioData(arrayBuf.slice(0));
+      const channel = audioBuf.getChannelData(0);
+      // Compute RMS and peak
+      let sumSq = 0;
+      let peak = 0;
+      const step = Math.max(1, Math.floor(channel.length / 50000));
+      let count = 0;
+      for (let i = 0; i < channel.length; i += step) {
+        const v = channel[i];
+        sumSq += v * v;
+        if (Math.abs(v) > peak) peak = Math.abs(v);
+        count++;
+      }
+      const rms = Math.sqrt(sumSq / count);
+      ctx.close().catch(() => {});
+      if (audioBuf.duration < 3) return { ok: false, reason: 'Audio is too short. Please upload at least 3 seconds of speech.' };
+      if (peak < 0.02 || rms < 0.005) return { ok: false, reason: 'Audio is too quiet or silent. Please upload a clearly audible recording.' };
+      return { ok: true, duration: Math.round(audioBuf.duration) };
+    } catch {
+      return { ok: false, reason: 'Could not read this audio file. Please upload a valid MP3 or WAV file.' };
+    }
+  };
+
+  const handleAudioFileSelect = async (file: File) => {
     if (!file.type.match(/^audio\/(mpeg|wav|mp3|x-wav|webm)$/)) {
       alert('Please upload an MP3 or WAV file only.');
+      return;
+    }
+    const validation = await validateAudioFile(file);
+    if (!validation.ok) {
+      alert(validation.reason || 'Audio file is not suitable for processing.');
       return;
     }
     const url = URL.createObjectURL(file);
     if (audioUrl) URL.revokeObjectURL(audioUrl);
     setAudioBlob(file);
     setAudioUrl(url);
-    const audio = new Audio(url);
-    audio.onloadedmetadata = () => setAudioDuration(Math.round(audio.duration));
+    setAudioDuration(validation.duration || 0);
   };
 
   const togglePlayback = () => {
@@ -882,7 +983,7 @@ const CreateAvatar = () => {
       {/* Header */}
       <header className="border-b border-border bg-background sticky top-0 z-40">
         <div className="container mx-auto px-4 py-3 flex items-center justify-between">
-          <Link to="/home" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
+          <Link to="/" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
             <ArrowLeft className="w-4 h-4" />
             <span className="hidden sm:inline">Back</span>
           </Link>
