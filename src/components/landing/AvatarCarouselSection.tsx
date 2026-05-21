@@ -136,7 +136,7 @@ const AvatarCarouselSection = () => {
   }, [animate]);
 
   return (
-    <section className="py-20 lg:py-28 overflow-hidden" aria-label="AI Avatar gallery" style={{ background: '#FFFFFF' }}>
+    <section className="py-20 lg:py-28 overflow-hidden" aria-label="AI Avatar gallery" style={{ background: 'linear-gradient(135deg, #7f5ef4, #6d4fe0)' }}>
       <div className="container mx-auto px-4 lg:px-8 mb-12">
         <div
           ref={headingRef}
