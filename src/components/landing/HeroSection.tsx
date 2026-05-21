@@ -13,7 +13,7 @@ const HeroSection = () => {
 
   return (
     <section
-      className="relative overflow-hidden pt-28 pb-20 lg:pt-36 lg:pb-28"
+      className="relative overflow-hidden pt-24 pb-14 lg:pt-28 lg:pb-16"
       aria-label="Hero"
       style={{
         background: 'linear-gradient(180deg, #F8FAFF 0%, #EEF2FF 20%, #E0E7FF 45%, #C7D2FE 70%, #A5B4FC 90%, #818CF8 100%)',
