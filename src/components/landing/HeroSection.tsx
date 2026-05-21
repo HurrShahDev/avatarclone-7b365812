@@ -71,7 +71,7 @@ const HeroSection = () => {
             </h1>
 
             <p
-              className="text-lg mb-10 max-w-lg leading-relaxed transition-all duration-700"
+              className="text-lg mb-7 max-w-lg leading-relaxed transition-all duration-700"
               style={{
                 color: '#475569',
                 opacity: textVisible ? 1 : 0,
