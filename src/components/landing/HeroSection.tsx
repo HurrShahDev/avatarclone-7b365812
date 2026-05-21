@@ -34,7 +34,7 @@ const HeroSection = () => {
             }}
           >
             <div
-              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full mb-8 text-sm font-medium transition-all duration-500"
+              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full mb-5 text-sm font-medium transition-all duration-500"
               style={{
                 background: 'rgba(255,255,255,0.85)',
                 border: '1px solid #C7D2FE',
