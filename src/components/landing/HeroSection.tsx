@@ -156,7 +156,7 @@ const HeroSection = () => {
             }}
             aria-hidden="true"
           >
-            <div className="w-full max-w-lg aspect-square">
+            <div className="w-full max-w-sm lg:max-w-md aspect-square">
               <HeroAnimation />
             </div>
           </div>
