@@ -83,7 +83,7 @@ const HeroSection = () => {
             </p>
 
             <div
-              className="flex flex-col sm:flex-row gap-3 mb-10 transition-all duration-700"
+              className="flex flex-col sm:flex-row gap-3 mb-6 transition-all duration-700"
               style={{
                 opacity: textVisible ? 1 : 0,
                 transform: textVisible ? 'translateY(0)' : 'translateY(16px)',
