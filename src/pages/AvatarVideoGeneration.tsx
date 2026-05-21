@@ -51,7 +51,7 @@ const AvatarVideoGeneration = () => {
                   </Link>
                 </Button>
                 <Button variant="outline" size="lg" asChild>
-                  <Link to="/home">Learn More</Link>
+                  <Link to="/">Learn More</Link>
                 </Button>
               </div>
             </div>
