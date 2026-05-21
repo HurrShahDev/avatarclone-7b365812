@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { Play } from 'lucide-react';
 import avatar1img from '@/assets/carousel-avatar-1.jpg';
 import avatar2img from '@/assets/carousel-avatar-2.jpg';
 import avatar3img from '@/assets/carousel-avatar-3.jpg';
