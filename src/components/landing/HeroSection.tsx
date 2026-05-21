@@ -48,7 +48,7 @@ const HeroSection = () => {
             </div>
 
             <h1
-              className="text-4xl sm:text-5xl lg:text-[3.5rem] font-extrabold leading-[1.1] mb-6 transition-all duration-700"
+              className="text-4xl sm:text-5xl lg:text-[3.25rem] font-extrabold leading-[1.1] mb-4 transition-all duration-700"
               style={{
                 opacity: textVisible ? 1 : 0,
                 transform: textVisible ? 'translateY(0)' : 'translateY(16px)',
