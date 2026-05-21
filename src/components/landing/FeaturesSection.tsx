@@ -44,7 +44,7 @@ const FeaturesSection = () => {
   const { ref: gridRef, isVisible: gridVisible, getDelay } = useStaggerReveal(features.length);
 
   return (
-    <section id="features" className="py-20 lg:py-28 relative" aria-label="Platform features" style={{ background: '#F8FAFC' }}>
+    <section id="features" className="py-20 lg:py-28 relative" aria-label="Platform features" style={{ background: 'linear-gradient(135deg, #DBEAFE, #BAE6FD)' }}>
       <div className="container mx-auto px-4 lg:px-8">
         <div
           ref={headingRef}
