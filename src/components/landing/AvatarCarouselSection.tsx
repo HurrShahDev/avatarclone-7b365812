@@ -82,6 +82,19 @@ const AvatarCard = ({ avatar }: { avatar: typeof avatars[0] }) => {
           <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/60 to-transparent p-4 pt-10">
             <span className="text-sm font-medium text-white">{avatar.name}</span>
           </div>
+          {!hovered && (
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none" aria-hidden="true">
+              <div
+                className="w-14 h-14 rounded-full flex items-center justify-center backdrop-blur-sm transition-transform duration-300"
+                style={{
+                  background: 'rgba(255,255,255,0.9)',
+                  boxShadow: '0 6px 24px rgba(67,56,202,0.35)',
+                }}
+              >
+                <Play className="w-5 h-5 ml-0.5" style={{ color: '#4338CA', fill: '#4338CA' }} />
+              </div>
+            </div>
+          )}
           {hovered && (
             <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent flex flex-col items-center justify-end pb-4 animate-fade-in pointer-events-none">
               <div className="flex items-end gap-[3px] h-5 mb-1" aria-hidden="true">
