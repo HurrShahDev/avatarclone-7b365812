@@ -24,7 +24,7 @@ const HeroSection = () => {
       <div className="absolute bottom-10 left-[5%] w-96 h-96 rounded-full opacity-10 blur-3xl pointer-events-none" style={{ background: '#6366F1', zIndex: 2 }} aria-hidden="true" />
 
       <div className="container mx-auto px-4 lg:px-8 relative z-10">
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+        <div className="grid lg:grid-cols-2 gap-8 lg:gap-10 items-center">
           <div
             ref={textRef}
             className="text-left transition-all duration-700 ease-out"
