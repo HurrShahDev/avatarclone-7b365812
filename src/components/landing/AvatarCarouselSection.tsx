@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { Play } from 'lucide-react';
 import avatar1img from '@/assets/carousel-avatar-1.jpg';
 import avatar2img from '@/assets/carousel-avatar-2.jpg';
 import avatar3img from '@/assets/carousel-avatar-3.jpg';
@@ -81,6 +82,19 @@ const AvatarCard = ({ avatar }: { avatar: typeof avatars[0] }) => {
           <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/60 to-transparent p-4 pt-10">
             <span className="text-sm font-medium text-white">{avatar.name}</span>
           </div>
+          {!hovered && (
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none" aria-hidden="true">
+              <div
+                className="w-14 h-14 rounded-full flex items-center justify-center backdrop-blur-sm transition-transform duration-300"
+                style={{
+                  background: 'rgba(255,255,255,0.9)',
+                  boxShadow: '0 6px 24px rgba(67,56,202,0.35)',
+                }}
+              >
+                <Play className="w-5 h-5 ml-0.5" style={{ color: '#4338CA', fill: '#4338CA' }} />
+              </div>
+            </div>
+          )}
           {hovered && (
             <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent flex flex-col items-center justify-end pb-4 animate-fade-in pointer-events-none">
               <div className="flex items-end gap-[3px] h-5 mb-1" aria-hidden="true">
@@ -136,7 +150,7 @@ const AvatarCarouselSection = () => {
   }, [animate]);
 
   return (
-    <section className="py-20 lg:py-28 overflow-hidden" aria-label="AI Avatar gallery" style={{ background: 'linear-gradient(135deg, #7f5ef4, #6d4fe0)' }}>
+    <section className="py-20 lg:py-28 overflow-hidden" aria-label="AI Avatar gallery" style={{ background: 'linear-gradient(135deg, #312E81 0%, #4338CA 55%, #6366F1 100%)' }}>
       <div className="container mx-auto px-4 lg:px-8 mb-12">
         <div
           ref={headingRef}

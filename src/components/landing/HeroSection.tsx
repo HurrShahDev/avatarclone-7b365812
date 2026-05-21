@@ -13,7 +13,7 @@ const HeroSection = () => {
 
   return (
     <section
-      className="relative overflow-hidden pt-28 pb-20 lg:pt-36 lg:pb-28"
+      className="relative overflow-hidden pt-24 pb-14 lg:pt-28 lg:pb-16"
       aria-label="Hero"
       style={{
         background: 'linear-gradient(180deg, #F8FAFF 0%, #EEF2FF 20%, #E0E7FF 45%, #C7D2FE 70%, #A5B4FC 90%, #818CF8 100%)',
@@ -24,7 +24,7 @@ const HeroSection = () => {
       <div className="absolute bottom-10 left-[5%] w-96 h-96 rounded-full opacity-10 blur-3xl pointer-events-none" style={{ background: '#6366F1', zIndex: 2 }} aria-hidden="true" />
 
       <div className="container mx-auto px-4 lg:px-8 relative z-10">
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+        <div className="grid lg:grid-cols-2 gap-8 lg:gap-10 items-center">
           <div
             ref={textRef}
             className="text-left transition-all duration-700 ease-out"
@@ -34,7 +34,7 @@ const HeroSection = () => {
             }}
           >
             <div
-              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full mb-8 text-sm font-medium transition-all duration-500"
+              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full mb-5 text-sm font-medium transition-all duration-500"
               style={{
                 background: 'rgba(255,255,255,0.85)',
                 border: '1px solid #C7D2FE',
@@ -48,7 +48,7 @@ const HeroSection = () => {
             </div>
 
             <h1
-              className="text-4xl sm:text-5xl lg:text-[3.5rem] font-extrabold leading-[1.1] mb-6 transition-all duration-700"
+              className="text-4xl sm:text-5xl lg:text-[3.25rem] font-extrabold leading-[1.1] mb-4 transition-all duration-700"
               style={{
                 opacity: textVisible ? 1 : 0,
                 transform: textVisible ? 'translateY(0)' : 'translateY(16px)',
@@ -71,7 +71,7 @@ const HeroSection = () => {
             </h1>
 
             <p
-              className="text-lg mb-10 max-w-lg leading-relaxed transition-all duration-700"
+              className="text-lg mb-7 max-w-lg leading-relaxed transition-all duration-700"
               style={{
                 color: '#475569',
                 opacity: textVisible ? 1 : 0,
@@ -83,7 +83,7 @@ const HeroSection = () => {
             </p>
 
             <div
-              className="flex flex-col sm:flex-row gap-3 mb-10 transition-all duration-700"
+              className="flex flex-col sm:flex-row gap-3 mb-6 transition-all duration-700"
               style={{
                 opacity: textVisible ? 1 : 0,
                 transform: textVisible ? 'translateY(0)' : 'translateY(16px)',
@@ -156,7 +156,7 @@ const HeroSection = () => {
             }}
             aria-hidden="true"
           >
-            <div className="w-full max-w-lg aspect-square">
+            <div className="w-full max-w-sm lg:max-w-md aspect-square">
               <HeroAnimation />
             </div>
           </div>
