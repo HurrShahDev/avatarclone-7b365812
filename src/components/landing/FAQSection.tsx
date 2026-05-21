@@ -42,7 +42,7 @@ const FAQSection = () => {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   return (
-    <section className="py-20 lg:py-28" aria-label="Frequently asked questions" style={{ background: '#4B43D3' }}>
+    <section className="py-20 lg:py-28" aria-label="Frequently asked questions" style={{ background: 'linear-gradient(180deg, #F8FAFF 0%, #EEF2FF 100%)' }}>
       <div className="container mx-auto px-4 lg:px-8">
         <div
           ref={ref}
