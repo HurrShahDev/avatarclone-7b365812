@@ -52,11 +52,11 @@ const FAQSection = () => {
             transform: isVisible ? 'translateY(0)' : 'translateY(20px)',
           }}
         >
-          <p className="text-sm font-semibold mb-3 tracking-wide uppercase" style={{ color: '#C7D2FE' }}>FAQ</p>
-          <h2 className="text-2xl lg:text-4xl font-bold mb-4" style={{ color: '#FFFFFF' }}>
+          <p className="text-sm font-semibold mb-3 tracking-wide uppercase" style={{ color: '#4F46E5' }}>FAQ</p>
+          <h2 className="text-2xl lg:text-4xl font-bold mb-4" style={{ color: '#0F172A' }}>
             Frequently Asked Questions
           </h2>
-          <p className="text-base leading-relaxed" style={{ color: 'rgba(255,255,255,0.85)' }}>
+          <p className="text-base leading-relaxed" style={{ color: '#475569' }}>
             Everything you need to know about creating your AI avatar.
           </p>
         </div>
