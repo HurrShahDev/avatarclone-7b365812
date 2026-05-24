@@ -181,6 +181,8 @@ const CreateAvatar = () => {
     setImagePreview(url);
     // Persist to IndexedDB so backend can use it later
     try { await savePhoto(file, file.name, file.type); } catch (e) { console.warn('savePhoto failed', e); }
+  };
+
 
   const handleImageDrop = (e: React.DragEvent) => {
     e.preventDefault();
