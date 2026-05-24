@@ -488,6 +488,8 @@ const CreateAvatar = () => {
         setAudioBlob(blob);
         setAudioUrl(url);
         setAudioDuration(recordingDuration);
+        // Persist voice for backend
+        saveVoice(blob, 'voice-recording.webm', 'audio/webm', recordingDuration).catch(e => console.warn('saveVoice failed', e));
         stream.getTracks().forEach(track => track.stop());
         if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
         if (audioContextRef.current) {
