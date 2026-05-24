@@ -2,10 +2,12 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import {
   ArrowLeft, ArrowRight, Upload, Mic, Camera, Check, Play, Square,
-  Info, X, Pause, AlertTriangle, RefreshCw, SwitchCamera, Sparkles
+  Info, X, Pause, AlertTriangle, RefreshCw, SwitchCamera, Sparkles,
+  Download, Share2, Loader2, Database, Send, Film
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import avatarPreview from '@/assets/avatar-preview.jpg';
+import { savePhoto, saveVoice, saveMeta, getAvatarAsset, sendAvatarToBackend, clearAvatarAsset } from '@/lib/avatarStorage';
 
 const steps = [
   { id: 1, name: 'Info' },
