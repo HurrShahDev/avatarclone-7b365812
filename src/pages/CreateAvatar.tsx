@@ -91,6 +91,37 @@ const CreateAvatar = () => {
     };
   }, []);
 
+  // Persist form metadata to IndexedDB whenever it changes
+  useEffect(() => {
+    saveMeta({
+      name: formData.name,
+      description: formData.description,
+      language: formData.language,
+      privacy: formData.privacy as 'private' | 'public' | 'unlisted',
+      consent: formData.consent,
+    }).catch(() => {});
+  }, [formData]);
+
+  // Generation state for Step 4
+  const [genStatus, setGenStatus] = useState<'idle' | 'sending' | 'processing' | 'ready' | 'error'>('idle');
+  const [genProgress, setGenProgress] = useState(0);
+  const [genError, setGenError] = useState<string | null>(null);
+  const [generatedVideoUrl, setGeneratedVideoUrl] = useState<string | null>(null);
+  const [storageInfo, setStorageInfo] = useState<{ photo: boolean; voice: boolean; sizeKB: number }>({
+    photo: false, voice: false, sizeKB: 0,
+  });
+
+  // Refresh storage info whenever we land on the Generate step
+  useEffect(() => {
+    if (currentStep !== 4) return;
+    getAvatarAsset().then(a => {
+      if (!a) { setStorageInfo({ photo: false, voice: false, sizeKB: 0 }); return; }
+      const sizeKB = Math.round(((a.photo?.size ?? 0) + (a.voice?.size ?? 0)) / 1024);
+      setStorageInfo({ photo: !!a.photo, voice: !!a.voice, sizeKB });
+    });
+  }, [currentStep]);
+
+
   // Validate uploaded image: brightness + face centered
   const validateUploadedImage = async (file: File): Promise<{ ok: boolean; reason?: string }> => {
     return new Promise((resolve) => {
