@@ -973,39 +973,199 @@ const CreateAvatar = () => {
   );
 
   // ─── Step 4: Generate ───
-  const renderGenerateStep = () => (
-    <div className="max-w-4xl mx-auto animate-fade-in">
-      <div className="grid lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 card-simple p-5">
-          <div className="aspect-video rounded-lg bg-muted flex items-center justify-center mb-4 overflow-hidden relative">
-            <img src={avatarPreview} alt="Avatar Preview" className="w-full h-full object-cover" />
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="w-16 h-16 rounded-full bg-primary/80 flex items-center justify-center">
-                <Play className="w-6 h-6 text-primary-foreground ml-1" />
-              </div>
-            </div>
-          </div>
-          <div className="flex items-center gap-3 mb-4">
-            <Button variant="ghost" size="icon"><Play className="w-4 h-4" /></Button>
-            <div className="flex-1 h-1.5 rounded-full bg-muted">
-              <div className="h-full w-1/3 rounded-full bg-primary" />
-            </div>
-            <span className="text-xs text-muted-foreground">0:08 / 0:24</span>
-          </div>
+  const handleGenerate = async () => {
+    setGenError(null);
+    setGenStatus('sending');
+    setGenProgress(5);
+
+    const apiUrl = (import.meta as any).env?.VITE_BACKEND_API_URL as string | undefined;
+
+    // If no backend yet → run a realistic local simulation so the FYP demo works.
+    if (!apiUrl) {
+      const steps = [
+        { p: 25, label: 'uploading' },
+        { p: 55, label: 'processing' as const },
+        { p: 80, label: 'processing' as const },
+        { p: 100, label: 'ready' as const },
+      ];
+      for (const s of steps) {
+        await new Promise(r => setTimeout(r, 900));
+        setGenProgress(s.p);
+        if (s.label === 'processing') setGenStatus('processing');
+        if (s.label === 'ready') {
+          // Use the captured photo as a stand-in preview poster until backend returns a real video.
+          const a = await getAvatarAsset();
+          if (a?.photo) setGeneratedVideoUrl(URL.createObjectURL(a.photo));
+          setGenStatus('ready');
+        }
+      }
+      return;
+    }
+
+    // Real backend call
+    try {
+      setGenStatus('processing');
+      setGenProgress(40);
+      const res = await sendAvatarToBackend(apiUrl);
+      setGenProgress(100);
+      if (res?.video_url) setGeneratedVideoUrl(res.video_url);
+      setGenStatus('ready');
+    } catch (e: any) {
+      setGenError(e?.message ?? 'Failed to send to backend');
+      setGenStatus('error');
+    }
+  };
+
+  const renderGenerateStep = () => {
+    const ready = genStatus === 'ready';
+    const busy = genStatus === 'sending' || genStatus === 'processing';
+    return (
+      <div className="max-w-5xl mx-auto animate-fade-in">
+        <div className="text-center mb-6">
+          <h2 className="text-xl font-semibold mb-1">Your AI Video</h2>
+          <p className="text-sm text-muted-foreground">
+            We'll combine your photo and voice into a lifelike, lip-synced clone.
+          </p>
         </div>
-        <div className="space-y-4">
-          <div className="card-simple p-4">
-            <h3 className="font-medium mb-3 text-sm">Export</h3>
-            <Button className="w-full mb-2">Generate Video</Button>
-            <div className="grid grid-cols-2 gap-2">
-              <Button variant="outline" size="sm">720p</Button>
-              <Button variant="outline" size="sm">1080p</Button>
+
+        <div className="grid lg:grid-cols-3 gap-6">
+          {/* Video preview */}
+          <div className="lg:col-span-2 card-simple p-5">
+            <div className="aspect-video rounded-lg overflow-hidden relative bg-gradient-to-br from-indigo-900 via-purple-900 to-slate-900 flex items-center justify-center">
+              {ready && generatedVideoUrl ? (
+                generatedVideoUrl.endsWith('.mp4') ? (
+                  <video src={generatedVideoUrl} controls className="w-full h-full object-cover" />
+                ) : (
+                  <img src={generatedVideoUrl} alt="Generated avatar" className="w-full h-full object-cover" />
+                )
+              ) : (
+                <>
+                  <img
+                    src={imagePreview ?? avatarPreview}
+                    alt="Avatar preview"
+                    className={`w-full h-full object-cover ${busy ? 'opacity-40 blur-sm' : 'opacity-60'}`}
+                  />
+                  <div className="absolute inset-0 flex flex-col items-center justify-center text-white">
+                    {busy ? (
+                      <>
+                        <Loader2 className="w-12 h-12 animate-spin mb-3" />
+                        <p className="text-sm font-medium">
+                          {genStatus === 'sending' ? 'Uploading your assets…' : 'Generating your avatar…'}
+                        </p>
+                        <p className="text-xs opacity-80 mt-1">This usually takes 30–60 seconds</p>
+                      </>
+                    ) : genStatus === 'error' ? (
+                      <>
+                        <AlertTriangle className="w-12 h-12 mb-3 text-red-300" />
+                        <p className="text-sm font-medium">{genError}</p>
+                      </>
+                    ) : (
+                      <>
+                        <Film className="w-12 h-12 mb-3 opacity-80" />
+                        <p className="text-sm font-medium">Ready to generate</p>
+                        <p className="text-xs opacity-80 mt-1">Click "Generate Video" to start</p>
+                      </>
+                    )}
+                  </div>
+                </>
+              )}
+            </div>
+
+            {/* Progress */}
+            {busy && (
+              <div className="mt-4">
+                <div className="h-1.5 rounded-full bg-muted overflow-hidden">
+                  <div className="h-full bg-primary transition-all duration-500" style={{ width: `${genProgress}%` }} />
+                </div>
+                <p className="text-xs text-muted-foreground mt-1.5 text-center">{genProgress}%</p>
+              </div>
+            )}
+
+            {ready && (
+              <div className="mt-4 flex flex-wrap gap-2">
+                <Button variant="outline" size="sm" disabled={!generatedVideoUrl} asChild>
+                  <a href={generatedVideoUrl ?? '#'} download="avatar-video.mp4">
+                    <Download className="w-4 h-4 mr-1" /> Download
+                  </a>
+                </Button>
+                <Button variant="outline" size="sm" onClick={() => navigator.clipboard?.writeText(generatedVideoUrl ?? '')}>
+                  <Share2 className="w-4 h-4 mr-1" /> Copy link
+                </Button>
+                <Button variant="ghost" size="sm" onClick={() => { setGenStatus('idle'); setGenProgress(0); setGeneratedVideoUrl(null); }}>
+                  <RefreshCw className="w-4 h-4 mr-1" /> Regenerate
+                </Button>
+              </div>
+            )}
+          </div>
+
+          {/* Sidebar */}
+          <div className="space-y-4">
+            {/* Storage status */}
+            <div className="card-simple p-4">
+              <h3 className="font-medium mb-2 text-sm flex items-center gap-1.5">
+                <Database className="w-4 h-4 text-primary" /> Stored locally
+              </h3>
+              <ul className="text-xs space-y-1.5">
+                <li className="flex items-center justify-between">
+                  <span className="text-muted-foreground">Photo</span>
+                  <span className={storageInfo.photo ? 'text-accent font-medium flex items-center gap-1' : 'text-destructive'}>
+                    {storageInfo.photo ? <><Check className="w-3 h-3" /> Saved</> : 'Missing'}
+                  </span>
+                </li>
+                <li className="flex items-center justify-between">
+                  <span className="text-muted-foreground">Voice</span>
+                  <span className={storageInfo.voice ? 'text-accent font-medium flex items-center gap-1' : 'text-destructive'}>
+                    {storageInfo.voice ? <><Check className="w-3 h-3" /> Saved</> : 'Missing'}
+                  </span>
+                </li>
+                <li className="flex items-center justify-between">
+                  <span className="text-muted-foreground">Total size</span>
+                  <span className="font-medium">{storageInfo.sizeKB} KB</span>
+                </li>
+              </ul>
+              <p className="text-[10px] text-muted-foreground mt-2 leading-relaxed">
+                Held in your browser's IndexedDB (<code>avatarclone-assets</code>) — survives reloads, ready to POST to your backend.
+              </p>
+            </div>
+
+            {/* Generate */}
+            <div className="card-simple p-4">
+              <h3 className="font-medium mb-3 text-sm">Generate</h3>
+              <Button
+                className="w-full mb-2"
+                onClick={handleGenerate}
+                disabled={busy || !storageInfo.photo || !storageInfo.voice}
+              >
+                {busy ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Working…</> : <><Send className="w-4 h-4 mr-2" /> Generate Video</>}
+              </Button>
+              <div className="grid grid-cols-2 gap-2">
+                <Button variant="outline" size="sm" disabled>720p</Button>
+                <Button variant="outline" size="sm" disabled>1080p</Button>
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="w-full mt-2 text-xs text-muted-foreground"
+                onClick={async () => { await clearAvatarAsset(); setStorageInfo({ photo: false, voice: false, sizeKB: 0 }); setGeneratedVideoUrl(null); setGenStatus('idle'); }}
+              >
+                Clear stored data
+              </Button>
+            </div>
+
+            {/* Backend integration note */}
+            <div className="card-simple p-4 border-primary/30 bg-primary/5">
+              <h3 className="font-medium mb-1 text-sm">Backend hookup</h3>
+              <p className="text-[11px] text-muted-foreground leading-relaxed">
+                Set <code className="text-foreground">VITE_BACKEND_API_URL</code> in your env. The app will POST{' '}
+                <code className="text-foreground">multipart/form-data</code> with <code>photo</code>, <code>voice</code> and a JSON <code>meta</code> field to that URL and expect <code>{`{ video_url }`}</code> back.
+              </p>
             </div>
           </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  };
+
 
   const renderStepContent = () => {
     switch (currentStep) {
