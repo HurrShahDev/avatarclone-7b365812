@@ -99,6 +99,7 @@ const CreateAvatar = () => {
     saveMeta({
       name: formData.name,
       description: formData.description,
+      script: formData.script,
       language: formData.language,
       privacy: formData.privacy as 'private' | 'public' | 'unlisted',
       consent: formData.consent,
