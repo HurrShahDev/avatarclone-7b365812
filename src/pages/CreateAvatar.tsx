@@ -36,6 +36,7 @@ const CreateAvatar = () => {
   const [formData, setFormData] = useState({
     name: '',
     description: '',
+    script: 'Hello! This is my AI-generated avatar speaking.',
     language: 'en',
     privacy: 'private',
     consent: false,
