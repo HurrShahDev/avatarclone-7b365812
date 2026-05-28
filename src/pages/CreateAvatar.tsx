@@ -6,6 +6,8 @@ import {
   Download, Share2, Loader2, Database, Send, Film
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import Header from '@/components/layout/Header';
+import { toast } from 'sonner';
 import avatarPreview from '@/assets/avatar-preview.jpg';
 import { savePhoto, saveVoice, saveMeta, getAvatarAsset, sendAvatarToBackend, clearAvatarAsset } from '@/lib/avatarStorage';
 
@@ -34,6 +36,7 @@ const CreateAvatar = () => {
   const [formData, setFormData] = useState({
     name: '',
     description: '',
+    script: 'Hello! This is my AI-generated avatar speaking.',
     language: 'en',
     privacy: 'private',
     consent: false,
@@ -96,6 +99,7 @@ const CreateAvatar = () => {
     saveMeta({
       name: formData.name,
       description: formData.description,
+      script: formData.script,
       language: formData.language,
       privacy: formData.privacy as 'private' | 'public' | 'unlisted',
       consent: formData.consent,
@@ -211,7 +215,10 @@ const CreateAvatar = () => {
     setUploadedImage(file);
     setImagePreview(url);
     // Persist to IndexedDB so backend can use it later
-    try { await savePhoto(file, file.name, file.type); } catch (e) { console.warn('savePhoto failed', e); }
+    try {
+      await savePhoto(file, file.name, file.type);
+      toast.success('Photo uploaded & validated', { description: 'Saved — ready for video generation.' });
+    } catch (e) { console.warn('savePhoto failed', e); }
   };
 
 
@@ -520,7 +527,9 @@ const CreateAvatar = () => {
         setAudioUrl(url);
         setAudioDuration(recordingDuration);
         // Persist voice for backend
-        saveVoice(blob, 'voice-recording.webm', 'audio/webm', recordingDuration).catch(e => console.warn('saveVoice failed', e));
+        saveVoice(blob, 'voice-recording.webm', 'audio/webm', recordingDuration)
+          .then(() => toast.success('Voice recorded & saved', { description: 'Audible & ready for cloning.' }))
+          .catch(e => console.warn('saveVoice failed', e));
         stream.getTracks().forEach(track => track.stop());
         if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
         if (audioContextRef.current) {
@@ -617,7 +626,10 @@ const CreateAvatar = () => {
     setAudioBlob(file);
     setAudioUrl(url);
     setAudioDuration(validation.duration || 0);
-    try { await saveVoice(file, file.name, file.type, validation.duration); } catch (e) { console.warn('saveVoice failed', e); }
+    try {
+      await saveVoice(file, file.name, file.type, validation.duration);
+      toast.success('Voice uploaded & validated', { description: 'Saved — ready for cloning.' });
+    } catch (e) { console.warn('saveVoice failed', e); }
   };
 
   const togglePlayback = () => {
@@ -677,12 +689,14 @@ const CreateAvatar = () => {
         />
       </div>
       <div>
-        <label className="block text-sm font-medium mb-1.5">Script</label>
+        <label className="block text-sm font-medium mb-1.5">Script <span className="text-xs text-muted-foreground font-normal">— what your avatar will say</span></label>
         <textarea
-          placeholder="Enter text for your avatar to speak..."
-          className="input-field min-h-[100px] resize-none"
-          defaultValue="Hello! This is my AI-generated avatar speaking."
+          placeholder="Enter the text your avatar will speak..."
+          className="input-field min-h-[120px] resize-none"
+          value={formData.script}
+          onChange={(e) => setFormData({ ...formData, script: e.target.value })}
         />
+        <p className="text-[11px] text-muted-foreground mt-1.5">Saved with your avatar — the cloned voice will speak this text.</p>
       </div>
     </div>
   );
@@ -1071,6 +1085,13 @@ const CreateAvatar = () => {
               )}
             </div>
 
+            {/* Generated-for caption */}
+            {ready && formData.name && (
+              <p className="text-center text-sm mt-3 text-foreground">
+                Video Generated for <span className="font-semibold text-primary">"{formData.name}"</span>
+              </p>
+            )}
+
             {/* Progress */}
             {busy && (
               <div className="mt-4">
@@ -1124,7 +1145,7 @@ const CreateAvatar = () => {
                 </li>
               </ul>
               <p className="text-[10px] text-muted-foreground mt-2 leading-relaxed">
-                Held in your browser's IndexedDB (<code>avatarclone-assets</code>) — survives reloads, ready to POST to your backend.
+                Your photo, voice and script are securely held in your browser ready for processing.
               </p>
             </div>
 
@@ -1151,15 +1172,6 @@ const CreateAvatar = () => {
                 Clear stored data
               </Button>
             </div>
-
-            {/* Backend integration note */}
-            <div className="card-simple p-4 border-primary/30 bg-primary/5">
-              <h3 className="font-medium mb-1 text-sm">Backend hookup</h3>
-              <p className="text-[11px] text-muted-foreground leading-relaxed">
-                Set <code className="text-foreground">VITE_BACKEND_API_URL</code> in your env. The app will POST{' '}
-                <code className="text-foreground">multipart/form-data</code> with <code>photo</code>, <code>voice</code> and a JSON <code>meta</code> field to that URL and expect <code>{`{ video_url }`}</code> back.
-              </p>
-            </div>
           </div>
         </div>
       </div>
@@ -1179,19 +1191,22 @@ const CreateAvatar = () => {
 
   return (
     <div className="min-h-screen flex flex-col" style={{ background: 'linear-gradient(180deg, #F8FAFF 0%, #EEF2FF 40%, #E0E7FF 100%)' }}>
-      {/* Header */}
-      <header className="border-b border-border bg-background sticky top-0 z-40">
-        <div className="container mx-auto px-4 py-3 flex items-center justify-between">
+      {/* Main site header */}
+      <Header />
+
+      {/* Sub bar: Back / Save Draft / Cancel */}
+      <div className="pt-16 border-b border-white/40 bg-white/40 backdrop-blur-sm">
+        <div className="container mx-auto px-4 py-2.5 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
             <ArrowLeft className="w-4 h-4" />
-            <span className="hidden sm:inline">Back</span>
+            <span className="hidden sm:inline">Back to home</span>
           </Link>
           <div className="flex gap-2">
             <Button variant="ghost" size="sm">Save Draft</Button>
-            <Button variant="outline" size="sm">Cancel</Button>
+            <Button variant="outline" size="sm" asChild><Link to="/">Cancel</Link></Button>
           </div>
         </div>
-      </header>
+      </div>
 
       {/* Stepper */}
       <div className="border-b border-border bg-muted/30">

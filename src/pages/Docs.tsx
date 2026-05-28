@@ -28,27 +28,19 @@ AvatarClone is an AI-powered platform that creates realistic digital avatars usi
       `},
       { id: 'quick-start', title: 'Quick Start Guide', content: `
 **Step 1: Create an Account**
-Sign up with your email or GitHub account. You'll need to consent to our data processing terms.
+Sign up with your email or Google account. You'll need to consent to our data processing terms.
 
-**Step 2: Upload Your Photo**
-Upload a clear headshot photo. Best results come from:
-- Front-facing photos with good lighting
-- Neutral expression
-- Plain background
-- Resolution of at least 512x512 pixels
+**Step 2: Add Your Info & Script**
+Name your avatar, add an optional description, and write the script your cloned voice will speak.
 
-**Step 3: Record Your Voice**
-Record 30-60 seconds of your natural speech. Tips:
-- Use a quiet environment
-- Speak at your normal pace
-- Read the provided sample sentences
-- Keep consistent volume
+**Step 3: Upload Your Photo**
+Upload (or capture with your camera) a clear, well-lit, front-facing headshot. The app validates brightness and face centering automatically.
 
-**Step 4: Train Your Model**
-Click "Train" and wait 5-10 minutes for your model to be ready.
+**Step 4: Record or Upload Your Voice**
+Record 30–60 seconds of natural speech, or upload an existing MP3/WAV. The app checks that your audio is audible.
 
-**Step 5: Generate Videos**
-Enter any script and generate videos with your avatar speaking the text.
+**Step 5: Generate Your Video**
+On the Generate step, your photo, voice and script are bundled and sent to the AI pipeline. Your finished video appears in the preview within ~30–60 seconds.
       `},
       { id: 'system-requirements', title: 'System Requirements', content: `
 **Browser Support:**
@@ -231,22 +223,20 @@ After training, you'll see a similarity percentage:
     icon: Shield,
     articles: [
       { id: 'data-protection', title: 'Data Protection', content: `
-**How We Protect Your Data:**
-- End-to-end encryption for all uploads
-- Data stored in SOC 2 compliant facilities
-- Regular security audits
+**How We Handle Your Data:**
+- Your photo and voice are stored securely and used only to generate your avatar
 - No third-party data sharing
+- You stay in control of your assets at all times
 
-**Your Rights (GDPR):**
+**Your Rights:**
 - Access: Download all your data anytime
 - Rectification: Update your information
-- Erasure: Delete your account and all data
+- Erasure: Delete your account and all associated data
 - Portability: Export data in standard formats
 
 **Data Retention:**
 - Active accounts: Data retained while account is active
 - Deleted accounts: Data purged within 30 days
-- Backups: Encrypted and purged within 90 days
       `},
       { id: 'consent-policy', title: 'Consent Policy', content: `
 **Why We Require Consent:**
