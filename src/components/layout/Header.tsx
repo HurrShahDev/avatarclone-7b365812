@@ -39,20 +39,22 @@ const Header = () => {
   return (
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled ? 'shadow-sm border-b border-gray-200/60' : 'border-b border-transparent'
+        isScrolled ? 'shadow-sm border-b border-white/30 bg-white/70 backdrop-blur-md' : 'border-b border-transparent bg-transparent'
       }`}
-      style={{
-        backgroundColor: isScrolled ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.6)',
-        backdropFilter: 'blur(12px)',
-        WebkitBackdropFilter: 'blur(12px)',
-      }}
       role="banner"
     >
       <div className="container mx-auto px-4 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          <Link to="/" className="flex items-center gap-2.5" aria-label="AvatarClone home">
-            <img src={logoIcon} alt="" className="h-9 w-auto" aria-hidden="true" />
-            <span className="font-bold text-lg tracking-tight" style={{ color: '#1E293B' }}>
+          <Link to="/" className="flex items-center gap-2.5 group" aria-label="AvatarClone home">
+            <span
+              aria-hidden="true"
+              className="relative h-9 w-9 rounded-xl flex items-center justify-center text-white font-extrabold text-[15px] tracking-tight shadow-lg shadow-indigo-500/30 ring-1 ring-white/30 transition-transform group-hover:scale-105"
+              style={{ background: 'linear-gradient(135deg, #4338CA 0%, #6366F1 50%, #7C3AED 100%)' }}
+            >
+              AC
+              <span className="absolute -bottom-1 -right-1 h-2.5 w-2.5 rounded-full bg-cyan-400 ring-2 ring-white" />
+            </span>
+            <span className="font-bold text-lg tracking-tight" style={{ color: '#0F172A' }}>
               Avatar<span style={{ color: '#4F46E5' }}>Clone</span>
             </span>
           </Link>
