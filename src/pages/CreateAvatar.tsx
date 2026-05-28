@@ -1085,6 +1085,13 @@ const CreateAvatar = () => {
               )}
             </div>
 
+            {/* Generated-for caption */}
+            {ready && formData.name && (
+              <p className="text-center text-sm mt-3 text-foreground">
+                Video Generated for <span className="font-semibold text-primary">"{formData.name}"</span>
+              </p>
+            )}
+
             {/* Progress */}
             {busy && (
               <div className="mt-4">
