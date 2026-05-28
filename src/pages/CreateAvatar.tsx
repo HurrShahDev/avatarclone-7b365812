@@ -6,6 +6,8 @@ import {
   Download, Share2, Loader2, Database, Send, Film
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import Header from '@/components/layout/Header';
+import { toast } from 'sonner';
 import avatarPreview from '@/assets/avatar-preview.jpg';
 import { savePhoto, saveVoice, saveMeta, getAvatarAsset, sendAvatarToBackend, clearAvatarAsset } from '@/lib/avatarStorage';
 
