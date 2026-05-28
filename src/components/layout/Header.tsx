@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Menu, X, LogOut, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import logoIcon from '@/assets/logo-icon.png';
+
 import { useAuth } from '@/hooks/use-auth';
 
 const Header = () => {
