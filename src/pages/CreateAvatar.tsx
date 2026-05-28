@@ -1145,7 +1145,7 @@ const CreateAvatar = () => {
                 </li>
               </ul>
               <p className="text-[10px] text-muted-foreground mt-2 leading-relaxed">
-                Held in your browser's IndexedDB (<code>avatarclone-assets</code>) — survives reloads, ready to POST to your backend.
+                Your photo, voice and script are securely held in your browser ready for processing.
               </p>
             </div>
 
@@ -1171,15 +1171,6 @@ const CreateAvatar = () => {
               >
                 Clear stored data
               </Button>
-            </div>
-
-            {/* Backend integration note */}
-            <div className="card-simple p-4 border-primary/30 bg-primary/5">
-              <h3 className="font-medium mb-1 text-sm">Backend hookup</h3>
-              <p className="text-[11px] text-muted-foreground leading-relaxed">
-                Set <code className="text-foreground">VITE_BACKEND_API_URL</code> in your env. The app will POST{' '}
-                <code className="text-foreground">multipart/form-data</code> with <code>photo</code>, <code>voice</code> and a JSON <code>meta</code> field to that URL and expect <code>{`{ video_url }`}</code> back.
-              </p>
             </div>
           </div>
         </div>
