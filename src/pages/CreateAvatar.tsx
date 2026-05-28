@@ -689,12 +689,14 @@ const CreateAvatar = () => {
         />
       </div>
       <div>
-        <label className="block text-sm font-medium mb-1.5">Script</label>
+        <label className="block text-sm font-medium mb-1.5">Script <span className="text-xs text-muted-foreground font-normal">— what your avatar will say</span></label>
         <textarea
-          placeholder="Enter text for your avatar to speak..."
-          className="input-field min-h-[100px] resize-none"
-          defaultValue="Hello! This is my AI-generated avatar speaking."
+          placeholder="Enter the text your avatar will speak..."
+          className="input-field min-h-[120px] resize-none"
+          value={formData.script}
+          onChange={(e) => setFormData({ ...formData, script: e.target.value })}
         />
+        <p className="text-[11px] text-muted-foreground mt-1.5">Saved with your avatar — the cloned voice will speak this text.</p>
       </div>
     </div>
   );
