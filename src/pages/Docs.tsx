@@ -223,22 +223,20 @@ After training, you'll see a similarity percentage:
     icon: Shield,
     articles: [
       { id: 'data-protection', title: 'Data Protection', content: `
-**How We Protect Your Data:**
-- End-to-end encryption for all uploads
-- Data stored in SOC 2 compliant facilities
-- Regular security audits
+**How We Handle Your Data:**
+- Your photo and voice are stored securely and used only to generate your avatar
 - No third-party data sharing
+- You stay in control of your assets at all times
 
-**Your Rights (GDPR):**
+**Your Rights:**
 - Access: Download all your data anytime
 - Rectification: Update your information
-- Erasure: Delete your account and all data
+- Erasure: Delete your account and all associated data
 - Portability: Export data in standard formats
 
 **Data Retention:**
 - Active accounts: Data retained while account is active
 - Deleted accounts: Data purged within 30 days
-- Backups: Encrypted and purged within 90 days
       `},
       { id: 'consent-policy', title: 'Consent Policy', content: `
 **Why We Require Consent:**
