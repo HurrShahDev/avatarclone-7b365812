@@ -150,7 +150,7 @@ const AvatarCarouselSection = () => {
   }, [animate]);
 
   return (
-    <section className="py-20 lg:py-28 overflow-hidden" aria-label="AI Avatar gallery" style={{ background: 'linear-gradient(135deg, #312E81 0%, #4338CA 55%, #6366F1 100%)' }}>
+    <section className="py-20 lg:py-28 overflow-hidden" aria-label="AI Avatar gallery" style={{ background: 'linear-gradient(135deg, #EEF2FF 0%, #E0E7FF 50%, #DDD6FE 100%)' }}>
       <div className="container mx-auto px-4 lg:px-8 mb-12">
         <div
           ref={headingRef}
@@ -160,11 +160,11 @@ const AvatarCarouselSection = () => {
             transform: headingVisible ? 'translateY(0)' : 'translateY(20px)',
           }}
         >
-          <p className="text-sm font-semibold mb-3 tracking-wide uppercase" style={{ color: '#E0E7FF' }}>Sample Preview</p>
-          <h2 className="text-2xl lg:text-4xl font-bold mb-4" style={{ color: '#FFFFFF' }}>
+          <p className="text-sm font-semibold mb-3 tracking-wide uppercase" style={{ color: '#4F46E5' }}>Sample Preview</p>
+          <h2 className="text-2xl lg:text-4xl font-bold mb-4" style={{ color: '#0F172A' }}>
             Your AI Avatar in Action
           </h2>
-          <p className="text-base leading-relaxed" style={{ color: 'rgba(255,255,255,0.85)' }}>
+          <p className="text-base leading-relaxed" style={{ color: '#475569' }}>
             View sample videos showcasing how your real avatar can deliver messages naturally.
           </p>
         </div>
