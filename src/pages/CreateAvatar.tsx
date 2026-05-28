@@ -626,7 +626,10 @@ const CreateAvatar = () => {
     setAudioBlob(file);
     setAudioUrl(url);
     setAudioDuration(validation.duration || 0);
-    try { await saveVoice(file, file.name, file.type, validation.duration); } catch (e) { console.warn('saveVoice failed', e); }
+    try {
+      await saveVoice(file, file.name, file.type, validation.duration);
+      toast.success('Voice uploaded & validated', { description: 'Saved — ready for cloning.' });
+    } catch (e) { console.warn('saveVoice failed', e); }
   };
 
   const togglePlayback = () => {
