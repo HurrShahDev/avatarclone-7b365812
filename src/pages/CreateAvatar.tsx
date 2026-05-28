@@ -215,7 +215,10 @@ const CreateAvatar = () => {
     setUploadedImage(file);
     setImagePreview(url);
     // Persist to IndexedDB so backend can use it later
-    try { await savePhoto(file, file.name, file.type); } catch (e) { console.warn('savePhoto failed', e); }
+    try {
+      await savePhoto(file, file.name, file.type);
+      toast.success('Photo uploaded & validated', { description: 'Saved — ready for video generation.' });
+    } catch (e) { console.warn('savePhoto failed', e); }
   };
 
 
