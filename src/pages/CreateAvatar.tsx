@@ -212,13 +212,11 @@ const CreateAvatar = () => {
       alert('Please upload a JPG or PNG image only.');
       return;
     }
-    // Validate face & brightness (skip for camera captures — already guided)
-    if (file.name !== 'camera-photo.png') {
-      const validation = await validateUploadedImage(file);
-      if (!validation.ok) {
-        alert(validation.reason || 'Please upload a clearer photo.');
-        return;
-      }
+    // Always validate face & brightness (including camera captures)
+    const validation = await validateUploadedImage(file);
+    if (!validation.ok) {
+      alert(validation.reason || 'Please upload a clearer photo.');
+      return;
     }
     const url = URL.createObjectURL(file);
     const img = new Image();
@@ -334,9 +332,13 @@ const CreateAvatar = () => {
     const rightData = ctx.getImageData(w - edgeW, 0, edgeW, h).data;
     const edgeVariance = (calcVariance(leftData, 8) + calcVariance(rightData, 8)) / 2;
 
-    // Face present in center: center has significantly more detail than edges
-    // AND center variance must exceed an absolute minimum (a face is complex)
-    const rawCentered = centerVariance > 400 && centerVariance > edgeVariance * 1.5;
+    // Face present in center: strong skin-tone signal in center AND visual complexity
+    // AND skin in center is meaningfully higher than at edges
+    const centerSkin = skinRatio(centerData);
+    const leftSkin = skinRatio(leftData);
+    const rightSkin = skinRatio(rightData);
+    const edgeSkin = (leftSkin + rightSkin) / 2;
+    const rawCentered = centerSkin > 0.10 && centerSkin > edgeSkin * 1.4 && centerVariance > 400;
 
     // Also try FaceDetector API (async, updates on next cycle)
     if (hasFaceDetectorRef.current && faceDetectorRef.current) {
