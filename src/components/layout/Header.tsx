@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Menu, X, LogOut, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import logoImg from '@/assets/logo.png';
 
 import { useAuth } from '@/hooks/use-auth';
 
@@ -48,11 +49,9 @@ const Header = () => {
           <Link to="/" className="flex items-center gap-2.5 group" aria-label="AvatarClone home">
             <span
               aria-hidden="true"
-              className="relative h-9 w-9 rounded-xl flex items-center justify-center text-white font-extrabold text-[15px] tracking-tight shadow-lg shadow-indigo-500/30 ring-1 ring-white/30 transition-transform group-hover:scale-105"
-              style={{ background: 'linear-gradient(135deg, #4338CA 0%, #6366F1 50%, #7C3AED 100%)' }}
+              className="relative h-10 w-10 rounded-xl flex items-center justify-center bg-white shadow-md ring-1 ring-indigo-100 transition-transform group-hover:scale-105 overflow-hidden"
             >
-              AC
-              <span className="absolute -bottom-1 -right-1 h-2.5 w-2.5 rounded-full bg-cyan-400 ring-2 ring-white" />
+              <img src={logoImg} alt="" className="h-9 w-9 object-contain" />
             </span>
             <span className="font-bold text-lg tracking-tight" style={{ color: '#0F172A' }}>
               Avatar<span style={{ color: '#4F46E5' }}>Clone</span>
@@ -64,8 +63,14 @@ const Header = () => {
           </nav>
 
           <div className="hidden md:flex items-center gap-2">
+            <Link to="/docs">
+              <Button variant="ghost" size="sm" className="text-gray-700 hover:text-gray-900 font-medium">Docs</Button>
+            </Link>
+            <Link to="/pricing">
+              <Button variant="ghost" size="sm" className="text-gray-700 hover:text-gray-900 font-medium">Pricing</Button>
+            </Link>
             {user ? (
-              <div ref={profileRef} className="relative">
+              <div ref={profileRef} className="relative ml-1">
                 <button
                   onClick={() => setShowProfileMenu(!showProfileMenu)}
                   className="flex items-center gap-2 px-2 py-1 rounded-lg hover:bg-gray-100 transition-colors"
@@ -99,12 +104,6 @@ const Header = () => {
               </div>
             ) : (
               <>
-                <Link to="/docs">
-                  <Button variant="ghost" size="sm" className="text-gray-500 hover:text-gray-800 font-medium">Docs</Button>
-                </Link>
-                <Link to="/pricing">
-                  <Button variant="ghost" size="sm" className="text-gray-700 hover:text-gray-900 font-medium">Pricing</Button>
-                </Link>
                 <Link to="/auth" aria-label="Sign in to your account">
                   <Button variant="ghost" size="sm" className="text-gray-700 hover:text-gray-900 font-medium">Sign In</Button>
                 </Link>

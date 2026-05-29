@@ -126,7 +126,21 @@ const CreateAvatar = () => {
   }, [currentStep]);
 
 
-  // Validate uploaded image: brightness + face centered
+  // Count ratio of skin-tone pixels in a region (YCbCr heuristic)
+  const skinRatio = (data: Uint8ClampedArray) => {
+    let skin = 0, total = 0;
+    for (let i = 0; i < data.length; i += 16) {
+      const r = data[i], g = data[i + 1], b = data[i + 2];
+      const y = 0.299 * r + 0.587 * g + 0.114 * b;
+      const cb = 128 - 0.168736 * r - 0.331264 * g + 0.5 * b;
+      const cr = 128 + 0.5 * r - 0.418688 * g - 0.081312 * b;
+      if (y > 40 && cb >= 77 && cb <= 127 && cr >= 133 && cr <= 173) skin++;
+      total++;
+    }
+    return total === 0 ? 0 : skin / total;
+  };
+
+  // Validate uploaded/captured image: brightness + face presence + centering
   const validateUploadedImage = async (file: File): Promise<{ ok: boolean; reason?: string }> => {
     return new Promise((resolve) => {
       const url = URL.createObjectURL(file);
@@ -150,7 +164,7 @@ const CreateAvatar = () => {
         if (avg < 60) { URL.revokeObjectURL(url); resolve({ ok: false, reason: 'Image is too dark. Please upload a well-lit photo.' }); return; }
         if (avg > 220) { URL.revokeObjectURL(url); resolve({ ok: false, reason: 'Image is overexposed. Please reduce the brightness or use softer lighting.' }); return; }
 
-        // Face centering — try FaceDetector API
+        // Try FaceDetector API first
         if (hasFaceDetectorRef.current && faceDetectorRef.current) {
           try {
             const faces = await faceDetectorRef.current.detect(canvas);
@@ -160,26 +174,31 @@ const CreateAvatar = () => {
             const fy = f.y + f.height / 2;
             const xOff = Math.abs(fx - w / 2) / w;
             const yOff = Math.abs(fy - h / 2) / h;
-            if (xOff > 0.2 || yOff > 0.2) { URL.revokeObjectURL(url); resolve({ ok: false, reason: 'Your face is not centered. Please crop or retake the photo so your face is in the middle of the frame.' }); return; }
+            if (xOff > 0.2 || yOff > 0.25) { URL.revokeObjectURL(url); resolve({ ok: false, reason: 'Your face is not centered. Please crop or retake the photo so your face is in the middle of the frame.' }); return; }
             URL.revokeObjectURL(url); resolve({ ok: true }); return;
           } catch { /* fall through */ }
         }
 
-        // Fallback: variance-based centering heuristic
-        const cw = Math.floor(w * 0.5), ch = Math.floor(h * 0.65);
+        // Fallback: skin-tone + variance in center region
+        const cw = Math.floor(w * 0.5), ch = Math.floor(h * 0.6);
         const cx = Math.floor((w - cw) / 2), cy = Math.floor(h * 0.1);
         const centerData = ctx.getImageData(cx, cy, cw, ch).data;
         const edgeW = Math.floor(w * 0.15);
         const leftData = ctx.getImageData(0, 0, edgeW, h).data;
         const rightData = ctx.getImageData(w - edgeW, 0, edgeW, h).data;
+
+        const centerSkin = skinRatio(centerData);
+        const edgeSkin = (skinRatio(leftData) + skinRatio(rightData)) / 2;
         const centerVariance = calcVariance(centerData, 8);
-        const edgeVariance = (calcVariance(leftData, 8) + calcVariance(rightData, 8)) / 2;
-        if (centerVariance < 350 || centerVariance < edgeVariance * 1.3) {
-          URL.revokeObjectURL(url);
-          resolve({ ok: false, reason: 'Could not detect a centered face. Please upload a clear, front-facing photo with your face centered.' });
+
+        // Face present: enough skin pixels in center, more than at edges, and visual complexity
+        const faceLikely = centerSkin > 0.08 && centerSkin > edgeSkin * 1.4 && centerVariance > 300;
+
+        URL.revokeObjectURL(url);
+        if (!faceLikely) {
+          resolve({ ok: false, reason: 'No clearly centered face detected. Please upload a clear, front-facing photo with your face centered in the frame.' });
           return;
         }
-        URL.revokeObjectURL(url);
         resolve({ ok: true });
       };
       img.onerror = () => { URL.revokeObjectURL(url); resolve({ ok: false, reason: 'Could not read this image file.' }); };
@@ -193,13 +212,11 @@ const CreateAvatar = () => {
       alert('Please upload a JPG or PNG image only.');
       return;
     }
-    // Validate face & brightness (skip for camera captures — already guided)
-    if (file.name !== 'camera-photo.png') {
-      const validation = await validateUploadedImage(file);
-      if (!validation.ok) {
-        alert(validation.reason || 'Please upload a clearer photo.');
-        return;
-      }
+    // Always validate face & brightness (including camera captures)
+    const validation = await validateUploadedImage(file);
+    if (!validation.ok) {
+      alert(validation.reason || 'Please upload a clearer photo.');
+      return;
     }
     const url = URL.createObjectURL(file);
     const img = new Image();
@@ -315,9 +332,13 @@ const CreateAvatar = () => {
     const rightData = ctx.getImageData(w - edgeW, 0, edgeW, h).data;
     const edgeVariance = (calcVariance(leftData, 8) + calcVariance(rightData, 8)) / 2;
 
-    // Face present in center: center has significantly more detail than edges
-    // AND center variance must exceed an absolute minimum (a face is complex)
-    const rawCentered = centerVariance > 400 && centerVariance > edgeVariance * 1.5;
+    // Face present in center: strong skin-tone signal in center AND visual complexity
+    // AND skin in center is meaningfully higher than at edges
+    const centerSkin = skinRatio(centerData);
+    const leftSkin = skinRatio(leftData);
+    const rightSkin = skinRatio(rightData);
+    const edgeSkin = (leftSkin + rightSkin) / 2;
+    const rawCentered = centerSkin > 0.10 && centerSkin > edgeSkin * 1.4 && centerVariance > 400;
 
     // Also try FaceDetector API (async, updates on next cycle)
     if (hasFaceDetectorRef.current && faceDetectorRef.current) {
