@@ -46,17 +46,13 @@ const Header = () => {
     >
       <div className="container mx-auto px-4 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          <Link to="/" className="flex items-center gap-2.5 group" aria-label="AvatarClone home">
-            <span
-              aria-hidden="true"
-              className="relative h-10 w-10 rounded-xl flex items-center justify-center bg-white shadow-md ring-1 ring-indigo-100 transition-transform group-hover:scale-105 overflow-hidden"
-            >
-              <img src={logoImg} alt="" className="h-9 w-9 object-contain" />
-            </span>
+          <Link to="/" className="flex items-center gap-2 group" aria-label="AvatarClone home">
+            <img src={logoImg} alt="" aria-hidden="true" className="h-10 w-10 object-contain transition-transform group-hover:scale-105" />
             <span className="font-bold text-lg tracking-tight" style={{ color: '#0F172A' }}>
               Avatar<span style={{ color: '#4F46E5' }}>Clone</span>
             </span>
           </Link>
+
 
           <nav className="hidden md:flex items-center gap-1" aria-label="Main navigation">
             {/* Empty for non-logged-in, could add nav links */}
