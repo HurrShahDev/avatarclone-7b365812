@@ -46,10 +46,23 @@ const Header = () => {
     >
       <div className="container mx-auto px-4 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          <Link to="/" className="flex items-center gap-2 group" aria-label="AvatarClone home">
-            <img src={logoImg} alt="" aria-hidden="true" className="h-10 w-10 object-contain transition-transform group-hover:scale-105" />
-            <span className="font-bold text-lg tracking-tight" style={{ color: '#0F172A' }}>
-              Avatar<span style={{ color: '#4F46E5' }}>Clone</span>
+          <Link to="/" className="flex items-center gap-2.5 group" aria-label="AvatarClone home">
+            <span
+              className="relative inline-flex items-center justify-center h-10 w-10 rounded-xl transition-all duration-300 group-hover:scale-105"
+              style={{
+                background: 'linear-gradient(135deg, #EEF2FF 0%, #E0E7FF 100%)',
+                boxShadow: '0 4px 14px rgba(99,102,241,0.25), inset 0 0 0 1px rgba(99,102,241,0.18)',
+              }}
+            >
+              <span
+                aria-hidden="true"
+                className="absolute -inset-px rounded-xl opacity-60 blur-sm transition-opacity duration-300 group-hover:opacity-90"
+                style={{ background: 'linear-gradient(135deg, rgba(99,102,241,0.45), rgba(124,58,237,0.35))' }}
+              />
+              <img src={logoImg} alt="" aria-hidden="true" className="relative h-7 w-7 object-contain drop-shadow-sm" />
+            </span>
+            <span className="font-bold text-lg tracking-tight leading-none" style={{ color: '#0F172A' }}>
+              Avatar<span style={{ background: 'linear-gradient(90deg, #4F46E5, #7C3AED)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Clone</span>
             </span>
           </Link>
 
