@@ -162,7 +162,7 @@ const OrbitingLine = ({ cardRef }: { cardRef: React.RefObject<HTMLDivElement> })
   return (
     <canvas
       ref={canvasRef}
-      className="absolute pointer-events-none z-30"
+      className="absolute pointer-events-none z-30 hidden lg:block"
       style={{ left: -20, top: -20 }}
     />
   );
