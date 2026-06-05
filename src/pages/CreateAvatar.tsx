@@ -1008,6 +1008,30 @@ const CreateAvatar = () => {
   );
 
   // ─── Step 4: Generate ───
+  const downloadVideo = async (url: string, filename: string) => {
+    try {
+      // Blob URLs (from binary backend responses) can be linked directly.
+      if (url.startsWith('blob:')) {
+        const a = document.createElement('a');
+        a.href = url; a.download = filename;
+        document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        return;
+      }
+      // Cross-origin URLs: fetch as blob so the download attribute is honored.
+      const res = await fetch(url, { mode: 'cors' });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const blob = await res.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = blobUrl; a.download = filename;
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
+    } catch (e) {
+      // Fallback: open in new tab so the user can save manually.
+      window.open(url, '_blank', 'noopener,noreferrer');
+    }
+  };
+
   const handleGenerate = async () => {
     setGenError(null);
     setGenStatus('sending');
