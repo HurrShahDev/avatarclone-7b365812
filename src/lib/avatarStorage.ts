@@ -128,7 +128,27 @@ export async function sendAvatarToBackend(apiUrl: string, extraHeaders: Record<s
 
   const res = await fetch(apiUrl, { method: 'POST', body: fd, headers: extraHeaders });
   if (!res.ok) throw new Error(`Backend returned ${res.status}: ${await res.text()}`);
-  return res.json().catch(() => ({}));
+
+  // Backend can return EITHER JSON ({ video_url: "..." }) OR a raw video/* binary stream.
+  const contentType = res.headers.get('content-type')?.toLowerCase() ?? '';
+
+  if (contentType.includes('application/json')) {
+    return res.json().catch(() => ({}));
+  }
+
+  if (contentType.startsWith('video/') || contentType.includes('octet-stream')) {
+    const blob = await res.blob();
+    const blobUrl = URL.createObjectURL(blob);
+    return { video_url: blobUrl, isBlob: true };
+  }
+
+  // Unknown content-type: try JSON first, otherwise treat as blob.
+  try {
+    return await res.json();
+  } catch {
+    const blob = await res.blob();
+    return { video_url: URL.createObjectURL(blob), isBlob: true };
+  }
 }
 
 /** Helper for debugging: dump current storage info to the console. */
