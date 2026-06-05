@@ -1008,6 +1008,30 @@ const CreateAvatar = () => {
   );
 
   // ─── Step 4: Generate ───
+  const downloadVideo = async (url: string, filename: string) => {
+    try {
+      // Blob URLs (from binary backend responses) can be linked directly.
+      if (url.startsWith('blob:')) {
+        const a = document.createElement('a');
+        a.href = url; a.download = filename;
+        document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        return;
+      }
+      // Cross-origin URLs: fetch as blob so the download attribute is honored.
+      const res = await fetch(url, { mode: 'cors' });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const blob = await res.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = blobUrl; a.download = filename;
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
+    } catch (e) {
+      // Fallback: open in new tab so the user can save manually.
+      window.open(url, '_blank', 'noopener,noreferrer');
+    }
+  };
+
   const handleGenerate = async () => {
     setGenError(null);
     setGenStatus('sending');
@@ -1068,11 +1092,12 @@ const CreateAvatar = () => {
           <div className="lg:col-span-2 card-simple p-5">
             <div className="aspect-video rounded-lg overflow-hidden relative bg-gradient-to-br from-indigo-900 via-purple-900 to-slate-900 flex items-center justify-center">
               {ready && generatedVideoUrl ? (
-                generatedVideoUrl.endsWith('.mp4') ? (
-                  <video src={generatedVideoUrl} controls className="w-full h-full object-cover" />
-                ) : (
-                  <img src={generatedVideoUrl} alt="Generated avatar" className="w-full h-full object-cover" />
-                )
+                <video
+                  src={generatedVideoUrl}
+                  controls
+                  playsInline
+                  className="w-full h-full object-contain bg-black"
+                />
               ) : (
                 <>
                   <img
@@ -1125,15 +1150,21 @@ const CreateAvatar = () => {
 
             {ready && (
               <div className="mt-4 flex flex-wrap gap-2">
-                <Button variant="outline" size="sm" disabled={!generatedVideoUrl} asChild>
-                  <a href={generatedVideoUrl ?? '#'} download="avatar-video.mp4">
-                    <Download className="w-4 h-4 mr-1" /> Download
-                  </a>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={!generatedVideoUrl}
+                  onClick={() => generatedVideoUrl && downloadVideo(generatedVideoUrl, 'avatar-video.mp4')}
+                >
+                  <Download className="w-4 h-4 mr-1" /> Download
                 </Button>
                 <Button variant="outline" size="sm" onClick={() => navigator.clipboard?.writeText(generatedVideoUrl ?? '')}>
                   <Share2 className="w-4 h-4 mr-1" /> Copy link
                 </Button>
-                <Button variant="ghost" size="sm" onClick={() => { setGenStatus('idle'); setGenProgress(0); setGeneratedVideoUrl(null); }}>
+                <Button variant="ghost" size="sm" onClick={() => {
+                  if (generatedVideoUrl?.startsWith('blob:')) URL.revokeObjectURL(generatedVideoUrl);
+                  setGenStatus('idle'); setGenProgress(0); setGeneratedVideoUrl(null);
+                }}>
                   <RefreshCw className="w-4 h-4 mr-1" /> Regenerate
                 </Button>
               </div>
