@@ -1126,15 +1126,21 @@ const CreateAvatar = () => {
 
             {ready && (
               <div className="mt-4 flex flex-wrap gap-2">
-                <Button variant="outline" size="sm" disabled={!generatedVideoUrl} asChild>
-                  <a href={generatedVideoUrl ?? '#'} download="avatar-video.mp4">
-                    <Download className="w-4 h-4 mr-1" /> Download
-                  </a>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={!generatedVideoUrl}
+                  onClick={() => generatedVideoUrl && downloadVideo(generatedVideoUrl, 'avatar-video.mp4')}
+                >
+                  <Download className="w-4 h-4 mr-1" /> Download
                 </Button>
                 <Button variant="outline" size="sm" onClick={() => navigator.clipboard?.writeText(generatedVideoUrl ?? '')}>
                   <Share2 className="w-4 h-4 mr-1" /> Copy link
                 </Button>
-                <Button variant="ghost" size="sm" onClick={() => { setGenStatus('idle'); setGenProgress(0); setGeneratedVideoUrl(null); }}>
+                <Button variant="ghost" size="sm" onClick={() => {
+                  if (generatedVideoUrl?.startsWith('blob:')) URL.revokeObjectURL(generatedVideoUrl);
+                  setGenStatus('idle'); setGenProgress(0); setGeneratedVideoUrl(null);
+                }}>
                   <RefreshCw className="w-4 h-4 mr-1" /> Regenerate
                 </Button>
               </div>
