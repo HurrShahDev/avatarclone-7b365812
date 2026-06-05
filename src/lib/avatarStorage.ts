@@ -11,8 +11,8 @@
  *
  * How to send to your backend (when ready):
  *   import { getAvatarAsset, sendAvatarToBackend } from '@/lib/avatarStorage';
- *   const res = await sendAvatarToBackend('https://api.your-backend.com/avatars');
- *   // → backend receives multipart/form-data with `photo`, `voice`, `meta`
+ *   const res = await sendAvatarToBackend('http://localhost:8000/generate');
+ *   // → backend receives multipart/form-data with `face_file`, `ref_audio_file`, `text`, `user_id`
  */
 
 const DB_NAME = 'avatarclone-assets';
@@ -95,30 +95,37 @@ export async function clearAvatarAsset() {
 }
 
 /**
- * POST the stored avatar to a backend endpoint as multipart/form-data.
+ * POST the stored avatar to the backend /generate endpoint as multipart/form-data.
  *
- * Backend will receive form fields:
- *   - photo  (File)  — JPG / PNG of the user's face
- *   - voice  (File)  — WebM / MP3 / WAV of the user's voice
- *   - meta   (JSON string) — { name, description, language, script, ... }
+ * Backend receives:
+ *   - face_file      (File)    — JPG / PNG of the user's face
+ *   - ref_audio_file (File)    — WebM / MP3 / WAV of the user's voice
+ *   - text           (string)  — Avatar script text
+ *   - user_id        (string)  — Firebase UID or 'anonymous'
  *
- * Example FastAPI signature:
- *   @app.post("/avatars")
- *   async def create_avatar(photo: UploadFile, voice: UploadFile, meta: str = Form(...)):
- *       ...
- *
- * Example Express + multer signature:
- *   app.post('/avatars', upload.fields([{name:'photo'}, {name:'voice'}]), (req, res) => { ... })
+ * FastAPI backend signature:
+ *   @app.post("/generate")
+ *   async def generate_from_text(
+ *       text: str = Form(...),
+ *       user_id: str = Form("anonymous"),
+ *       face_file: UploadFile = File(...),
+ *       ref_audio_file: UploadFile = File(...),
+ *   ):
  */
 export async function sendAvatarToBackend(apiUrl: string, extraHeaders: Record<string, string> = {}) {
   const asset = await getAvatarAsset();
   if (!asset?.photo || !asset?.voice) {
     throw new Error('Missing photo or voice. Complete the upload steps first.');
   }
+
   const fd = new FormData();
-  fd.append('photo', new File([asset.photo], asset.photoName ?? 'photo.png', { type: asset.photoType }));
-  fd.append('voice', new File([asset.voice], asset.voiceName ?? 'voice.webm', { type: asset.voiceType }));
-  fd.append('meta', JSON.stringify(asset.meta ?? {}));
+
+  // ✅ Correct field names matching FastAPI /generate endpoint
+  fd.append('face_file', new File([asset.photo], asset.photoName ?? 'photo.png', { type: asset.photoType }));
+  fd.append('ref_audio_file', new File([asset.voice], asset.voiceName ?? 'voice.webm', { type: asset.voiceType }));
+  fd.append('text', asset.meta?.script ?? '');
+  fd.append('user_id', asset.meta?.name ?? 'anonymous');
+
   const res = await fetch(apiUrl, { method: 'POST', body: fd, headers: extraHeaders });
   if (!res.ok) throw new Error(`Backend returned ${res.status}: ${await res.text()}`);
   return res.json().catch(() => ({}));

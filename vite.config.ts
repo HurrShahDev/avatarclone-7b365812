@@ -9,12 +9,16 @@ export default defineConfig(() => ({
 
     proxy: {
       "/__l5e": {
-        target: "https://id-preview--38758152-3020-413a-a96c-9abee3a54eb9.lovable.app",
-        changeOrigin: true,
-      },
-    },
+    target: "https://id-preview--38758152-3020-413a-a96c-9abee3a54eb9.lovable.app",
+    changeOrigin: true,
   },
-
+  "/generate": {
+    target: "http://localhost:8000",
+    changeOrigin: true,
+  },
+},
+  },
+  
   plugins: [react()],
 
   resolve: {
