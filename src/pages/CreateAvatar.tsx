@@ -1068,11 +1068,12 @@ const CreateAvatar = () => {
           <div className="lg:col-span-2 card-simple p-5">
             <div className="aspect-video rounded-lg overflow-hidden relative bg-gradient-to-br from-indigo-900 via-purple-900 to-slate-900 flex items-center justify-center">
               {ready && generatedVideoUrl ? (
-                generatedVideoUrl.endsWith('.mp4') ? (
-                  <video src={generatedVideoUrl} controls className="w-full h-full object-cover" />
-                ) : (
-                  <img src={generatedVideoUrl} alt="Generated avatar" className="w-full h-full object-cover" />
-                )
+                <video
+                  src={generatedVideoUrl}
+                  controls
+                  playsInline
+                  className="w-full h-full object-contain bg-black"
+                />
               ) : (
                 <>
                   <img
