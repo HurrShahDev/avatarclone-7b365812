@@ -1074,6 +1074,7 @@ const CreateAvatar = () => {
       setGenProgress(100);
       if (res?.video_url) setGeneratedVideoUrl(res.video_url);
       setGenStatus('ready');
+      if (user && formData.name?.trim()) trackAvatar(user.uid, formData.name.trim());
     } catch (e: any) {
       setGenError(e?.message ?? 'Failed to send to backend');
       setGenStatus('error');
