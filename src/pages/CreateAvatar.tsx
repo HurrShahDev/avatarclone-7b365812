@@ -1260,10 +1260,14 @@ const CreateAvatar = () => {
               >
                 {busy ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Working…</> : <><Send className="w-4 h-4 mr-2" /> Generate Video</>}
               </Button>
-              <div className="grid grid-cols-2 gap-2">
-                <Button variant="outline" size="sm" disabled>720p</Button>
-                <Button variant="outline" size="sm" disabled>1080p</Button>
-              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                className="w-full"
+                onClick={() => toast.info('Other model coming soon', { description: 'This button is not yet wired to an endpoint.' })}
+              >
+                <Sparkles className="w-4 h-4 mr-1.5" /> Generate with Other Model
+              </Button>
               <Button
                 variant="ghost"
                 size="sm"
