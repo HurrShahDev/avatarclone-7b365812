@@ -59,7 +59,7 @@ export function getBackendBase(): string {
     const u = new URL(url);
     return `${u.protocol}//${u.host}`;
   } catch {
-    return url.replace(/\/generate\/?$/, '');
+    return url.replace(/\/(generate(-from-file)?|generate_from_text)\/?$/, '');
   }
 }
 
@@ -75,20 +75,25 @@ export interface HistoryVideo {
 /** Normalises whatever shape the backend returns into HistoryVideo[]. */
 export async function fetchHistory(uid: string, avatarName: string): Promise<HistoryVideo[]> {
   const base = getBackendBase();
-  const url = `${base}/history/${encodeURIComponent(uid)}?avatar_name=${encodeURIComponent(avatarName)}`;
+
+  const url = `${base}/history/${encodeURIComponent(avatarName)}?avatar_name=${encodeURIComponent(avatarName)}`;
+
   const res = await fetch(url);
   if (!res.ok) throw new Error(`Backend ${res.status}: ${await res.text().catch(() => '')}`);
   const data = await res.json();
 
+  // ✅ FIX: data.records ab pehle check hoga (backend yahi return karta hai)
   const rawList: any[] = Array.isArray(data)
     ? data
-    : Array.isArray(data?.videos)
-      ? data.videos
-      : Array.isArray(data?.history)
-        ? data.history
-        : Array.isArray(data?.files)
-          ? data.files
-          : [];
+    : Array.isArray(data?.records)
+      ? data.records
+      : Array.isArray(data?.videos)
+        ? data.videos
+        : Array.isArray(data?.history)
+          ? data.history
+          : Array.isArray(data?.files)
+            ? data.files
+            : [];
 
   return rawList.map((item: any, idx: number) => {
     if (typeof item === 'string') {
@@ -104,7 +109,7 @@ export async function fetchHistory(uid: string, avatarName: string): Promise<His
       ? rawUrl
       : rawUrl
         ? `${base}${rawUrl.startsWith('/') ? '' : '/'}${rawUrl}`
-        : `${base}/history/${encodeURIComponent(uid)}/${encodeURIComponent(avatarName)}/${encodeURIComponent(filename)}`;
+        : `${base}/history/${encodeURIComponent(avatarName)}/${encodeURIComponent(avatarName)}/${encodeURIComponent(filename)}`;
     return {
       id: item.id ?? filename,
       url: fullUrl,
@@ -116,12 +121,13 @@ export async function fetchHistory(uid: string, avatarName: string): Promise<His
   });
 }
 
-/** Attempts a backend delete; falls back silently. Caller should also call hideVideo(). */
+/** Attempts a backend delete using the avatarName as the primary identifier. */
 export async function tryDeleteVideo(uid: string, avatarName: string, filename: string) {
   const base = getBackendBase();
+
   const candidates = [
-    `${base}/history/${encodeURIComponent(uid)}/${encodeURIComponent(filename)}?avatar_name=${encodeURIComponent(avatarName)}`,
-    `${base}/history/${encodeURIComponent(uid)}?avatar_name=${encodeURIComponent(avatarName)}&filename=${encodeURIComponent(filename)}`,
+    `${base}/history/${encodeURIComponent(avatarName)}/${encodeURIComponent(filename)}?avatar_name=${encodeURIComponent(avatarName)}`,
+    `${base}/history/${encodeURIComponent(avatarName)}?avatar_name=${encodeURIComponent(avatarName)}&filename=${encodeURIComponent(filename)}`,
   ];
   for (const url of candidates) {
     try {

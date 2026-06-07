@@ -5,14 +5,9 @@
  * survive page reloads and can later be POSTed to a backend API.
  *
  * Why IndexedDB (not localStorage)?
- *   - Stores Blob/File natively (no base64 inflation)
- *   - ~Quota of hundreds of MB (vs ~5 MB for localStorage)
- *   - Async, non-blocking
- *
- * How to send to your backend (when ready):
- *   import { getAvatarAsset, sendAvatarToBackend } from '@/lib/avatarStorage';
- *   const res = await sendAvatarToBackend('http://localhost:8000/generate');
- *   // → backend receives multipart/form-data with `face_file`, `ref_audio_file`, `text`, `user_id`
+ * - Stores Blob/File natively (no base64 inflation)
+ * - ~Quota of hundreds of MB (vs ~5 MB for localStorage)
+ * - Async, non-blocking
  */
 
 const DB_NAME = 'avatarclone-assets';
@@ -106,20 +101,20 @@ export async function clearAvatarAsset() {
 }
 
 /**
- * Derive the FastAPI base URL from VITE_BACKEND_API_URL (which may point at
- * `/generate` already). Returns e.g. "http://localhost:8000".
+ * Derive the FastAPI base URL from VITE_BACKEND_API_URL.
+ * Removes trailing slashes and common generate paths to get clean base URL.
  */
 function deriveBase(apiUrl: string): string {
-  return apiUrl.replace(/\/+$/, '').replace(/\/(generate(-from-file)?)$/, '');
+  return apiUrl.replace(/\/+$/, '').replace(/\/(generate(-from-file)?|generate_from_text)$/, '');
 }
 
 /**
  * POST the stored avatar to the backend.
  *
  * - If a script .txt file is stored → POST /generate-from-file
- *     (face_file, ref_audio_file, text_file, user_id)
- * - Otherwise                       → POST /generate
- *     (face_file, ref_audio_file, text, user_id)
+ * (face_file, ref_audio_file, script_file, user_id)
+ * - Otherwise                     → POST /generate
+ * (face_file, ref_audio_file, text, user_id)
  */
 export async function sendAvatarToBackend(apiUrl: string, extraHeaders: Record<string, string> = {}) {
   const asset = await getAvatarAsset();
@@ -129,6 +124,8 @@ export async function sendAvatarToBackend(apiUrl: string, extraHeaders: Record<s
 
   const base = deriveBase(apiUrl);
   const useFile = !!asset.scriptFile;
+  
+  // UPDATED: Now points exactly to /generate-from-file or /generate
   const endpoint = useFile ? `${base}/generate-from-file` : `${base}/generate`;
 
   const fd = new FormData();
@@ -137,8 +134,8 @@ export async function sendAvatarToBackend(apiUrl: string, extraHeaders: Record<s
   fd.append('user_id', asset.meta?.name ?? 'anonymous');
 
   if (useFile && asset.scriptFile) {
-    // NOTE: field name `text_file` matches the FastAPI generate_from_file signature.
-    fd.append('text_file', new File([asset.scriptFile], asset.scriptFileName ?? 'script.txt', { type: asset.scriptFileType ?? 'text/plain' }));
+    // FIXED: Parameter key changed from 'text_file' to 'script_file' to fix 422 error
+    fd.append('script_file', new File([asset.scriptFile], asset.scriptFileName ?? 'script.txt', { type: asset.scriptFileType ?? 'text/plain' }));
   } else {
     fd.append('text', asset.meta?.script ?? '');
   }
@@ -169,6 +166,7 @@ export async function debugDumpAvatarAsset() {
   console.log('[AvatarStorage]', a ? {
     photo: a.photo ? `${a.photoType} ${a.photo.size}B` : 'none',
     voice: a.voice ? `${a.voiceType} ${a.voice.size}B (${a.voiceDurationSec}s)` : 'none',
+    scriptFile: a.scriptFile ? `${a.scriptFileType} ${a.scriptFile.size}B` : 'none',
     meta: a.meta,
     updatedAt: new Date(a.updatedAt).toISOString(),
   } : 'empty');
