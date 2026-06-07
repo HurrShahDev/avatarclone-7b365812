@@ -10,6 +10,8 @@ import Header from '@/components/layout/Header';
 import { toast } from 'sonner';
 import avatarPreview from '@/assets/avatar-preview.jpg';
 import { savePhoto, saveVoice, saveMeta, getAvatarAsset, sendAvatarToBackend, clearAvatarAsset } from '@/lib/avatarStorage';
+import { trackAvatar } from '@/lib/historyTracker';
+import { useAuth } from '@/hooks/use-auth';
 
 const steps = [
   { id: 1, name: 'Info' },
@@ -32,6 +34,7 @@ const photoTips = [
 ];
 
 const CreateAvatar = () => {
+  const { user } = useAuth();
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState({
     name: '',
@@ -1057,6 +1060,7 @@ const CreateAvatar = () => {
           const a = await getAvatarAsset();
           if (a?.photo) setGeneratedVideoUrl(URL.createObjectURL(a.photo));
           setGenStatus('ready');
+          if (user && formData.name?.trim()) trackAvatar(user.uid, formData.name.trim());
         }
       }
       return;
