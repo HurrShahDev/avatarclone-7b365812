@@ -17,6 +17,7 @@ import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
 import About from "./pages/About";
 import Demo from "./pages/Demo";
+import UserHistory from "./pages/UserHistory";
 
 const queryClient = new QueryClient();
 
@@ -37,6 +38,7 @@ const App = () => (
           <Route path="/terms" element={<Terms />} />
           <Route path="/about" element={<About />} />
           <Route path="/demo" element={<Demo />} />
+          <Route path="/history" element={<UserHistory />} />
           <Route path="/products/avatar-video" element={<AvatarVideoGeneration />} />
           <Route path="/products/voice-cloning" element={<VoiceCloning />} />
           <Route path="/products/text-to-speech" element={<TextToSpeech />} />

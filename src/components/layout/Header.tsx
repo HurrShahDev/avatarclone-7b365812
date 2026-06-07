@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Menu, X, LogOut, ChevronDown } from 'lucide-react';
+import { Menu, X, LogOut, ChevronDown, History } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import logoImg from '@/assets/logo.png';
 
@@ -94,9 +94,17 @@ const Header = () => {
                       <p className="text-sm font-medium text-gray-900 truncate">{user.displayName || 'User'}</p>
                       <p className="text-xs text-gray-500 truncate">{user.email}</p>
                     </div>
+                    <Link
+                      to="/history"
+                      onClick={() => setShowProfileMenu(false)}
+                      className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                    >
+                      <History className="w-4 h-4 text-indigo-600" />
+                      User History
+                    </Link>
                     <button
                       onClick={handleSignOut}
-                      className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                      className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors border-t border-gray-100"
                     >
                       <LogOut className="w-4 h-4" />
                       Sign Out
@@ -140,6 +148,14 @@ const Header = () => {
                     <p className="text-sm font-medium text-gray-900">{user.displayName || 'User'}</p>
                     <p className="text-xs text-gray-500">{user.email}</p>
                   </div>
+                  <Link
+                    to="/history"
+                    onClick={() => setIsMenuOpen(false)}
+                    className="flex items-center gap-2 py-2.5 px-3 text-gray-700 hover:bg-gray-50 rounded-lg min-h-[44px]"
+                  >
+                    <History className="w-4 h-4 text-indigo-600" />
+                    User History
+                  </Link>
                   <button
                     onClick={() => { handleSignOut(); setIsMenuOpen(false); }}
                     className="flex items-center gap-2 py-2.5 px-3 text-red-600 hover:bg-red-50 rounded-lg min-h-[44px]"
