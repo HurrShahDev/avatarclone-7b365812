@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import Header from '@/components/layout/Header';
 import { toast } from 'sonner';
 import avatarPreview from '@/assets/avatar-preview.jpg';
-import { savePhoto, saveVoice, saveMeta, getAvatarAsset, sendAvatarToBackend, clearAvatarAsset } from '@/lib/avatarStorage';
+import { savePhoto, saveVoice, saveMeta, getAvatarAsset, sendAvatarToBackend, clearAvatarAsset, saveScriptFile, clearScriptFile } from '@/lib/avatarStorage';
 import { trackAvatar } from '@/lib/historyTracker';
 import { useAuth } from '@/hooks/use-auth';
 
@@ -81,6 +81,8 @@ const CreateAvatar = () => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const recordingIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const audioInputRef = useRef<HTMLInputElement>(null);
+  const scriptFileInputRef = useRef<HTMLInputElement>(null);
+  const [scriptFile, setScriptFile] = useState<File | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
   const animFrameRef = useRef<number | null>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
@@ -721,6 +723,43 @@ const CreateAvatar = () => {
           onChange={(e) => setFormData({ ...formData, script: e.target.value })}
         />
         <p className="text-[11px] text-muted-foreground mt-1.5">Saved with your avatar — the cloned voice will speak this text.</p>
+
+        {/* Optional script .txt file upload */}
+        <div className="mt-3 p-3 rounded-lg border border-dashed border-border bg-muted/30">
+          <div className="flex items-center justify-between gap-3">
+            <div className="min-w-0">
+              <p className="text-xs font-medium">Or upload a script file (.txt)</p>
+              <p className="text-[11px] text-muted-foreground truncate">
+                {scriptFile ? `Selected: ${scriptFile.name} (${Math.round(scriptFile.size / 1024)} KB)` : 'If provided, we\'ll send the file to /generate-from-file instead of plain text.'}
+              </p>
+            </div>
+            <div className="flex items-center gap-2 shrink-0">
+              <input
+                ref={scriptFileInputRef}
+                type="file"
+                accept=".txt,text/plain"
+                className="hidden"
+                onChange={async (e) => {
+                  const f = e.target.files?.[0];
+                  if (!f) return;
+                  if (!f.name.toLowerCase().endsWith('.txt')) { toast.error('Only .txt files are supported'); return; }
+                  if (f.size > 1024 * 1024) { toast.error('Script file must be under 1 MB'); return; }
+                  setScriptFile(f);
+                  try { await saveScriptFile(f, f.name, f.type || 'text/plain'); toast.success('Script file saved'); } catch {}
+                  e.target.value = '';
+                }}
+              />
+              <Button type="button" variant="outline" size="sm" onClick={() => scriptFileInputRef.current?.click()}>
+                <Upload className="w-3.5 h-3.5 mr-1" /> {scriptFile ? 'Change' : 'Upload .txt'}
+              </Button>
+              {scriptFile && (
+                <Button type="button" variant="ghost" size="sm" onClick={async () => { setScriptFile(null); await clearScriptFile(); }}>
+                  <X className="w-3.5 h-3.5" />
+                </Button>
+              )}
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -1221,10 +1260,14 @@ const CreateAvatar = () => {
               >
                 {busy ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Working…</> : <><Send className="w-4 h-4 mr-2" /> Generate Video</>}
               </Button>
-              <div className="grid grid-cols-2 gap-2">
-                <Button variant="outline" size="sm" disabled>720p</Button>
-                <Button variant="outline" size="sm" disabled>1080p</Button>
-              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                className="w-full"
+                onClick={() => toast.info('Other model coming soon', { description: 'This button is not yet wired to an endpoint.' })}
+              >
+                <Sparkles className="w-4 h-4 mr-1.5" /> Generate with Other Model
+              </Button>
               <Button
                 variant="ghost"
                 size="sm"
