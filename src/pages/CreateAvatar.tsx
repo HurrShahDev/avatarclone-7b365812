@@ -1034,6 +1034,7 @@ const CreateAvatar = () => {
 
   const handleGenerate = async () => {
     setGenError(null);
+    setGeneratedVideoUrl(null);
     setGenStatus('sending');
     setGenProgress(5);
 
@@ -1093,9 +1094,13 @@ const CreateAvatar = () => {
             <div className="aspect-video rounded-lg overflow-hidden relative bg-gradient-to-br from-indigo-900 via-purple-900 to-slate-900 flex items-center justify-center">
               {ready && generatedVideoUrl ? (
                 <video
-                  src={generatedVideoUrl}
+                  key={generatedVideoUrl}
+                  src={generatedVideoUrl ?? undefined}
                   controls
+                  autoPlay
+                  muted
                   playsInline
+                  preload="auto"
                   className="w-full h-full object-contain bg-black"
                 />
               ) : (
