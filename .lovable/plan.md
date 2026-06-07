@@ -1,49 +1,51 @@
-## Goal
-Backend (FastAPI `/generate`) ka return kiya hua `.mp4` site pe properly show ho aur Download button se actually download ho (cross-origin pe bhi).
+## Problem
+`avatar-video.mp4` ka codec `mpeg4` hai (DivX/Xvid family). Browsers ke `<video>` tag sirf **H.264 (avc1)** decode kar sakte hain MP4 container mein. Isi liye laptop player (VLC) chala leta hai, lekin Chrome blank screen + sirf audio dikhata hai.
 
-## Aaj kya hai
-- `src/lib/avatarStorage.ts` → `sendAvatarToBackend()` form-data bhejta hai, response ko `res.json()` karta hai aur `{ video_url }` expect karta hai.
-- `src/pages/CreateAvatar.tsx` (line 1044–1046) `video_url` set karta hai, `<video src=...>` mein dikhata hai aur `<a download>` se download try karta hai.
+Fix sirf backend ke `MODAL_HUG_GIT.py` mein hai — ffmpeg ko H.264 + yuv420p mein re-encode karwana hai. Frontend / site code bilkul touch nahi hoga.
 
-## Problems
-1. Agar backend response **JSON nahi** — seedha `video/mp4` binary stream bhejta hai — to `res.json()` fail/empty ho jata hai aur kuch nahi dikhega.
-2. Agar JSON mein URL aata hai par `.mp4` query-string ke sath hai (`/file.mp4?token=...`), to `endsWith('.mp4')` check fail ho jata hai → video ki jagah `<img>` render hota hai.
-3. **Download button** cross-origin URL pe `<a download>` browsers ignore kar dete hain → file download nahi hoti, sirf naya tab khulta hai.
-4. CORS: FastAPI mein CORS middleware na ho to browser response block kar dega.
+## Change (sirf 1 file: `MODAL_HUG_GIT.py`)
 
-## Fix plan (sirf 2 files)
+Function `generate_lipsync_video` ke andar **"Re-adding audio track"** wala `ffmpeg_cmd` block replace karna hai. Current mein `-c:v copy` hai (jo mpeg4 hi rakh leta hai). Isko H.264 high-quality settings se badalna hai:
 
-### 1. `src/lib/avatarStorage.ts` — `sendAvatarToBackend` smarter banao
-- Response ka `Content-Type` check karo:
-  - Agar `application/json` → pehle ki tarah `{ video_url }` return.
-  - Agar `video/*` (ya `application/octet-stream`) → response ko `blob()` karo, `URL.createObjectURL(blob)` se local URL banao aur `{ video_url: blobUrl, isBlob: true }` return karo.
-- Errors mein status + text dono throw karo (already partially hai).
-
-### 2. `src/pages/CreateAvatar.tsx` — preview + download fix
-- Video render condition se `.endsWith('.mp4')` hatao. Backend hamesha video deta hai, to direct `<video src={generatedVideoUrl} controls playsInline />` use karo (img fallback hata do, ya sirf error case ke liye rakho).
-- Naya helper `downloadVideo(url, filename)` add karo:
-  - `fetch(url)` → `blob()` → `URL.createObjectURL` → temp `<a download>` click → `revokeObjectURL`.
-  - Try/catch — fail ho to `window.open(url, '_blank')` fallback.
-- Download Button ko `<a>` ki jagah `onClick={() => downloadVideo(generatedVideoUrl, 'avatar-video.mp4')}` se chalao.
-- Component unmount / regenerate pe purane blob URL ko `URL.revokeObjectURL` karo (memory leak avoid).
-
-### 3. Backend side note (sirf information, code change nahi)
-FastAPI mein ye hona chahiye warna CORS error aayega:
-```py
-from fastapi.middleware.cors import CORSMiddleware
-app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
+```python
+print("\n  🔊 Re-adding audio track + browser-compatible re-encode...")
+ffmpeg_cmd = [
+    "ffmpeg", "-y",
+    "-i", "restored_no_audio.mp4",   # video (frames)
+    "-i", "temp_output.mp4",         # audio source
+    "-c:v", "libx264",               # ← H.264 (browser-compatible)
+    "-pix_fmt", "yuv420p",           # ← chroma format browsers need
+    "-profile:v", "high",            # high profile = better quality, sab modern browsers support
+    "-level", "4.0",
+    "-preset", "slow",               # ← slow = better compression at same quality
+    "-crf", "17",                    # ← 17 = visually lossless (18 default; 17 thoda aur sharp)
+    "-x264-params", "ref=5:bframes=3:me=umh:subme=8",  # quality tuning
+    "-movflags", "+faststart",       # browser streaming-friendly (moov atom front)
+    "-c:a", "aac",
+    "-b:a", "192k",                  # 192 kbps audio (clear voice)
+    "-ar", "44100",
+    "-map", "0:v:0",
+    "-map", "1:a:0",
+    "-shortest",
+    "output.mp4"
+]
 ```
-Aur response ya to:
-- JSON: `{"video_url": "https://your-host/files/abc.mp4"}` (publicly fetchable URL), ya
-- Direct: `FileResponse("output.mp4", media_type="video/mp4")`.
 
-Dono cases ab frontend handle kar lega.
+Baki sab same — `subprocess.run`, fallback `shutil.copy("temp_output.mp4", "output.mp4")`, file read, return — kuch nahi badlega.
 
-## Env
-`.env` mein already `VITE_BACKEND_API_URL=http://localhost:8000/generate` (ya jo bhi ho) set hona chahiye — code already isko use karta hai. Agar nahi set, simulation chalega.
+### Quality guarantees (blur nahi hoga)
+- **CRF 17** = visually lossless (CRF scale: 0 lossless, 18 default "indistinguishable", 23 average). 17 par output GFPGAN-restored frames jaisa hi sharp rahega.
+- **preset slow** = encoder ko zyada time deta hai better compression dhoondhne ka → same quality at smaller size, koi softening nahi.
+- **profile high + ref 5 + subme 8** = motion estimation strong, lip-sync edges crisp.
+- **yuv420p** = chroma subsampling browsers ke liye mandatory; GFPGAN already RGB→BGR frames likhta hai, downsample sirf chroma channel par hota hai → luma (sharpness) full rahega.
+- **faststart** = `<video>` tag ko start hote hi metadata mil jata hai (warna kabhi-kabhi blank dikh sakta hai jab tak full download na ho).
 
-## Files changed
-- `src/lib/avatarStorage.ts`
-- `src/pages/CreateAvatar.tsx`
+### Trade-off note
+`preset slow` se encoding ~2-3x slower hogi (Modal T4 par typically 10-20s extra for short clips). Agar speed chahiye to `preset medium` use kar lo — quality almost same rahegi. Blur kisi bhi case mein nahi aayega.
 
-Koi aur file touch nahi hogi.
+## Frontend status
+Frontend (`avatarStorage.ts` + `CreateAvatar.tsx`) pehle se sahi hai — blob URL bana ke `<video>` mein dal raha hai. Backend ka codec fix hote hi video browser mein normally play hone lagegi, koi frontend change nahi chahiye.
+
+## Files
+- `MODAL_HUG_GIT.py` (backend, Modal) — sirf `ffmpeg_cmd` block update.
+- ❌ Lovable project mein koi file nahi badlegi.
