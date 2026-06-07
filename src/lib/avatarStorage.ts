@@ -93,27 +93,33 @@ export async function saveMeta(meta: Partial<AvatarMeta>) {
   return putAvatarAsset({ meta });
 }
 
+export async function saveScriptFile(file: Blob, name = 'script.txt', type?: string) {
+  return putAvatarAsset({ scriptFile: file, scriptFileName: name, scriptFileType: type ?? file.type });
+}
+
+export async function clearScriptFile() {
+  return putAvatarAsset({ scriptFile: undefined, scriptFileName: undefined, scriptFileType: undefined });
+}
+
 export async function clearAvatarAsset() {
   await tx('readwrite', (s) => s.delete(RECORD_ID));
 }
 
 /**
- * POST the stored avatar to the backend /generate endpoint as multipart/form-data.
+ * Derive the FastAPI base URL from VITE_BACKEND_API_URL (which may point at
+ * `/generate` already). Returns e.g. "http://localhost:8000".
+ */
+function deriveBase(apiUrl: string): string {
+  return apiUrl.replace(/\/+$/, '').replace(/\/(generate(-from-file)?)$/, '');
+}
+
+/**
+ * POST the stored avatar to the backend.
  *
- * Backend receives:
- *   - face_file      (File)    — JPG / PNG of the user's face
- *   - ref_audio_file (File)    — WebM / MP3 / WAV of the user's voice
- *   - text           (string)  — Avatar script text
- *   - user_id        (string)  — Firebase UID or 'anonymous'
- *
- * FastAPI backend signature:
- *   @app.post("/generate")
- *   async def generate_from_text(
- *       text: str = Form(...),
- *       user_id: str = Form("anonymous"),
- *       face_file: UploadFile = File(...),
- *       ref_audio_file: UploadFile = File(...),
- *   ):
+ * - If a script .txt file is stored → POST /generate-from-file
+ *     (face_file, ref_audio_file, text_file, user_id)
+ * - Otherwise                       → POST /generate
+ *     (face_file, ref_audio_file, text, user_id)
  */
 export async function sendAvatarToBackend(apiUrl: string, extraHeaders: Record<string, string> = {}) {
   const asset = await getAvatarAsset();
@@ -121,31 +127,33 @@ export async function sendAvatarToBackend(apiUrl: string, extraHeaders: Record<s
     throw new Error('Missing photo or voice. Complete the upload steps first.');
   }
 
-  const fd = new FormData();
+  const base = deriveBase(apiUrl);
+  const useFile = !!asset.scriptFile;
+  const endpoint = useFile ? `${base}/generate-from-file` : `${base}/generate`;
 
-  // ✅ Correct field names matching FastAPI /generate endpoint
+  const fd = new FormData();
   fd.append('face_file', new File([asset.photo], asset.photoName ?? 'photo.png', { type: asset.photoType }));
   fd.append('ref_audio_file', new File([asset.voice], asset.voiceName ?? 'voice.webm', { type: asset.voiceType }));
-  fd.append('text', asset.meta?.script ?? '');
   fd.append('user_id', asset.meta?.name ?? 'anonymous');
 
-  const res = await fetch(apiUrl, { method: 'POST', body: fd, headers: extraHeaders });
+  if (useFile && asset.scriptFile) {
+    // NOTE: field name `text_file` matches the FastAPI generate_from_file signature.
+    fd.append('text_file', new File([asset.scriptFile], asset.scriptFileName ?? 'script.txt', { type: asset.scriptFileType ?? 'text/plain' }));
+  } else {
+    fd.append('text', asset.meta?.script ?? '');
+  }
+
+  const res = await fetch(endpoint, { method: 'POST', body: fd, headers: extraHeaders });
   if (!res.ok) throw new Error(`Backend returned ${res.status}: ${await res.text()}`);
 
-  // Backend can return EITHER JSON ({ video_url: "..." }) OR a raw video/* binary stream.
   const contentType = res.headers.get('content-type')?.toLowerCase() ?? '';
-
   if (contentType.includes('application/json')) {
     return res.json().catch(() => ({}));
   }
-
   if (contentType.startsWith('video/') || contentType.includes('octet-stream')) {
     const blob = await res.blob();
-    const blobUrl = URL.createObjectURL(blob);
-    return { video_url: blobUrl, isBlob: true };
+    return { video_url: URL.createObjectURL(blob), isBlob: true };
   }
-
-  // Unknown content-type: try JSON first, otherwise treat as blob.
   try {
     return await res.json();
   } catch {
