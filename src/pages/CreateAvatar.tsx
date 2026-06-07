@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import Header from '@/components/layout/Header';
 import { toast } from 'sonner';
 import avatarPreview from '@/assets/avatar-preview.jpg';
-import { savePhoto, saveVoice, saveMeta, getAvatarAsset, sendAvatarToBackend, clearAvatarAsset } from '@/lib/avatarStorage';
+import { savePhoto, saveVoice, saveMeta, getAvatarAsset, sendAvatarToBackend, clearAvatarAsset, saveScriptFile, clearScriptFile } from '@/lib/avatarStorage';
 import { trackAvatar } from '@/lib/historyTracker';
 import { useAuth } from '@/hooks/use-auth';
 
