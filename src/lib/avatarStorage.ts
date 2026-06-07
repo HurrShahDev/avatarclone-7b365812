@@ -38,6 +38,9 @@ export interface AvatarAsset {
   voiceName?: string;
   voiceType?: string;
   voiceDurationSec?: number;
+  scriptFile?: Blob;
+  scriptFileName?: string;
+  scriptFileType?: string;
   meta?: Partial<AvatarMeta>;
   updatedAt: number;
 }
