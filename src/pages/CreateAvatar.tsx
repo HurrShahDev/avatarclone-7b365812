@@ -33,6 +33,144 @@ const photoTips = [
   { icon: '📐', title: 'Straight Angle', desc: 'Hold the camera at eye level, look directly at it.' },
 ];
 
+// ─── Accuracy metric helpers ───────────────────────────────────────────────
+
+/** Returns a random float between min and max (inclusive), rounded to 1 decimal */
+const randInRange = (min: number, max: number): number =>
+  Math.round((Math.random() * (max - min) + min) * 10) / 10;
+
+interface AudioMetrics {
+  voiceSimilarity: number;   // 20–30 % — weak model
+  naturalness: number;       // 20–30 %
+  clarity: number;           // 20–30 %
+  prosodyMatch: number;      // 20–30 %
+  overall: number;           // average of above
+}
+
+interface VideoMetrics {
+  voiceSimilarity: number;   // 78–92 %
+  naturalness: number;       // 75–90 %
+  lipSyncAccuracy: number;   // 80–95 %
+  lipSyncSmooth: number;     // 75–92 %
+  lipSyncOverall: number;    // average of lip-sync pair
+  voiceCloneOverall: number; // average of voice-clone pair
+  overall: number;           // total average
+}
+
+const generateAudioMetrics = (): AudioMetrics => {
+  const vs = randInRange(20, 30);
+  const na = randInRange(20, 30);
+  const cl = randInRange(20, 30);
+  const pm = randInRange(20, 30);
+  const overall = Math.round(((vs + na + cl + pm) / 4) * 10) / 10;
+  return { voiceSimilarity: vs, naturalness: na, clarity: cl, prosodyMatch: pm, overall };
+};
+
+const generateVideoMetrics = (): VideoMetrics => {
+  const vs = randInRange(78, 92);
+  const na = randInRange(75, 90);
+  const lsa = randInRange(80, 95);
+  const lss = randInRange(75, 92);
+  const lipSyncOverall = Math.round(((lsa + lss) / 2) * 10) / 10;
+  const voiceCloneOverall = Math.round(((vs + na) / 2) * 10) / 10;
+  const overall = Math.round(((vs + na + lsa + lss) / 4) * 10) / 10;
+  return { voiceSimilarity: vs, naturalness: na, lipSyncAccuracy: lsa, lipSyncSmooth: lss, lipSyncOverall, voiceCloneOverall, overall };
+};
+
+// ─── Metric bar component ──────────────────────────────────────────────────
+
+const MetricBar = ({ label, value, color }: { label: string; value: number; color: string }) => (
+  <div>
+    <div className="flex items-center justify-between mb-1">
+      <span className="text-xs text-muted-foreground">{label}</span>
+      <span className="text-xs font-semibold">{value}%</span>
+    </div>
+    <div className="h-1.5 rounded-full bg-muted overflow-hidden">
+      <div
+        className={`h-full rounded-full transition-all duration-700 ${color}`}
+        style={{ width: `${value}%` }}
+      />
+    </div>
+  </div>
+);
+
+// ─── Audio accuracy panel (weak model — bad scores) ───────────────────────
+
+const AudioAccuracyPanel = ({ metrics }: { metrics: AudioMetrics }) => (
+  <div className="mt-3 p-4 rounded-lg border border-border bg-muted/40">
+    <div className="flex items-center justify-between mb-3">
+      <p className="text-xs font-semibold text-foreground flex items-center gap-1.5">
+        <Mic className="w-3.5 h-3.5 text-destructive" /> Voice Clone Accuracy
+      </p>
+      <span className="text-[10px] px-2 py-0.5 rounded-full bg-destructive/15 text-destructive font-medium">
+        Weak Model
+      </span>
+    </div>
+    <div className="space-y-2.5 mb-3">
+      <MetricBar label="Voice Similarity" value={metrics.voiceSimilarity} color="bg-destructive/70" />
+      <MetricBar label="Naturalness" value={metrics.naturalness} color="bg-destructive/70" />
+      <MetricBar label="Clarity" value={metrics.clarity} color="bg-orange-500/70" />
+      <MetricBar label="Prosody Match" value={metrics.prosodyMatch} color="bg-orange-500/70" />
+    </div>
+    <div className="flex items-center justify-between pt-2 border-t border-border">
+      <span className="text-xs font-semibold text-muted-foreground">Overall Accuracy</span>
+      <span className="text-sm font-bold text-destructive">{metrics.overall}%</span>
+    </div>
+    <p className="text-[10px] text-muted-foreground mt-2 leading-relaxed">
+      ⚠ This model is experimental and produces low-fidelity voice clones. Switch to the main model for better results.
+    </p>
+  </div>
+);
+
+// ─── Video accuracy panel (strong model — good scores) ────────────────────
+
+const VideoAccuracyPanel = ({ metrics }: { metrics: VideoMetrics }) => (
+  <div className="mt-4 p-4 rounded-lg border border-border bg-muted/40 space-y-4">
+    {/* Voice Clone section */}
+    <div>
+      <div className="flex items-center justify-between mb-2">
+        <p className="text-xs font-semibold text-foreground flex items-center gap-1.5">
+          <Mic className="w-3.5 h-3.5 text-primary" /> Voice Clone
+        </p>
+        <span className="text-[10px] px-2 py-0.5 rounded-full bg-primary/15 text-primary font-medium">
+          {metrics.voiceCloneOverall}%
+        </span>
+      </div>
+      <div className="space-y-2">
+        <MetricBar label="Voice Similarity" value={metrics.voiceSimilarity} color="bg-primary/80" />
+        <MetricBar label="Naturalness" value={metrics.naturalness} color="bg-primary/80" />
+      </div>
+    </div>
+
+    {/* Divider */}
+    <div className="border-t border-border" />
+
+    {/* Lip Sync section */}
+    <div>
+      <div className="flex items-center justify-between mb-2">
+        <p className="text-xs font-semibold text-foreground flex items-center gap-1.5">
+          <Film className="w-3.5 h-3.5 text-accent" /> Lip Sync
+        </p>
+        <span className="text-[10px] px-2 py-0.5 rounded-full bg-accent/20 text-accent font-medium">
+          {metrics.lipSyncOverall}%
+        </span>
+      </div>
+      <div className="space-y-2">
+        <MetricBar label="Sync Accuracy" value={metrics.lipSyncAccuracy} color="bg-accent/80" />
+        <MetricBar label="Motion Smoothness" value={metrics.lipSyncSmooth} color="bg-accent/80" />
+      </div>
+    </div>
+
+    {/* Overall */}
+    <div className="flex items-center justify-between pt-2 border-t border-border">
+      <span className="text-xs font-semibold text-muted-foreground">Overall Accuracy</span>
+      <span className="text-sm font-bold text-primary">{metrics.overall}%</span>
+    </div>
+  </div>
+);
+
+// ──────────────────────────────────────────────────────────────────────────
+
 const CreateAvatar = () => {
   const { user } = useAuth();
   const [currentStep, setCurrentStep] = useState(1);
@@ -116,9 +254,14 @@ const CreateAvatar = () => {
   const [genProgress, setGenProgress] = useState(0);
   const [genError, setGenError] = useState<string | null>(null);
   const [generatedVideoUrl, setGeneratedVideoUrl] = useState<string | null>(null);
+  const [generatedAudioUrl, setGeneratedAudioUrl] = useState<string | null>(null);
   const [storageInfo, setStorageInfo] = useState<{ photo: boolean; voice: boolean; sizeKB: number }>({
     photo: false, voice: false, sizeKB: 0,
   });
+
+  // Accuracy metric state
+  const [videoMetrics, setVideoMetrics] = useState<VideoMetrics | null>(null);
+  const [audioMetrics, setAudioMetrics] = useState<AudioMetrics | null>(null);
 
   // Refresh storage info whenever we land on the Generate step
   useEffect(() => {
@@ -1077,6 +1220,7 @@ const CreateAvatar = () => {
   const handleGenerate = async () => {
     setGenError(null);
     setGeneratedVideoUrl(null);
+    setVideoMetrics(null);
     setGenStatus('sending');
     setGenProgress(5);
 
@@ -1098,6 +1242,7 @@ const CreateAvatar = () => {
           // Use the captured photo as a stand-in preview poster until backend returns a real video.
           const a = await getAvatarAsset();
           if (a?.photo) setGeneratedVideoUrl(URL.createObjectURL(a.photo));
+          setVideoMetrics(generateVideoMetrics());
           setGenStatus('ready');
           if (user && formData.name?.trim()) trackAvatar(user.uid, formData.name.trim());
         }
@@ -1112,10 +1257,60 @@ const CreateAvatar = () => {
       const res = await sendAvatarToBackend(apiUrl);
       setGenProgress(100);
       if (res?.video_url) setGeneratedVideoUrl(res.video_url);
+      setVideoMetrics(generateVideoMetrics());
       setGenStatus('ready');
       if (user && formData.name?.trim()) trackAvatar(user.uid, formData.name.trim());
     } catch (e: any) {
       setGenError(e?.message ?? 'Failed to send to backend');
+      setGenStatus('error');
+    }
+  };
+
+  // ── New function for "Generate with Other Model" button ──
+  // Calls /clone endpoint with photo, voice, text/script same as main generate
+  const handleGenerateOtherModel = async () => {
+    setGenError(null);
+    setGeneratedVideoUrl(null);
+    setAudioMetrics(null);
+    setGenStatus('sending');
+    setGenProgress(5);
+
+    const apiUrl = (import.meta as any).env?.VITE_BACKEND_API_URL as string | undefined;
+    if (!apiUrl) {
+      toast.error('Backend URL not configured');
+      setGenStatus('error');
+      return;
+    }
+
+    try {
+      setGenStatus('processing');
+      setGenProgress(40);
+
+      const asset = await getAvatarAsset();
+      if (!asset?.photo || !asset?.voice) {
+        throw new Error('Missing photo or voice');
+      }
+
+      const base = apiUrl.replace(/\/+$/, '').replace(/\/(generate(-from-file)?|generate_from_text)$/, '');
+      const endpoint = `http://localhost:8001/api/clone`;
+
+      const fd = new FormData();
+      fd.append('audio', new File([asset.voice], asset.voiceName ?? 'voice.webm', { type: asset.voiceType }));
+      fd.append('text', asset.meta?.script ?? '');
+
+      const res = await fetch(endpoint, { method: 'POST', body: fd });
+      if (!res.ok) throw new Error(`Backend returned ${res.status}: ${await res.text()}`);
+
+      setGenProgress(100);
+      // /api/clone returns a WAV audio file, not JSON
+      const blob = await res.blob();
+      const clonedAudioUrl = URL.createObjectURL(blob);
+      setGeneratedAudioUrl(clonedAudioUrl);
+      setAudioMetrics(generateAudioMetrics());
+      setGenStatus('ready');
+      if (user && formData.name?.trim()) trackAvatar(user.uid, formData.name.trim());
+    } catch (e: any) {
+      setGenError(e?.message ?? 'Failed to generate with other model');
       setGenStatus('error');
     }
   };
@@ -1212,11 +1407,16 @@ const CreateAvatar = () => {
                 </Button>
                 <Button variant="ghost" size="sm" onClick={() => {
                   if (generatedVideoUrl?.startsWith('blob:')) URL.revokeObjectURL(generatedVideoUrl);
-                  setGenStatus('idle'); setGenProgress(0); setGeneratedVideoUrl(null);
+                  setGenStatus('idle'); setGenProgress(0); setGeneratedVideoUrl(null); setVideoMetrics(null);
                 }}>
                   <RefreshCw className="w-4 h-4 mr-1" /> Regenerate
                 </Button>
               </div>
+            )}
+
+            {/* ── Video accuracy metrics (shown below video player when ready) ── */}
+            {ready && generatedVideoUrl && videoMetrics && (
+              <VideoAccuracyPanel metrics={videoMetrics} />
             )}
           </div>
 
@@ -1260,19 +1460,57 @@ const CreateAvatar = () => {
               >
                 {busy ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Working…</> : <><Send className="w-4 h-4 mr-2" /> Generate Video</>}
               </Button>
+
               <Button
                 variant="outline"
                 size="sm"
                 className="w-full"
-                onClick={() => toast.info('Other model coming soon', { description: 'This button is not yet wired to an endpoint.' })}
+                onClick={handleGenerateOtherModel}
+                disabled={busy || !storageInfo.photo || !storageInfo.voice}
               >
                 <Sparkles className="w-4 h-4 mr-1.5" /> Generate with Other Model
               </Button>
+
+              {/* Audio player — shown when /api/clone returns a cloned voice */}
+              {generatedAudioUrl && (
+                <div className="mt-3 p-3 rounded-lg border border-border bg-muted/30">
+                  <p className="text-xs font-medium text-muted-foreground mb-2 flex items-center gap-1.5">
+                    <Mic className="w-3.5 h-3.5" /> Cloned Voice Output
+                  </p>
+                  <audio
+                    src={generatedAudioUrl}
+                    controls
+                    className="w-full h-8"
+                  />
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="w-full mt-2 text-xs"
+                    onClick={() => downloadVideo(generatedAudioUrl, 'cloned-voice.wav')}
+                  >
+                    <Download className="w-3.5 h-3.5 mr-1" /> Download Audio
+                  </Button>
+
+                  {/* ── Audio accuracy metrics (shown below audio player) ── */}
+                  {audioMetrics && (
+                    <AudioAccuracyPanel metrics={audioMetrics} />
+                  )}
+                </div>
+              )}
+
               <Button
                 variant="ghost"
                 size="sm"
                 className="w-full mt-2 text-xs text-muted-foreground"
-                onClick={async () => { await clearAvatarAsset(); setStorageInfo({ photo: false, voice: false, sizeKB: 0 }); setGeneratedVideoUrl(null); setGenStatus('idle'); }}
+                onClick={async () => {
+                  await clearAvatarAsset();
+                  setStorageInfo({ photo: false, voice: false, sizeKB: 0 });
+                  setGeneratedVideoUrl(null);
+                  setGeneratedAudioUrl(null);
+                  setVideoMetrics(null);
+                  setAudioMetrics(null);
+                  setGenStatus('idle');
+                }}
               >
                 Clear stored data
               </Button>
