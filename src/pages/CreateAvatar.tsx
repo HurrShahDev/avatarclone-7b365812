@@ -67,10 +67,10 @@ const generateAudioMetrics = (): AudioMetrics => {
 };
 
 const generateVideoMetrics = (): VideoMetrics => {
-  const vs = randInRange(78, 92);
-  const na = randInRange(75, 90);
-  const lsa = randInRange(80, 95);
-  const lss = randInRange(75, 92);
+  const vs = randInRange(75, 82);
+  const na = randInRange(72, 80);
+  const lsa = randInRange(70, 85);
+  const lss = randInRange(76, 82);
   const lipSyncOverall = Math.round(((lsa + lss) / 2) * 10) / 10;
   const voiceCloneOverall = Math.round(((vs + na) / 2) * 10) / 10;
   const overall = Math.round(((vs + na + lsa + lss) / 4) * 10) / 10;
@@ -249,19 +249,26 @@ const CreateAvatar = () => {
     }).catch(() => {});
   }, [formData]);
 
-  // Generation state for Step 4
-  const [genStatus, setGenStatus] = useState<'idle' | 'sending' | 'processing' | 'ready' | 'error'>('idle');
-  const [genProgress, setGenProgress] = useState(0);
-  const [genError, setGenError] = useState<string | null>(null);
+  // ─── FIXED: Separate independent state for main generate and other model ───
+
+  // Main "Generate Video" state
+  const [mainGenStatus, setMainGenStatus] = useState<'idle' | 'sending' | 'processing' | 'ready' | 'error'>('idle');
+  const [mainGenProgress, setMainGenProgress] = useState(0);
+  const [mainGenError, setMainGenError] = useState<string | null>(null);
   const [generatedVideoUrl, setGeneratedVideoUrl] = useState<string | null>(null);
+  const [videoMetrics, setVideoMetrics] = useState<VideoMetrics | null>(null);
+
+  // "Generate with Other Model" state
+  const [otherGenStatus, setOtherGenStatus] = useState<'idle' | 'sending' | 'processing' | 'ready' | 'error'>('idle');
+  const [otherGenError, setOtherGenError] = useState<string | null>(null);
   const [generatedAudioUrl, setGeneratedAudioUrl] = useState<string | null>(null);
+  const [audioMetrics, setAudioMetrics] = useState<AudioMetrics | null>(null);
+
+  // ─────────────────────────────────────────────────────────────────────────
+
   const [storageInfo, setStorageInfo] = useState<{ photo: boolean; voice: boolean; sizeKB: number }>({
     photo: false, voice: false, sizeKB: 0,
   });
-
-  // Accuracy metric state
-  const [videoMetrics, setVideoMetrics] = useState<VideoMetrics | null>(null);
-  const [audioMetrics, setAudioMetrics] = useState<AudioMetrics | null>(null);
 
   // Refresh storage info whenever we land on the Generate step
   useEffect(() => {
@@ -1218,32 +1225,32 @@ const CreateAvatar = () => {
   };
 
   const handleGenerate = async () => {
-    setGenError(null);
+    setMainGenError(null);
     setGeneratedVideoUrl(null);
     setVideoMetrics(null);
-    setGenStatus('sending');
-    setGenProgress(5);
+    setMainGenStatus('sending');
+    setMainGenProgress(5);
 
     const apiUrl = (import.meta as any).env?.VITE_BACKEND_API_URL as string | undefined;
 
     // If no backend yet → run a realistic local simulation so the FYP demo works.
     if (!apiUrl) {
-      const steps = [
+      const simSteps = [
         { p: 25, label: 'uploading' },
         { p: 55, label: 'processing' as const },
         { p: 80, label: 'processing' as const },
         { p: 100, label: 'ready' as const },
       ];
-      for (const s of steps) {
+      for (const s of simSteps) {
         await new Promise(r => setTimeout(r, 900));
-        setGenProgress(s.p);
-        if (s.label === 'processing') setGenStatus('processing');
+        setMainGenProgress(s.p);
+        if (s.label === 'processing') setMainGenStatus('processing');
         if (s.label === 'ready') {
           // Use the captured photo as a stand-in preview poster until backend returns a real video.
           const a = await getAvatarAsset();
           if (a?.photo) setGeneratedVideoUrl(URL.createObjectURL(a.photo));
           setVideoMetrics(generateVideoMetrics());
-          setGenStatus('ready');
+          setMainGenStatus('ready');
           if (user && formData.name?.trim()) trackAvatar(user.uid, formData.name.trim());
         }
       }
@@ -1252,39 +1259,36 @@ const CreateAvatar = () => {
 
     // Real backend call
     try {
-      setGenStatus('processing');
-      setGenProgress(40);
+      setMainGenStatus('processing');
+      setMainGenProgress(40);
       const res = await sendAvatarToBackend(apiUrl);
-      setGenProgress(100);
+      setMainGenProgress(100);
       if (res?.video_url) setGeneratedVideoUrl(res.video_url);
       setVideoMetrics(generateVideoMetrics());
-      setGenStatus('ready');
+      setMainGenStatus('ready');
       if (user && formData.name?.trim()) trackAvatar(user.uid, formData.name.trim());
     } catch (e: any) {
-      setGenError(e?.message ?? 'Failed to send to backend');
-      setGenStatus('error');
+      setMainGenError(e?.message ?? 'Failed to send to backend');
+      setMainGenStatus('error');
     }
   };
 
-  // ── New function for "Generate with Other Model" button ──
-  // Calls /clone endpoint with photo, voice, text/script same as main generate
+  // ── "Generate with Other Model" button ──
   const handleGenerateOtherModel = async () => {
-    setGenError(null);
-    setGeneratedVideoUrl(null);
+    setOtherGenError(null);
+    setGeneratedAudioUrl(null);
     setAudioMetrics(null);
-    setGenStatus('sending');
-    setGenProgress(5);
+    setOtherGenStatus('sending');
 
     const apiUrl = (import.meta as any).env?.VITE_BACKEND_API_URL as string | undefined;
     if (!apiUrl) {
       toast.error('Backend URL not configured');
-      setGenStatus('error');
+      setOtherGenStatus('error');
       return;
     }
 
     try {
-      setGenStatus('processing');
-      setGenProgress(40);
+      setOtherGenStatus('processing');
 
       const asset = await getAvatarAsset();
       if (!asset?.photo || !asset?.voice) {
@@ -1301,23 +1305,27 @@ const CreateAvatar = () => {
       const res = await fetch(endpoint, { method: 'POST', body: fd });
       if (!res.ok) throw new Error(`Backend returned ${res.status}: ${await res.text()}`);
 
-      setGenProgress(100);
       // /api/clone returns a WAV audio file, not JSON
       const blob = await res.blob();
       const clonedAudioUrl = URL.createObjectURL(blob);
       setGeneratedAudioUrl(clonedAudioUrl);
       setAudioMetrics(generateAudioMetrics());
-      setGenStatus('ready');
+      setOtherGenStatus('ready');
       if (user && formData.name?.trim()) trackAvatar(user.uid, formData.name.trim());
     } catch (e: any) {
-      setGenError(e?.message ?? 'Failed to generate with other model');
-      setGenStatus('error');
+      setOtherGenError(e?.message ?? 'Failed to generate with other model');
+      setOtherGenStatus('error');
     }
   };
 
   const renderGenerateStep = () => {
-    const ready = genStatus === 'ready';
-    const busy = genStatus === 'sending' || genStatus === 'processing';
+    // Derived booleans for each model independently
+    const mainReady = mainGenStatus === 'ready';
+    const mainBusy = mainGenStatus === 'sending' || mainGenStatus === 'processing';
+    const otherBusy = otherGenStatus === 'sending' || otherGenStatus === 'processing';
+    // Either model being busy disables both buttons to prevent overlapping calls
+    const anyBusy = mainBusy || otherBusy;
+
     return (
       <div className="max-w-5xl mx-auto animate-fade-in">
         <div className="text-center mb-6">
@@ -1331,7 +1339,7 @@ const CreateAvatar = () => {
           {/* Video preview */}
           <div className="lg:col-span-2 card-simple p-5">
             <div className="aspect-video rounded-lg overflow-hidden relative bg-gradient-to-br from-indigo-900 via-purple-900 to-slate-900 flex items-center justify-center">
-              {ready && generatedVideoUrl ? (
+              {mainReady && generatedVideoUrl ? (
                 <video
                   key={generatedVideoUrl}
                   src={generatedVideoUrl ?? undefined}
@@ -1347,21 +1355,21 @@ const CreateAvatar = () => {
                   <img
                     src={imagePreview ?? avatarPreview}
                     alt="Avatar preview"
-                    className={`w-full h-full object-cover ${busy ? 'opacity-40 blur-sm' : 'opacity-60'}`}
+                    className={`w-full h-full object-cover ${mainBusy ? 'opacity-40 blur-sm' : 'opacity-60'}`}
                   />
                   <div className="absolute inset-0 flex flex-col items-center justify-center text-white">
-                    {busy ? (
+                    {mainBusy ? (
                       <>
                         <Loader2 className="w-12 h-12 animate-spin mb-3" />
                         <p className="text-sm font-medium">
-                          {genStatus === 'sending' ? 'Uploading your assets…' : 'Generating your avatar…'}
+                          {mainGenStatus === 'sending' ? 'Uploading your assets…' : 'Generating your avatar…'}
                         </p>
                         <p className="text-xs opacity-80 mt-1">This usually takes 30–60 seconds</p>
                       </>
-                    ) : genStatus === 'error' ? (
+                    ) : mainGenStatus === 'error' ? (
                       <>
                         <AlertTriangle className="w-12 h-12 mb-3 text-red-300" />
-                        <p className="text-sm font-medium">{genError}</p>
+                        <p className="text-sm font-medium">{mainGenError}</p>
                       </>
                     ) : (
                       <>
@@ -1376,23 +1384,23 @@ const CreateAvatar = () => {
             </div>
 
             {/* Generated-for caption */}
-            {ready && formData.name && (
+            {mainReady && formData.name && (
               <p className="text-center text-sm mt-3 text-foreground">
                 Video Generated for <span className="font-semibold text-primary">"{formData.name}"</span>
               </p>
             )}
 
             {/* Progress */}
-            {busy && (
+            {mainBusy && (
               <div className="mt-4">
                 <div className="h-1.5 rounded-full bg-muted overflow-hidden">
-                  <div className="h-full bg-primary transition-all duration-500" style={{ width: `${genProgress}%` }} />
+                  <div className="h-full bg-primary transition-all duration-500" style={{ width: `${mainGenProgress}%` }} />
                 </div>
-                <p className="text-xs text-muted-foreground mt-1.5 text-center">{genProgress}%</p>
+                <p className="text-xs text-muted-foreground mt-1.5 text-center">{mainGenProgress}%</p>
               </div>
             )}
 
-            {ready && (
+            {mainReady && (
               <div className="mt-4 flex flex-wrap gap-2">
                 <Button
                   variant="outline"
@@ -1407,7 +1415,7 @@ const CreateAvatar = () => {
                 </Button>
                 <Button variant="ghost" size="sm" onClick={() => {
                   if (generatedVideoUrl?.startsWith('blob:')) URL.revokeObjectURL(generatedVideoUrl);
-                  setGenStatus('idle'); setGenProgress(0); setGeneratedVideoUrl(null); setVideoMetrics(null);
+                  setMainGenStatus('idle'); setMainGenProgress(0); setGeneratedVideoUrl(null); setVideoMetrics(null);
                 }}>
                   <RefreshCw className="w-4 h-4 mr-1" /> Regenerate
                 </Button>
@@ -1415,7 +1423,7 @@ const CreateAvatar = () => {
             )}
 
             {/* ── Video accuracy metrics (shown below video player when ready) ── */}
-            {ready && generatedVideoUrl && videoMetrics && (
+            {mainReady && generatedVideoUrl && videoMetrics && (
               <VideoAccuracyPanel metrics={videoMetrics} />
             )}
           </div>
@@ -1456,9 +1464,9 @@ const CreateAvatar = () => {
               <Button
                 className="w-full mb-2"
                 onClick={handleGenerate}
-                disabled={busy || !storageInfo.photo || !storageInfo.voice}
+                disabled={anyBusy || !storageInfo.photo || !storageInfo.voice}
               >
-                {busy ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Working…</> : <><Send className="w-4 h-4 mr-2" /> Generate Video</>}
+                {mainBusy ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Working…</> : <><Send className="w-4 h-4 mr-2" /> Generate Video</>}
               </Button>
 
               <Button
@@ -1466,9 +1474,9 @@ const CreateAvatar = () => {
                 size="sm"
                 className="w-full"
                 onClick={handleGenerateOtherModel}
-                disabled={busy || !storageInfo.photo || !storageInfo.voice}
+                disabled={anyBusy || !storageInfo.photo || !storageInfo.voice}
               >
-                <Sparkles className="w-4 h-4 mr-1.5" /> Generate with Other Model
+                {otherBusy ? <><Loader2 className="w-4 h-4 mr-1.5 animate-spin" /> Working…</> : <><Sparkles className="w-4 h-4 mr-1.5" /> Generate with Other Model</>}
               </Button>
 
               {/* Audio player — shown when /api/clone returns a cloned voice */}
@@ -1498,6 +1506,13 @@ const CreateAvatar = () => {
                 </div>
               )}
 
+              {/* Other model error */}
+              {otherGenStatus === 'error' && otherGenError && (
+                <p className="mt-2 text-xs text-destructive flex items-center gap-1.5">
+                  <AlertTriangle className="w-3 h-3 flex-shrink-0" /> {otherGenError}
+                </p>
+              )}
+
               <Button
                 variant="ghost"
                 size="sm"
@@ -1509,7 +1524,8 @@ const CreateAvatar = () => {
                   setGeneratedAudioUrl(null);
                   setVideoMetrics(null);
                   setAudioMetrics(null);
-                  setGenStatus('idle');
+                  setMainGenStatus('idle');
+                  setOtherGenStatus('idle');
                 }}
               >
                 Clear stored data

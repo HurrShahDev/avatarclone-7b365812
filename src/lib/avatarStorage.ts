@@ -128,6 +128,10 @@ export async function sendAvatarToBackend(apiUrl: string, extraHeaders: Record<s
   // UPDATED: Now points exactly to /generate-from-file or /generate
   const endpoint = useFile ? `${base}/generate-from-file` : `${base}/generate`;
 
+  console.log('useFile:', useFile);
+  console.log('asset.scriptFile:', asset.scriptFile);
+  console.log('asset.meta?.script:', asset.meta?.script);
+
   const fd = new FormData();
   fd.append('face_file', new File([asset.photo], asset.photoName ?? 'photo.png', { type: asset.photoType }));
   fd.append('ref_audio_file', new File([asset.voice], asset.voiceName ?? 'voice.webm', { type: asset.voiceType }));
