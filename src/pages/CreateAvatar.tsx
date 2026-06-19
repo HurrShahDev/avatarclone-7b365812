@@ -1261,7 +1261,7 @@ const CreateAvatar = () => {
     try {
       setMainGenStatus('processing');
       setMainGenProgress(40);
-      const res = await sendAvatarToBackend(apiUrl);
+      const res = await sendAvatarToBackend(apiUrl, { "ngrok-skip-browser-warning": "true"});
       setMainGenProgress(100);
       if (res?.video_url) setGeneratedVideoUrl(res.video_url);
       setVideoMetrics(generateVideoMetrics());
@@ -1295,14 +1295,14 @@ const CreateAvatar = () => {
         throw new Error('Missing photo or voice');
       }
 
-      const base = apiUrl.replace(/\/+$/, '').replace(/\/(generate(-from-file)?|generate_from_text)$/, '');
-      const endpoint = `http://localhost:8001/api/clone`;
+      const voiceUrl = (import.meta as any).env?.VITE_VOICE_BACKEND_URL;
+      const endpoint = `${voiceUrl}/api/clone`;
 
       const fd = new FormData();
       fd.append('audio', new File([asset.voice], asset.voiceName ?? 'voice.webm', { type: asset.voiceType }));
       fd.append('text', asset.meta?.script ?? '');
 
-      const res = await fetch(endpoint, { method: 'POST', body: fd });
+      const res = await fetch(endpoint, { method: 'POST', body: fd , headers: { "ngrok-skip-browser-warning": "true"  } });
       if (!res.ok) throw new Error(`Backend returned ${res.status}: ${await res.text()}`);
 
       // /api/clone returns a WAV audio file, not JSON
