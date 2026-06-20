@@ -78,7 +78,7 @@ export async function fetchHistory(uid: string, avatarName: string): Promise<His
 
   const url = `${base}/history/${encodeURIComponent(avatarName)}?avatar_name=${encodeURIComponent(avatarName)}`;
 
-  const res = await fetch(url);
+  const res = await fetch(url , { headers: {'ngrok-skip-browser-warning': 'true'}});
   if (!res.ok) throw new Error(`Backend ${res.status}: ${await res.text().catch(() => '')}`);
   const data = await res.json();
 
@@ -131,7 +131,7 @@ export async function tryDeleteVideo(uid: string, avatarName: string, filename: 
   ];
   for (const url of candidates) {
     try {
-      const res = await fetch(url, { method: 'DELETE' });
+      const res = await fetch(url, { method: 'DELETE' , headers: { 'ngrok-skip-browser-warning': 'true' } });
       if (res.ok) return true;
     } catch {
       /* try next */
